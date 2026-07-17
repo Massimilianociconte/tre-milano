@@ -15,5 +15,4 @@ supabase/.temp/
 .env
 .env.*
 !.env.example
-!.env.production
 !.env.pipeline.example
