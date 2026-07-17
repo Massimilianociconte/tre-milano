@@ -16,6 +16,14 @@ import { SITE } from '@/config/site';
     </div>
   </section>
   <div style="margin-top: -4.5rem; position: relative; z-index: 3">
+    <noscript>
+      <div class="shell" style="padding: 1.2rem 0 2rem">
+        <div class="explore__empty">
+          <strong>La ricerca interattiva richiede JavaScript.</strong>
+          <p>In alternativa esplora quartieri, guide e categorie: sono pagine complete anche senza script.</p>
+        </div>
+      </div>
+    </noscript>
     <DiscoveryExperience client:load initialQuery="aperitivo elegante" />
   </div>
   <BottomNav />

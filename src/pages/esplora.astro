@@ -22,6 +22,12 @@ import ExploreCatalog from '@/components/explore/ExploreCatalog';
     </div>
   </section>
   <div class="shell" style="padding-bottom: 5rem">
+    <noscript>
+      <div class="explore__empty" style="margin-bottom: 1.5rem">
+        <strong>Il browser del catalogo richiede JavaScript.</strong>
+        <p>Puoi comunque consultare le pagine editoriali di quartieri, guide e categorie dal menu.</p>
+      </div>
+    </noscript>
     <ExploreCatalog client:load />
   </div>
   <BottomNav />
