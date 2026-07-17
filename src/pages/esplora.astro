@@ -1,0 +1,28 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BottomNav from '@/components/layout/BottomNav.astro';
+import ExploreCatalog from '@/components/explore/ExploreCatalog';
+---
+
+<BaseLayout
+  title="Esplora tutti i locali di Milano — TRE Milano"
+  description="Sfoglia il catalogo completo dei locali di Milano: schede verificate dalla redazione e schede importate dalle fonti comunali, sempre distinte e dichiarate."
+  noindex={true}
+>
+  <section class="editorial-hero editorial-hero--compact">
+    <div class="shell">
+      <span class="editorial-eyebrow">Catalogo completo</span>
+      <h1 style="max-width: 760px">Esplora tutta Milano.</h1>
+      <p style="max-width: 640px">
+        Ogni scheda dichiara la propria origine: le selezioni <strong>verificate</strong> dalla
+        redazione convivono con le schede <strong>da verificare</strong> importate
+        dall’anagrafica del Comune di Milano (dati al 31/12/2023). Solo le prime
+        possono entrare nel podio.
+      </p>
+    </div>
+  </section>
+  <div class="shell" style="padding-bottom: 5rem">
+    <ExploreCatalog client:load />
+  </div>
+  <BottomNav />
+</BaseLayout>

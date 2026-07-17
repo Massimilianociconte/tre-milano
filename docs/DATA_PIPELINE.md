@@ -101,3 +101,22 @@ Le API le espongono solo su richiesta esplicita: `GET /api/catalog?include_unver
 le bronze, marcate "Scheda importata · non verificata", con placeholder di categoria
 come visual. Il podio e il ranking restano riservati a Gold/Platinum verificate:
 l'adapter client scarta ogni record senza `verifiedAt`.
+
+### Quartieri e revisione progressiva (17 luglio 2026, secondo round)
+
+- `20260717170000_nil_neighborhood_backfill.sql`: le 22 zone editoriali sono ora
+  tutte nel database con alias che coprono le etichette NIL comunali; backfill
+  eseguito → 4.142 sedi con quartiere assegnato, 3.395 NIL periferici restano
+  volutamente senza zona editoriale (il client mostra "Milano").
+- `20260717173000_explore_review_workflow.sql` + `scripts/data-review-venue.mjs`:
+  revisione umana bronze → silver (`verify-silver`, con correzioni opzionali di
+  nome, categoria e quartiere) oppure `unpublish`. Ogni azione richiede un
+  revisore dichiarato e viene tracciata in `venue_update_history`. La
+  promozione Gold e l'idoneità al podio restano nel workflow editoriale
+  ufficiale.
+- Pagina pubblica `/esplora/`: browser del catalogo completo con filtri per
+  testo, categoria e quartiere, badge "Verificato" / "Da verificare · fonte
+  2023" e paginazione keyset via `/api/catalog?include_unverified=1`.
+- Cost guard DeepSeek: cache in-memory per sessione di pagina delle
+  interpretazioni (stessa query ⇒ una sola chiamata al provider), senza
+  persistere il testo della query, in coerenza con la privacy policy.

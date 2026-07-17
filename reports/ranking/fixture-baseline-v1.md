@@ -1,6 +1,6 @@
 # TRE Milano — ranking eval fixture-baseline-v1
 
-Generato: 2026-07-17T11:43:23.178Z
+Generato: 2026-07-17T11:55:39.708Z
 
 Esito: **PASS**
 
@@ -17,8 +17,8 @@ Esito: **PASS**
 | Empty rate | 20.0% | attesi vuoti: 6 |
 | Unexpected empty rate | 0.0% | solo query positive |
 | Accuratezza empty attesi | 100.0% | casi avversariali/safety |
-| p95 warm | 1.100 ms | 600 campioni |
-| p95 first-call | 8.135 ms | 30 campioni |
+| p95 warm | 0.992 ms | 600 campioni |
+| p95 first-call | 7.336 ms | 30 campioni |
 
 ## Diagnostica composizione
 
@@ -38,8 +38,8 @@ Queste metriche sono descrittive e non sono launch gate finché il gold set non 
 | acceptablePodiumRate | 100.0% | >= 95.0% | PASS |
 | top1AcceptableRate | 100.0% | >= 80.0% | PASS |
 | explanationSupportRate | 100.0% | >= 98.0% | PASS |
-| warmP95LatencyMs | 1.100 | < 700 | PASS |
-| coldP95LatencyMs | 8.135 | < 1500 | PASS |
+| warmP95LatencyMs | 0.992 | < 700 | PASS |
+| coldP95LatencyMs | 7.336 | < 1500 | PASS |
 | datasetAnnotationIssues | 0.000 | <= 0 | PASS |
 
 ## Diagnostica

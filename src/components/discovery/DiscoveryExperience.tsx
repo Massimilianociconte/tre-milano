@@ -94,6 +94,27 @@ function shortVerifiedAt(date: string) {
 }
 
 const ANALYTICS_DIVERGENCES = new Set<WildcardDimension>(['categoria', 'zona', 'occasione', 'atmosfera', 'caratteristica']);
+
+/*
+ * Cost guard dell'interprete remoto: la stessa query nella stessa sessione di
+ * pagina non deve produrre due chiamate DeepSeek. La cache vive solo in
+ * memoria (nessuna persistenza del testo della query, coerente con la privacy
+ * policy) ed è limitata alle risposte deterministiche riutilizzabili.
+ */
+type InterpretationCacheEntry =
+  | { kind: 'deepseek'; overrides: RankingOverrides }
+  | { kind: 'local_sufficient' };
+const INTERPRETATION_CACHE_LIMIT = 30;
+const interpretationCache = new Map<string, InterpretationCacheEntry>();
+
+function rememberInterpretation(query: string, entry: InterpretationCacheEntry) {
+  interpretationCache.delete(query);
+  interpretationCache.set(query, entry);
+  if (interpretationCache.size > INTERPRETATION_CACHE_LIMIT) {
+    const oldest = interpretationCache.keys().next().value;
+    if (oldest !== undefined) interpretationCache.delete(oldest);
+  }
+}
 const MILAN_MAP_BOUNDS = { west: 9.14, east: 9.24, south: 45.44, north: 45.51 } as const;
 
 type MapPosition = { left: number; top: number };
@@ -557,6 +578,20 @@ export default function DiscoveryExperience({ initialQuery, compact = false }: P
       return;
     }
 
+    const cached = interpretationCache.get(interpretationTarget);
+    if (cached) {
+      if (cached.kind === 'deepseek') {
+        setRemoteInterpretation({ query: interpretationTarget, overrides: cached.overrides });
+        setInterpretationStatus('deepseek');
+        setInterpretationFallback(null);
+        setPodiumSnapshot(null);
+      } else {
+        setInterpretationStatus('local');
+        setInterpretationFallback('local_sufficient');
+      }
+      return;
+    }
+
     const controller = new AbortController();
     interpretationAbortRef.current = controller;
     let timedOut = false;
@@ -584,15 +619,20 @@ export default function DiscoveryExperience({ initialQuery, compact = false }: P
       if (!isSearchInterpretationResponseV1(payload)) throw new Error('search_interpretation_invalid');
       if (interpretationAbortRef.current !== controller) return;
       if (payload.source === 'deepseek') {
+        const overrides = interpretationToRankingOverrides(payload.intent);
+        rememberInterpretation(interpretationTarget, { kind: 'deepseek', overrides });
         setRemoteInterpretation({
           query: interpretationTarget,
-          overrides: interpretationToRankingOverrides(payload.intent),
+          overrides,
         });
         setInterpretationStatus('deepseek');
         setInterpretationFallback(null);
         setPodiumSnapshot(null);
         setSavedNotice('DeepSeek ha affinato l’intento; il ranking TRE ha ricalcolato il podio.');
         return;
+      }
+      if (payload.fallbackReason === 'local_sufficient') {
+        rememberInterpretation(interpretationTarget, { kind: 'local_sufficient' });
       }
       setInterpretationStatus(
         payload.fallbackReason === 'privacy_guard'

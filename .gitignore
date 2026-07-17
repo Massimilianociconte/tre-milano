@@ -16,3 +16,9 @@ supabase/.temp/
 .env.*
 !.env.example
 !.env.pipeline.example
+
+# Asset di lavoro locali (mockup e PRD PDF): non necessari al build/deploy.
+TRE_Milano_Strategia_Rivista_SEO_GEO_2026.pdf
+mockup-*.png
+mooadboard.png
+copertina-presentazione-promo.png

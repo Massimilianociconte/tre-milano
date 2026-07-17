@@ -166,5 +166,13 @@
     "lastmod": "2026-07-06",
     "changefreq": "weekly",
     "priority": 0.7
+  },
+  {
+    "path": "/esplora/",
+    "segment": "discovery",
+    "status": "draft",
+    "lastmod": "2026-07-17",
+    "changefreq": "weekly",
+    "priority": 0.6
   }
 ]
