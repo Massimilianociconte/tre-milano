@@ -94,7 +94,7 @@ osservazioni comunali in venue pubbliche **bronze/unverified explore-only**:
 - insegne generiche ("PASTICCERIA", "BAR"…) escluse dalla promozione (`20260717153000`); i 124 record già promossi con nome generico sono stati riportati a draft;
 - ogni scheda promossa dichiara fonte e data del dato ("anagrafica Comune di Milano, dati al 31/12/2023") nella descrizione e resta `recommendation_eligible=false`.
 
-Esito della promozione del 17 luglio 2026: **7.531 venue promosse**, 124 de-pubblicate per insegna generica → **7.407 schede bronze pubbliche** + 6 verificate Gold/Platinum.
+Esito finale del 17 luglio 2026: 7.531 venue promosse; 124 de-pubblicate per insegna generica e 5.743 per etichetta merceologica senza insegna reale (migrazione 20260717190000) → **1.664 schede bronze pubbliche con insegna reale** + 6 verificate Gold/Platinum.
 
 Le API le espongono solo su richiesta esplicita: `GET /api/catalog?include_unverified=1`
 (default invariato: solo verificate). Le schede runtime `/locale/?slug=…` servono anche
