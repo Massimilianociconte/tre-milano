@@ -1,0 +1,14 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BottomNav from '@/components/layout/BottomNav.astro';
+import TasteProfile from '@/components/profile/TasteProfile';
+---
+
+<BaseLayout
+  title="Profilo di gusto — TRE Milano"
+  description="Gestisci preferenze esplicite, locali e reversibili per atmosfera, energia, sperimentazione, socialità e budget."
+  noindex={true}
+>
+  <TasteProfile client:load />
+  <BottomNav />
+</BaseLayout>

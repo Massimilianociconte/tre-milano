@@ -1,0 +1,22 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BottomNav from '@/components/layout/BottomNav.astro';
+import DiscoveryExperience from '@/components/discovery/DiscoveryExperience';
+import { SITE } from '@/config/site';
+---
+
+<BaseLayout title="Cerca la tua top 3 — TRE Milano" description="Descrivi la serata che desideri e prova la ricerca semantica locale di TRE Milano con vincoli per quartiere, budget, distanza e apertura." noindex={true}>
+  <section class="editorial-hero" style="padding-bottom: 6rem">
+    <div class="shell">
+      <span class="editorial-eyebrow">{SITE.preview ? 'Ricerca in anteprima' : 'Ricerca semantica'}</span>
+      <h1 style="max-width: 820px">Dimmi che serata vuoi.</h1>
+      <p>{SITE.preview
+        ? 'La ricerca usa il catalogo verificato quando disponibile e dichiara sempre l’eventuale fallback dimostrativo. Il parser resta locale quando basta; DeepSeek interpreta soltanto le richieste complesse.'
+        : 'Il parser resta locale quando basta; le richieste complesse possono essere interpretate da DeepSeek. Vincoli e ranking operano sempre sulle schede editoriali verificate.'}</p>
+    </div>
+  </section>
+  <div style="margin-top: -4.5rem; position: relative; z-index: 3">
+    <DiscoveryExperience client:load initialQuery="aperitivo elegante" />
+  </div>
+  <BottomNav />
+</BaseLayout>

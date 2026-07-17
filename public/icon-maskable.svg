@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Full-bleed background: no transparent or light corners after OS masking. -->
+  <rect width="512" height="512" fill="#0b1320"/>
+
+  <!-- The complete mark stays inside the maskable safe-zone circle. -->
+  <circle cx="256" cy="256" r="176" fill="none" stroke="#c8a96e" stroke-width="6"/>
+  <circle cx="256" cy="256" r="158" fill="none" stroke="#c8a96e" stroke-opacity=".36" stroke-width="2"/>
+  <path d="M180 190h152M256 190v138M196 328h120" fill="none" stroke="#f7f5f1" stroke-linecap="square" stroke-width="14"/>
+  <path d="M176 256h160" fill="none" stroke="#c8a96e" stroke-width="4"/>
+  <path d="m256 116 11 11-11 11-11-11 11-11Zm0 258 11 11-11 11-11-11 11-11Z" fill="#c8a96e"/>
+</svg>

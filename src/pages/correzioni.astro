@@ -1,0 +1,243 @@
+---
+import EditorialPage from '@/components/editorial/EditorialPage.astro';
+---
+
+<EditorialPage
+  title="Correggere un dato deve essere semplice e tracciabile."
+  metaTitle="Segnalazioni e correzioni — TRE Milano"
+  description="Come segnalare errori, chiusure, conflitti di identità, dati obsoleti o media senza autorizzazione e come TRE Milano verifica le correzioni."
+  eyebrow="Correzioni"
+  answer="Ogni segnalazione crea una proposta di modifica, non una sovrascrittura invisibile. Le modifiche vengono confrontate campo per campo, moderate e registrate in un audit log."
+  related={[
+    { href: '/rivendica-scheda/', title: 'Rivendica una scheda', description: 'Percorso riservato a titolari e rappresentanti autorizzati.' },
+    { href: '/informativa-dati/', title: 'Informativa sui moduli', description: 'Dati, finalità, retention e diritti.' },
+    { href: '/fonti/', title: 'Policy delle fonti', description: 'Criteri applicati alla verifica.' },
+  ]}
+  noindex={true}
+>
+  <h2>Invia una segnalazione verificabile</h2>
+  <p>Usa questo modulo per indicare un dato preciso da controllare. L’invio apre una verifica editoriale: non pubblica contenuti, non sostituisce automaticamente il dato corrente e non modifica il ranking o le raccomandazioni.</p>
+
+  <form
+    class="correction-form"
+    name="tre-correzione"
+    method="POST"
+    action="/correzioni/inviata/"
+    data-netlify="true"
+    netlify-honeypot="bot-field"
+    aria-describedby="correction-form-note"
+  >
+    <input type="hidden" name="form-name" value="tre-correzione" />
+    <p class="correction-form__honeypot" aria-hidden="true">
+      <label>Non compilare questo campo <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+    </p>
+
+    <p id="correction-form-note" class="correction-form__note">
+      Indica solo informazioni utili alla verifica. Non inserire dati sensibili, documenti riservati o accuse personali.
+    </p>
+
+    <div class="correction-form__grid">
+      <label class="correction-form__field correction-form__field--wide">
+        <span>URL o nome della scheda <strong aria-hidden="true">*</strong></span>
+        <input
+          type="text"
+          name="pagina"
+          required
+          maxlength="500"
+          autocomplete="url"
+          placeholder="/locali/nome-scheda/ oppure nome del locale"
+        />
+      </label>
+
+      <label class="correction-form__field correction-form__field--wide">
+        <span>Tipo di correzione <strong aria-hidden="true">*</strong></span>
+        <select name="tipo-correzione" required>
+          <option value="" selected disabled>Scegli un ambito</option>
+          <option value="identita">Identità o attività</option>
+          <option value="indirizzo-zona">Indirizzo o zona</option>
+          <option value="orari-stato">Orari, apertura o chiusura</option>
+          <option value="prezzi">Prezzi o fascia di spesa</option>
+          <option value="descrizione-atmosfera">Descrizione o atmosfera</option>
+          <option value="accessibilita-servizi">Accessibilità o servizi</option>
+          <option value="media-diritti">Fotografia o diritti media</option>
+          <option value="altro-verificabile">Altro dato verificabile</option>
+        </select>
+      </label>
+
+      <label class="correction-form__field correction-form__field--wide">
+        <span>Che cosa dobbiamo verificare? <strong aria-hidden="true">*</strong></span>
+        <textarea
+          name="dettaglio"
+          required
+          minlength="20"
+          maxlength="1500"
+          rows="7"
+          placeholder="Descrivi il dato attuale, la correzione proposta e, se possibile, quando hai verificato l’informazione."
+        ></textarea>
+        <small>Da 20 a 1.500 caratteri. Una segnalazione fattuale è più facile da verificare.</small>
+      </label>
+
+      <label class="correction-form__field">
+        <span>Fonte pubblica <em>facoltativa</em></span>
+        <input
+          type="url"
+          name="fonte"
+          maxlength="500"
+          inputmode="url"
+          autocomplete="url"
+          placeholder="https://sito-ufficiale.it/pagina"
+        />
+      </label>
+
+      <label class="correction-form__field">
+        <span>Email per chiarimenti <em>facoltativa</em></span>
+        <input
+          type="email"
+          name="email"
+          maxlength="254"
+          autocomplete="email"
+          placeholder="nome@esempio.it"
+        />
+      </label>
+    </div>
+
+    <label class="correction-form__consent">
+      <input type="checkbox" name="consenso-privacy" value="accetto" required />
+      <span>Confermo di aver letto l’<a href="/informativa-dati/">informativa sui dati dei moduli</a> e la <a href="/privacy/">Privacy Policy</a>, e chiedo che la segnalazione sia gestita. La presa visione non autorizza comunicazioni promozionali.</span>
+    </label>
+
+    <div class="correction-form__actions">
+      <button type="submit">Invia per verifica</button>
+      <small>I campi contrassegnati con * sono obbligatori. L’email è facoltativa.</small>
+    </div>
+  </form>
+
+  <h2>Come viene gestita</h2>
+  <ol>
+    <li>identificazione della scheda e del campo contestato;</li>
+    <li>confronto con fonti pubbliche e con il valore attuale;</li>
+    <li>moderazione e, se necessario, richiesta di un chiarimento;</li>
+    <li>pubblicazione, rifiuto motivato o sospensione della scheda.</li>
+  </ol>
+  <h2>Chiusure e takedown</h2>
+  <p>Chiusure plausibili, conflitti di identità e contestazioni sui diritti delle immagini hanno una corsia prioritaria e possono rendere la scheda non raccomandabile durante la verifica.</p>
+  <p>Se rappresenti l’attività e vuoi gestire più campi, contestare diritti o chiedere la rimozione, usa il flusso <a href="/rivendica-scheda/">Rivendica una scheda</a>. Non inviare documenti o dati riservati nel modulo pubblico.</p>
+</EditorialPage>
+
+<style>
+  .correction-form {
+    margin: 1.6rem 0 3.5rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--gold);
+    box-shadow: var(--shadow-card);
+  }
+
+  .correction-form__honeypot {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .correction-form__note {
+    margin: 0 0 1.25rem;
+    padding: 0 0 1rem;
+    color: var(--muted);
+    border-bottom: 1px solid var(--line);
+    font-size: 0.78rem;
+  }
+
+  .correction-form__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+
+  .correction-form__field {
+    min-width: 0;
+    display: grid;
+    gap: 0.42rem;
+  }
+
+  .correction-form__field--wide { grid-column: 1 / -1; }
+
+  .correction-form__field > span {
+    color: var(--navy);
+    font-size: 0.66rem;
+    font-weight: 650;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .correction-form__field strong { color: var(--gold-ink); }
+  .correction-form__field em { color: var(--muted); font-size: 0.56rem; font-style: normal; letter-spacing: 0.03em; text-transform: none; }
+
+  .correction-form input:not([type='checkbox']),
+  .correction-form select,
+  .correction-form textarea {
+    width: 100%;
+    min-height: 48px;
+    padding: 0.72rem 0.8rem;
+    color: var(--navy);
+    background: var(--ivory);
+    border: 1px solid var(--line);
+    border-radius: 0.55rem;
+    font: inherit;
+    font-size: 0.82rem;
+  }
+
+  .correction-form textarea { min-height: 150px; resize: vertical; line-height: 1.55; }
+  .correction-form input:focus-visible,
+  .correction-form select:focus-visible,
+  .correction-form textarea:focus-visible { border-color: var(--gold-ink); outline: 2px solid color-mix(in srgb, var(--gold) 45%, transparent); outline-offset: 2px; }
+  .correction-form__field small { color: var(--muted); font-size: 0.65rem; line-height: 1.45; }
+
+  .correction-form__consent {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    margin-top: 1.2rem;
+    color: #413e39;
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+
+  .correction-form__consent input { width: 1.1rem; height: 1.1rem; flex: 0 0 1.1rem; margin-top: 0.12rem; accent-color: var(--gold-ink); }
+  .correction-form__consent a { color: var(--gold-ink); font-weight: 600; }
+
+  .correction-form__actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.35rem;
+  }
+
+  .correction-form__actions button {
+    min-height: 48px;
+    padding: 0.5rem 1.2rem;
+    color: var(--ivory);
+    background: var(--navy);
+    border: 1px solid var(--navy);
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .correction-form__actions button:hover { color: var(--navy); background: transparent; }
+  .correction-form__actions small { color: var(--muted); font-size: 0.62rem; }
+
+  @media (max-width: 620px) {
+    .correction-form { margin-inline: -0.15rem; padding: 1rem; }
+    .correction-form__grid { grid-template-columns: 1fr; }
+    .correction-form__field--wide { grid-column: auto; }
+    .correction-form__actions { align-items: stretch; flex-direction: column; }
+    .correction-form__actions button { width: 100%; }
+  }
+</style>

@@ -1,0 +1,89 @@
+---
+import EditorialPage from '@/components/editorial/EditorialPage.astro';
+---
+
+<EditorialPage
+  title="Un dato è utile solo se sappiamo da dove arriva."
+  metaTitle="Fonti, provenienza e freschezza — TRE Milano"
+  description="Policy di TRE Milano per fonti ufficiali, open data, contatti pubblici, immagini, recensioni aggregate, aggiornamento e correzione delle schede."
+  eyebrow="Fiducia"
+  answer="Ogni campo critico deve conservare fonte, licenza o base d’uso, data di osservazione e confidenza. Un import recente non equivale a una verifica recente, e un dato meno affidabile non sovrascrive automaticamente quello migliore."
+  status="Policy editoriale · catalogo reale non ancora acquisito"
+  related={[
+    { href: '/metodologia/', title: 'Metodologia', description: 'Come qualità e vincoli entrano nel ranking.' },
+    { href: '/correzioni/', title: 'Correzioni', description: 'Come contestare o aggiornare un fatto.' },
+    { href: '/rivendica-scheda/', title: 'Rivendica una scheda', description: 'Come proporre dati ufficiali senza comprare ranking.' },
+  ]}
+  faqs={[
+    { question: 'TRE Milano copia recensioni da altre piattaforme?', answer: 'No. Eventuali metriche aggregate devono restare attribuite alla fonte, datate e usate solo quando licenza e condizioni lo consentono; testi e profili dei recensori non vengono ripubblicati senza autorizzazione.' },
+    { question: 'Un titolare può modificare direttamente la scheda?', answer: 'No. Può proporre dati ufficiali attraverso il claim, ma ogni campo conserva provenienza e passa una verifica editoriale.' },
+    { question: 'Come viene trattato un locale chiuso?', answer: 'Una chiusura plausibile può sospendere subito la raccomandabilità. La scheda viene poi verificata, marcata come chiusa o trasferita e rimossa dal ranking; l’eventuale pagina storica dipende dall’utilità e dalla base editoriale.' },
+  ]}
+  noindex={true}
+>
+  <p><strong>Stato:</strong> la policy è pronta per guidare l’acquisizione, ma il catalogo pubblico attuale è una fixture dimostrativa. Nessuna scheda di demo rappresenta un locale reale e nessuna fonte elencata qui è dichiarata come già importata.</p>
+
+  <h2>1. Provenienza per campo</h2>
+  <p>Nome, indirizzo, coordinate, orari, prezzo, accessibilità, contatti, servizi, recensioni e immagini possono provenire da fonti diverse. Ogni valore deve quindi conservare almeno:</p>
+  <ul>
+    <li>URL o identificativo stabile della fonte e soggetto che la pubblica;</li>
+    <li>tipo di fonte, licenza/condizioni e modalità di acquisizione;</li>
+    <li>data di pubblicazione, osservazione e ultimo controllo TRE;</li>
+    <li>valore originale, valore normalizzato e trasformazioni applicate;</li>
+    <li>confidenza, stato di verifica e responsabile della decisione;</li>
+    <li>eventuali conflitti, scadenza e ragione dell’ultima modifica.</li>
+  </ul>
+
+  <h2>2. Ordine di affidabilità</h2>
+  <ol>
+    <li><strong>Fonti istituzionali e registri pubblici</strong>, nel perimetro e con la licenza applicabile.</li>
+    <li><strong>Canali ufficiali dell’attività</strong>: sito, menu, sistema di prenotazione o comunicazione firmata/verificata.</li>
+    <li><strong>Open data e API ufficiali</strong>, conservando versione, licenza e attribuzione.</li>
+    <li><strong>Osservazione editoriale documentata</strong>, con data, autore e ambito.</li>
+    <li><strong>Aggregatori o terze parti autorizzate</strong>, soltanto se condizioni e diritti ne consentono uso e aggiornamento.</li>
+    <li><strong>Segnalazioni</strong>, utili come trigger di verifica ma non come prova sufficiente da sole.</li>
+  </ol>
+  <p>La priorità non è assoluta: per gli orari del giorno il canale ufficiale recente può essere più utile di un dataset istituzionale datato; la decisione deve restare registrata.</p>
+
+  <h2>3. Fonti ammesse e limiti</h2>
+  <ul>
+    <li><strong>Comune di Milano e altri enti:</strong> solo dataset pertinenti, rispettando la licenza indicata nei metadati e l’attribuzione. Il portale comunale specifica che la licenza varia per dataset.</li>
+    <li><strong>API ufficiali:</strong> uso entro quote, scopi, condizioni e campi autorizzati; nessuna condivisione di credenziali.</li>
+    <li><strong>Siti pubblici:</strong> consultazione o acquisizione soltanto se compatibili con legge, termini, `robots.txt`, copyright e diritto sulle banche dati. L’accessibilità tecnica non equivale a licenza di riuso.</li>
+    <li><strong>Contatti professionali pubblici:</strong> raccolti solo se riferiti all’attività e necessari alla scheda; niente arricchimento di profili personali o marketing.</li>
+    <li><strong>Social ufficiali:</strong> link e fatti puntuali verificabili; nessuna copia sistematica di post, follower o media senza permesso.</li>
+  </ul>
+  <p>Fonti dietro login, paywall, CAPTCHA, accesso vietato o con licenza incompatibile non vengono aggirate. I dati ottenuti non possono essere usati oltre lo scopo e la base documentati.</p>
+
+  <h2>4. Recensioni e valutazioni</h2>
+  <p>Ogni valutazione aggregata deve mostrare piattaforma, scala, numero di recensioni e data di osservazione. Metriche provenienti da fonti diverse non vengono fuse come se fossero omogenee. TRE Milano non ripubblica il testo delle recensioni, username o fotografie dei recensori senza una licenza o autorizzazione specifica.</p>
+
+  <h2>5. Immagini, marchi e contenuti</h2>
+  <p>Sono ammesse immagini originali, commissionate, autorizzate o con licenza compatibile, con autore, licenza, fonte, data e prova del diritto conservati nell’asset ledger. Nomi e marchi sono usati solo in modo informativo e non devono suggerire una partnership inesistente.</p>
+  <p>La hero “terrazza con Duomo” pubblicata il 16 luglio 2026 è un asset originale generato con strumento AI e sottoposto a revisione visiva umana per proporzioni, prospettiva e assenza di segni di terzi. Il master di lavoro è conservato nel percorso di generazione Codex e i derivati ottimizzati sono `public/images/hero-milano.jpg` e `.webp`. È un’immagine editoriale rappresentativa: non è una fotografia documentale, non raffigura un locale reale e non prova vista, posizione o servizi di alcuna attività.</p>
+
+  <h2>6. Freschezza e obsolescenza</h2>
+  <p>Le finestre definitive devono essere calibrate sul campo. Come policy iniziale:</p>
+  <ul>
+    <li>stato aperto/chiuso, orari, prenotazione e contatti operativi: controllo entro 30–90 giorni;</li>
+    <li>menu e prezzi: controllo entro 90 giorni e indicazione “da” o stima quando variabili;</li>
+    <li>servizi, accessibilità e spazi: controllo entro 180 giorni o dopo segnalazione;</li>
+    <li>identità, indirizzo e coordinate: controllo annuale e a ogni conflitto;</li>
+    <li>metriche aggregate: data visibile e nessuna permanenza oltre la licenza o utilità prevista.</li>
+  </ul>
+  <p>Un dato scaduto non diventa falso, ma perde priorità e può rendere la scheda non idonea al podio. Dati ad alto impatto come accessibilità, allergeni e apertura richiedono evidenza adeguata; in assenza, TRE Milano dichiara “non verificato”.</p>
+
+  <h2>7. Deduplicazione, chiusure e trasferimenti</h2>
+  <p>L’identità viene confrontata usando nome normalizzato, indirizzo, coordinate, telefono, dominio e identificativi di fonte. I record candidati non vengono uniti automaticamente quando esistono conflitti sostanziali. Un trasferimento crea una nuova cronologia di indirizzo; una chiusura sospende ranking e CTA operative fino alla verifica.</p>
+
+  <h2>8. Correzioni e diritto di replica</h2>
+  <p>Ogni persona può <a href="/correzioni/">segnalare un errore</a>. Titolari e rappresentanti possono <a href="/rivendica-scheda/">rivendicare, aggiornare o chiedere la rimozione</a>. La redazione confronta le evidenze, registra la decisione e offre un canale di chiarimento; una rivendicazione non garantisce pubblicazione né influenza il ranking organico.</p>
+
+  <h2>9. Riferimenti pubblici</h2>
+  <ul>
+    <li><a href="https://dati.comune.milano.it/web/portale-del-dato/governo-dei-dati/licenze" rel="external">Comune di Milano — licenze dei dataset</a>;</li>
+    <li><a href="https://dati.comune.milano.it/web/portale-del-dato/governo-dei-dati" rel="external">Comune di Milano — governo dei dati e API</a>;</li>
+    <li><a href="https://eur-lex.europa.eu/legal-content/IT/TXT/?uri=CELEX:32016L0943" rel="external">Direttiva (UE) 2016/943 sui segreti commerciali</a>;</li>
+    <li><a href="https://eur-lex.europa.eu/legal-content/IT/TXT/?uri=CELEX:31996L0009" rel="external">Direttiva 96/9/CE sulla tutela delle banche dati</a>.</li>
+  </ul>
+</EditorialPage>

@@ -1,0 +1,121 @@
+---
+import EditorialPage from '@/components/editorial/EditorialPage.astro';
+---
+
+<EditorialPage
+  title="Privacy: poche informazioni, finalità leggibili."
+  metaTitle="Informativa privacy — TRE Milano"
+  description="Bozza dell’informativa sul trattamento dei dati di navigazione, ricerca, geolocalizzazione, preferenze e richieste inviate a TRE Milano."
+  eyebrow="Privacy"
+  answer="TRE Milano funziona senza account. Preferiti, profilo di gusto e posizione restano nel browser. Nella preview il catalogo Supabase e l’interprete DeepSeek sono tecnicamente attivi; la claim API con Turnstile non è collegata al modulo pubblico."
+  status="Bozza legale · non approvata per il go-live"
+  related={[
+    { href: '/informativa-dati/', title: 'Informativa sui moduli', description: 'Dati trattati per correzioni, rivendicazioni e reclami.' },
+    { href: '/cookie-policy/', title: 'Cookie e memoria locale', description: 'Inventario degli strumenti tecnici realmente presenti.' },
+    { href: '/termini/', title: 'Termini di utilizzo', description: 'Regole, responsabilità e limiti del servizio.' },
+  ]}
+  faqs={[
+    { question: 'La posizione viene salvata?', answer: 'No. Il codice attuale conserva le coordinate soltanto nella memoria della pagina per stimare distanze; non le inserisce in localStorage, non le include nelle query inviate a DeepSeek e non le registra in analytics.' },
+    { question: 'TRE Milano usa cookie pubblicitari?', answer: 'No. Il codice attuale non installa cookie pubblicitari, di profilazione o analytics remoti. Usa memoria locale e cache tecniche descritte nella Cookie Policy.' },
+    { question: 'Una ricerca può essere inviata a DeepSeek?', answer: 'Sì, soltanto per query complesse e solo quando la relativa chiave server è configurata. Il parser locale resta il percorso predefinito e un filtro impedisce l’invio dei formati personali più evidenti.' },
+  ]}
+  noindex={true}
+>
+  <p><strong>Avvertenza:</strong> questa pagina è una bozza professionale predisposta sul funzionamento osservabile del prodotto al 17 luglio 2026. Prima della promozione, dell’indicizzazione e del go-live sul dominio definitivo devono essere completati i dati del titolare, verificati i contratti con i fornitori e approvati testo, basi giuridiche, retention e trasferimenti da un legale o consulente privacy.</p>
+
+  <h2>1. Titolare del trattamento</h2>
+  <p><strong>[DA COMPLETARE — denominazione o nome del titolare]</strong>, con sede in <strong>[indirizzo completo]</strong>, codice fiscale/P. IVA <strong>[dato]</strong>, contattabile a <strong>[email privacy]</strong> e, se nominato, DPO <strong>[contatto DPO]</strong>.</p>
+  <p>Finché questi dati non sono completati e verificati, la presente informativa resta <code>noindex</code> e non è idonea al go-live pubblico.</p>
+
+  <h2>2. Categorie di dati e modalità effettive</h2>
+  <h3>Navigazione e sicurezza</h3>
+  <p>Il fornitore di hosting e CDN può trattare indirizzo IP, data e ora, URL richiesto, referrer, user agent, esito della richiesta e dati tecnici necessari a consegnare e proteggere il sito. TRE Milano non ha implementato un proprio sistema di analytics remoto.</p>
+
+  <h3>Ricerca e interpretazione semantica</h3>
+  <p>Le query comprese dalla tassonomia TRE sono elaborate localmente. Se una richiesta è complessa, se non contiene indicatori evidenti di dati personali e se l’integrazione è attiva, il testo della query può essere inviato dalla Netlify Function a DeepSeek V4 Flash. Il modello riceve il testo, ma non il catalogo dei locali, preferiti, profilo di gusto, coordinate precise o identificativi applicativi dell’utente.</p>
+  <p>Il codice TRE non registra intenzionalmente la query nei log applicativi o negli eventi analytics. DeepSeek può tuttavia trattare input, dati di rete e log secondo la propria informativa, che dichiara raccolta degli input e trattamento/conservazione nella Repubblica Popolare Cinese. Non inserire nomi, contatti, indirizzi privati, dati sanitari, convinzioni, informazioni su minori o altri dati personali o sensibili nella ricerca.</p>
+
+  <h3>Geolocalizzazione foreground</h3>
+  <p>La posizione viene richiesta dal browser soltanto dopo la selezione del relativo comando. La preview usa precisione non elevata (<code>enableHighAccuracy: false</code>), verifica che la posizione sia nell’area di Milano e la conserva solo nello stato in memoria della pagina per stimare distanze lineari. Non viene salvata nel browser, trasmessa alle API TRE o inoltrata a DeepSeek. Negare il permesso non impedisce la ricerca: resta disponibile l’origine predefinita Duomo.</p>
+
+  <h3>Preferiti, profilo e continuità della sessione</h3>
+  <ul>
+    <li><strong>Preferiti:</strong> identificativi dei locali salvati in <code>localStorage</code> fino alla rimozione dell’utente o alla cancellazione dei dati del browser.</li>
+    <li><strong>Profilo di gusto:</strong> preferenze dichiarate e salvate esclusivamente in <code>localStorage</code>; sono consultabili, modificabili ed eliminabili dalla pagina Profilo.</li>
+    <li><strong>Ultimo podio:</strong> risultato e criteri tecnici conservati localmente con scadenza applicativa di quattro ore.</li>
+    <li><strong>Handoff della ricerca:</strong> query e filtri passano temporaneamente in <code>sessionStorage</code> e vengono rimossi dalla pagina di destinazione dopo la lettura.</li>
+    <li><strong>Sessioni di gruppo:</strong> dati anonimi scelti dagli utenti possono essere codificati nel link condiviso; chi riceve il link può leggerli.</li>
+  </ul>
+  <p>Queste preferenze non vengono sincronizzate con un account o con il database del catalogo.</p>
+
+  <h3>Catalogo Supabase/PostGIS attivo nella preview</h3>
+  <p>Le migrazioni sono applicate a un progetto Supabase remoto in regione UE e le API same-origin alimentano ricerca, podio, mappa e schede con sei locali verificati. Le osservazioni comunali non revisionate restano private e non diventano automaticamente locali pubblici. Se le credenziali server mancano o il database non risponde, le API falliscono in modo esplicito e non sostituiscono silenziosamente il catalogo con dati dimostrativi.</p>
+  <p>Le Netlify Functions possono trattare filtri, area visibile della mappa e, solo quando la funzione corrispondente è usata, un’origine geografica scelta dall’utente. Questi parametri servono a cercare per testo, area e distanza; il codice non li inserisce nelle tabelle del catalogo. Per prevenire abusi, l’indirizzo IP viene trasformato mediante hash con segreto server e conservato in bucket a breve durata. URL e metadati della richiesta possono comunque rientrare nei log tecnici del fornitore.</p>
+  <p>Il database è progettato soprattutto per dati di attività economiche, fonti e provenance. Email o telefoni professionali pubblici possono tuttavia essere dati personali quando riferibili a una persona fisica: devono essere raccolti soltanto da fonti lecite, attribuiti, aggiornati e rimossi o corretti quando prevalgono i diritti dell’interessato.</p>
+
+  <h3>Moduli di correzione e rivendicazione</h3>
+  <p>Quando invii un modulo, Netlify Forms tratta i campi forniti e i metadati tecnici della richiesta per consegnarli alla redazione. Non inviare documenti d’identità, dati giudiziari, dati sanitari o segreti commerciali. Finalità, campi, basi giuridiche e tempi proposti sono descritti nell’<a href="/informativa-dati/">informativa dedicata</a>.</p>
+  <p>È inoltre predisposta, ma non collegata al modulo pubblico e mantenuta fail-closed finché Turnstile non viene configurato, una API claim con Supabase e Cloudflare Turnstile. Prima di sostituire Netlify Forms devono essere aggiornati questa informativa, il registro fornitori e il testo mostrato nel modulo.</p>
+
+  <h2>3. Finalità e basi giuridiche proposte</h2>
+  <ul>
+    <li><strong>Erogazione delle funzioni richieste:</strong> esecuzione di misure precontrattuali o del servizio richiesto, ove applicabile (art. 6.1.b GDPR), oppure legittimo interesse a rendere disponibile un servizio funzionale e sicuro (art. 6.1.f).</li>
+    <li><strong>Sicurezza, prevenzione abusi e difesa:</strong> legittimo interesse del titolare e degli utenti alla sicurezza del servizio (art. 6.1.f), oltre a eventuali obblighi di legge (art. 6.1.c).</li>
+    <li><strong>Correzioni, rivendicazioni e reclami:</strong> gestione della richiesta e verifiche collegate (art. 6.1.b o 6.1.f, da confermare in base al flusso definitivo); obblighi di legge e difesa di diritti ove necessari.</li>
+    <li><strong>Catalogo e contatti professionali pubblici:</strong> interesse legittimo a documentare attività e luoghi di interesse con informazioni utili, aggiornate e verificabili (art. 6.1.f, previa valutazione di bilanciamento), oltre a obblighi legali quando applicabili.</li>
+    <li><strong>Funzioni opzionali non necessarie:</strong> consenso preventivo, libero e revocabile (art. 6.1.a) qualora in futuro vengano attivati analytics non esenti, profilazione, marketing o cookie non tecnici.</li>
+  </ul>
+  <p>La base giuridica non può essere scelta solo nel testo: il titolare deve completare un bilanciamento documentato per il legittimo interesse e configurare i sistemi coerentemente prima del go-live.</p>
+
+  <h2>4. Destinatari e fornitori</h2>
+  <ul>
+    <li><strong>Netlify, Inc. e sub-responsabili:</strong> hosting, CDN, Functions, sicurezza e ricezione dei moduli, da contrattualizzare e censire nel registro fornitori.</li>
+    <li><strong>Supabase, Inc. e sub-responsabili:</strong> database Postgres/PostGIS e API del catalogo attivi nella preview; l’eventuale conservazione delle pratiche claim resta disattivata finché il relativo flusso non viene collegato.</li>
+    <li><strong>Cloudflare, Inc.:</strong> Turnstile per il controllo anti-abuso della futura API claim; non presente nel modulo Netlify Forms attivo.</li>
+    <li><strong>Hangzhou DeepSeek Artificial Intelligence Co., Ltd.:</strong> interpretazione delle query complesse tecnicamente attiva nella preview; trasferimento, accordi applicabili e conformità del caso d’uso devono essere approvati prima della promozione e del go-live.</li>
+    <li><strong>Consulenti e soggetti autorizzati:</strong> esclusivamente quando necessario e vincolati alla riservatezza.</li>
+    <li><strong>Autorità:</strong> nei casi previsti dalla legge o da un ordine legittimo.</li>
+  </ul>
+  <p>Non risultano attivi nel codice provider pubblicitari, social pixel, newsletter, pagamenti o analytics di terze parti.</p>
+
+  <h2>5. Trasferimenti internazionali</h2>
+  <p>Netlify dichiara possibili trattamenti internazionali e l’uso di meccanismi quali Data Privacy Framework e clausole contrattuali standard, secondo il servizio e il destinatario. Per Supabase deve essere selezionata e documentata una regione UE, sottoscritto o archiviato il DPA vigente e verificato l’elenco dei sub-responsabili; la regione primaria non elimina da sola ogni possibile trasferimento legato al servizio. L’eventuale Turnstile richiede verifica del relativo addendum privacy, DPA e trasferimenti.</p>
+  <p>DeepSeek dichiara trattamento e conservazione diretti nella Repubblica Popolare Cinese. L’attivazione tecnica della preview non chiude la verifica: prima di promuovere o indicizzare il servizio il titolare deve approvare ruoli, localizzazione, base del trasferimento ai sensi degli articoli 44 e seguenti GDPR, clausole applicabili, transfer impact assessment, misure supplementari e possibilità effettiva di esercizio dei diritti.</p>
+  <p>L’integrazione non deve essere considerata legalmente pronta per la produzione sulla sola base dell’inserimento della chiave API.</p>
+
+  <h2>6. Conservazione</h2>
+  <p>La seguente è la policy proposta; deve essere resa effettiva con procedure e verifiche prima del go-live:</p>
+  <ul>
+    <li>dati nel browser: fino alla cancellazione dell’utente, salvo ultimo podio (quattro ore) e handoff (singola sessione/lettura);</li>
+    <li>coordinate foreground: sola memoria della pagina, fino a reset, ricarica o chiusura;</li>
+    <li>moduli di correzione: massimo 12 mesi dalla chiusura della verifica;</li>
+    <li>rivendicazioni e contestazioni di diritti: massimo 24 mesi dalla chiusura, salvo controversie o obblighi di legge;</li>
+    <li>futura API claim Supabase: 365 giorni dalla ricezione per impostazione iniziale, configurabili tra 30 e 1.095 giorni; il job giornaliero elimina le pratiche scadute. Il valore definitivo e la gestione delle pratiche ancora aperte devono essere approvati prima dell’attivazione;</li>
+    <li>bucket di rate limiting nel database: scadenza tecnica pari al doppio della finestra applicata; identificatori pseudonimizzati con hash server-side;</li>
+    <li>payload grezzi delle fonti: non conservati salvo autorizzazione esplicita della fonte; se abilitati, periodo per fonte con default tecnico di 30 giorni e cancellazione giornaliera;</li>
+    <li>dati del catalogo e provenance: finché il locale è documentato o la cronologia è necessaria per accuratezza, attribuzione, contestazioni o obblighi, con scadenze di freschezza per i campi operativi;</li>
+    <li>log tecnici e di sicurezza: periodo minimo necessario, da allineare alle impostazioni e al contratto Netlify;</li>
+    <li>query trattate da DeepSeek: secondo condizioni del fornitore; la mancanza di un periodo contrattuale verificato mantiene bloccati promozione, indicizzazione e go-live del flusso remoto.</li>
+  </ul>
+
+  <h2>7. Diritti</h2>
+  <p>Nei casi previsti, puoi chiedere accesso, rettifica, cancellazione, limitazione, portabilità, opposizione e revoca del consenso senza pregiudicare i trattamenti precedenti. Puoi inoltre presentare reclamo al <a href="https://www.garanteprivacy.it/diritti/come-agire-per-tutelare-i-tuoi-dati-personali/reclamo" rel="external">Garante per la protezione dei dati personali</a> o rivolgerti all’autorità giudiziaria.</p>
+  <p>Le richieste al titolare dovranno essere inviate a <strong>[EMAIL PRIVACY DA COMPLETARE]</strong>. Verranno richiesti solo gli elementi proporzionati a verificare identità e legittimazione; non inviare spontaneamente documenti d’identità via modulo pubblico.</p>
+
+  <h2>8. Minori e decisioni automatizzate</h2>
+  <p>Il servizio non è progettato per raccogliere consapevolmente dati di minori. Il ranking suggerisce luoghi ma non produce effetti giuridici o analogamente significativi sull’utente. Il modello remoto interpreta l’intento; non sceglie i locali, non supera i vincoli e non determina il ranking.</p>
+
+  <h2>9. Fonti normative e documentali</h2>
+  <ul>
+    <li><a href="https://eur-lex.europa.eu/legal-content/it/TXT/?uri=CELEX:32016R0679" rel="external">Regolamento (UE) 2016/679</a>;</li>
+    <li><a href="https://www.garanteprivacy.it/web/guest/home/docweb/-/docweb-display/docweb/9677876" rel="external">Linee guida del Garante su cookie e altri strumenti di tracciamento</a>;</li>
+    <li><a href="https://commission.europa.eu/law/law-topic/data-protection/international-dimension-data-protection/rules-international-data-transfers_en" rel="external">Commissione europea: trasferimenti internazionali</a>;</li>
+    <li><a href="https://www.netlify.com/privacy/" rel="external">Privacy Statement Netlify</a> e <a href="https://docs.netlify.com/manage/forms/submissions/" rel="external">gestione dei dati Netlify Forms</a>;</li>
+    <li><a href="https://supabase.com/downloads/docs/Supabase%2BDPA%2B260601.pdf" rel="external">Data Processing Addendum Supabase</a> e <a href="https://supabase.com/docs/guides/platform/regions" rel="external">regioni Supabase</a>;</li>
+    <li><a href="https://www.cloudflare.com/en-in/turnstile-privacy-policy/" rel="external">Turnstile Privacy Addendum</a>;</li>
+    <li><a href="https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html" rel="external">Privacy Policy DeepSeek</a> e <a href="https://cdn.deepseek.com/policies/en-US/deepseek-open-platform-terms-of-service.html" rel="external">Open Platform Terms</a>.</li>
+  </ul>
+
+  <h2>10. Versioni e modifiche</h2>
+  <p>Bozza v0.4 — ultimo aggiornamento 17 luglio 2026. Le modifiche sostanziali dovranno essere comunicate con modalità coerenti con il trattamento e, quando richiesto, sottoposte a nuovo consenso.</p>
+</EditorialPage>

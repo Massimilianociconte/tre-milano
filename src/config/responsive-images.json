@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "assetVersion": "v1",
+  "targetWidths": [480, 768, 1200, 1600],
+  "formats": {
+    "avif": { "quality": 62, "effort": 4 },
+    "webp": { "quality": 80, "effort": 4 }
+  },
+  "images": [
+    {
+      "id": "hero-milano",
+      "source": "/images/hero-milano.jpg",
+      "aliases": ["/images/hero-milano.webp"],
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "id": "galleria-milano",
+      "source": "/images/galleria-milano.jpg",
+      "aliases": ["/images/galleria-milano.webp"],
+      "width": 1600,
+      "height": 1066
+    },
+    {
+      "id": "venue-cocktail",
+      "source": "/images/venue-cocktail.jpg",
+      "aliases": ["/images/venue-cocktail.webp"],
+      "width": 900,
+      "height": 1124
+    },
+    {
+      "id": "venue-navigli",
+      "source": "/images/venue-navigli.jpg",
+      "aliases": ["/images/venue-navigli.webp"],
+      "width": 900,
+      "height": 1124
+    },
+    {
+      "id": "venue-ristorante",
+      "source": "/images/venue-ristorante.jpg",
+      "aliases": ["/images/venue-ristorante.webp"],
+      "width": 900,
+      "height": 1124
+    }
+  ]
+}

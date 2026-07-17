@@ -1,0 +1,65 @@
+---
+import BrandMark from '@/components/brand/BrandMark.astro';
+import { SITE } from '@/config/site';
+---
+
+<footer class="site-footer">
+  <div class="brand-values" aria-label="Valori del progetto">
+    <div class="shell brand-values__inner">
+      {['Selezioni curate', 'Esperienze rilevanti', 'Locale e autentico', 'Elegante e senza eccessi'].map((value) => (
+        <span><i aria-hidden="true"></i>{value}</span>
+      ))}
+    </div>
+  </div>
+  <div class="shell site-footer__inner">
+    <section class="site-footer__identity" aria-label="TRE Milano">
+      <a class="site-footer__brand" href="/" aria-label="TRE Milano, torna alla home">
+        <BrandMark inverse />
+      </a>
+      <p>Tre scelte motivate per decidere meglio, a Milano.</p>
+    </section>
+
+    <aside class="site-footer__status" aria-label={SITE.preview ? 'Informazioni sull’anteprima' : 'Informazioni sui dati'}>
+      <span class="site-footer__status-mark" aria-hidden="true"></span>
+      <div>
+        <p class="site-footer__status-title">{SITE.preview ? 'Anteprima verificabile' : 'Dati mantenuti'}</p>
+        <p class="site-footer__note">
+          {SITE.preview
+            ? 'La ricerca usa il catalogo verificato quando è collegato; le pagine dimostrative restano identificate e noindex.'
+            : 'Ogni scheda pubblica riporta la data dell’ultima verifica e un canale per segnalare correzioni.'}
+        </p>
+      </div>
+    </aside>
+
+    <nav class="site-footer__directory site-footer__directory--discover" aria-labelledby="footer-discover-title">
+      <h2 id="footer-discover-title"><span aria-hidden="true">01</span>Scopri</h2>
+      <ul>
+        <li><a href="/milano/">Milano</a></li>
+        <li><a href="/quartieri/brera/">Quartieri</a></li>
+        <li><a href="/categorie/cocktail-bar/">Categorie</a></li>
+        <li><a href="/occasioni/cena-romantica/">Occasioni</a></li>
+        <li><a href="/gruppo/">Scegli in gruppo</a></li>
+      </ul>
+    </nav>
+
+    <nav class="site-footer__directory site-footer__directory--trust" aria-labelledby="footer-trust-title">
+      <h2 id="footer-trust-title"><span aria-hidden="true">02</span>Metodo e fiducia</h2>
+      <ul>
+        <li><a href="/metodologia/">Come scegliamo</a></li>
+        <li><a href="/fonti/">Fonti e dati</a></li>
+        <li><a href="/redazione/">Redazione</a></li>
+        <li><a href="/correzioni/">Correzioni</a></li>
+        <li><a href="/rivendica-scheda/">Rivendica una scheda</a></li>
+        <li><a href="/privacy/">Privacy</a></li>
+        <li><a href="/cookie-policy/">Cookie</a></li>
+        <li><a href="/termini/">Termini</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="site-footer__legal-band">
+    <div class="shell site-footer__legal">
+      <span>© 2026 TRE Milano · {SITE.preview ? 'concept in verifica' : 'selezioni curate a Milano'}</span>
+      <span>Milano, Italia</span>
+    </div>
+  </div>
+</footer>

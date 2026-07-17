@@ -1,0 +1,71 @@
+---
+type Props = {
+  compact?: boolean;
+  inverse?: boolean;
+};
+
+const { compact = false, inverse = false } = Astro.props;
+---
+
+<span class:list={['brand-mark', { compact, inverse }]} aria-label="TRE Milano">
+  <span class="brand-mark__tre">TRE</span>
+  <span class="brand-mark__milano">MILANO</span>
+  {!compact && <span class="brand-mark__diamond" aria-hidden="true"></span>}
+</span>
+
+<style>
+  .brand-mark {
+    color: var(--navy);
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+    text-decoration: none;
+  }
+
+  .brand-mark.inverse {
+    color: var(--ivory);
+  }
+
+  .brand-mark__tre {
+    font-family: var(--font-display);
+    font-size: 2.35rem;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+  }
+
+  .brand-mark__milano {
+    margin-top: 0.15rem;
+    font-family: var(--font-sans);
+    font-size: 0.55rem;
+    font-weight: 600;
+    letter-spacing: 0.55em;
+    padding-left: 0.55em;
+  }
+
+  .brand-mark__diamond {
+    width: 0.38rem;
+    height: 0.38rem;
+    margin-top: 0.45rem;
+    background: var(--gold);
+    transform: rotate(45deg);
+  }
+
+  .brand-mark.compact .brand-mark__tre {
+    font-size: 1.75rem;
+  }
+
+  .brand-mark.compact .brand-mark__milano {
+    font-size: 0.43rem;
+  }
+
+  @media (max-width: 720px) {
+    .brand-mark__tre {
+      font-size: 2.75rem;
+    }
+
+    .brand-mark__milano {
+      font-size: 0.61rem;
+    }
+  }
+</style>

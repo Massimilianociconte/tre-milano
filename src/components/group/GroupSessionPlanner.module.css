@@ -1,0 +1,761 @@
+.page {
+  min-height: calc(100vh - 78px);
+  padding: clamp(3rem, 7vw, 6.5rem) 24px clamp(7rem, 11vw, 10rem);
+  background:
+    radial-gradient(circle at 82% 2%, rgb(200 169 110 / 11%), transparent 28rem),
+    linear-gradient(180deg, var(--surface) 0, var(--ivory) 42rem);
+}
+
+.hero {
+  width: min(1120px, 100%);
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(300px, 0.6fr);
+  align-items: end;
+  gap: clamp(2rem, 7vw, 7rem);
+  margin: 0 auto clamp(3.5rem, 7vw, 6rem);
+}
+
+.heroCopy h1 {
+  max-width: 800px;
+  margin: 0;
+  color: var(--navy);
+  font-family: var(--font-display);
+  font-size: clamp(2.85rem, 6vw, 5.7rem);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+}
+
+.heroCopy h1 em {
+  color: var(--gold-ink);
+  font-weight: 400;
+}
+
+.heroCopy > p {
+  max-width: 670px;
+  margin: 1.6rem 0 0;
+  color: var(--muted);
+  font-size: clamp(0.9rem, 1.3vw, 1.02rem);
+  line-height: 1.75;
+}
+
+.privacyPromise {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr;
+  gap: 1rem;
+  padding: 1.4rem 0 0;
+  border-top: 1px solid var(--gold);
+}
+
+.privacyPromise > svg {
+  width: 2rem;
+  height: 2rem;
+  color: var(--gold-ink);
+  stroke-width: 1.35;
+}
+
+.privacyPromise strong {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.privacyPromise p {
+  margin: 0.45rem 0 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.65;
+}
+
+.privacyPromise code {
+  padding: 0.06rem 0.25rem;
+  color: var(--navy);
+  background: rgb(200 169 110 / 14%);
+  border-radius: 0.2rem;
+  font-size: 0.72rem;
+}
+
+.workspace {
+  width: min(1120px, 100%);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(330px, 390px);
+  align-items: start;
+  gap: clamp(2rem, 5vw, 5rem);
+  margin-inline: auto;
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-bottom: 1.15rem;
+  border-bottom: 1px solid var(--stone);
+}
+
+.sectionHeading span,
+.resultPanel header span {
+  color: var(--gold-ink);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.sectionHeading h2,
+.resultPanel header h2 {
+  margin: 0.16rem 0 0;
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.sectionHeading > p {
+  margin: 0 0 0.2rem;
+  color: var(--muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.participantList {
+  display: grid;
+}
+
+.participant {
+  padding: 2rem 0 2.25rem;
+  border-bottom: 1px solid var(--stone);
+}
+
+.participantHeader {
+  display: grid;
+  grid-template-columns: 2.75rem 1fr auto;
+  align-items: center;
+  gap: 1rem;
+}
+
+.participantNumber {
+  width: 2.4rem;
+  height: 2.4rem;
+  display: grid;
+  place-items: center;
+  color: var(--gold);
+  background: var(--navy);
+  border: 1px solid var(--gold);
+  transform: rotate(45deg);
+  font-family: var(--font-display);
+  font-size: 1rem;
+}
+
+.participantNumber i {
+  display: block;
+  font-style: normal;
+  transform: rotate(-45deg);
+}
+
+.participantHeader h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.16rem;
+  font-weight: 500;
+}
+
+.participantHeader p {
+  margin: 0.18rem 0 0;
+  color: var(--muted);
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+}
+
+.removeButton,
+.resetButton {
+  min-height: 36px;
+  padding: 0.3rem 0;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  cursor: pointer;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.fieldset {
+  min-width: 0;
+  margin: 1.55rem 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.fieldset legend,
+.preferenceRow label > span,
+.areaPicker > span {
+  margin-bottom: 0.65rem;
+  color: var(--navy);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.choiceGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.choiceGrid button,
+.areaPicker button {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  padding: 0.48rem 0.75rem;
+  color: var(--navy);
+  background: var(--surface);
+  border: 1px solid var(--stone);
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.69rem;
+  font-weight: 500;
+  transition: color 160ms ease, background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.choiceGrid button:hover:not(:disabled),
+.areaPicker button:hover {
+  border-color: var(--gold-ink);
+  transform: translateY(-1px);
+}
+
+.choiceGrid button[aria-pressed='true'],
+.areaPicker button[aria-pressed='true'] {
+  color: var(--surface);
+  background: var(--navy);
+  border-color: var(--navy);
+}
+
+.choiceGrid button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.choiceGrid button span {
+  color: var(--gold);
+  font-size: 0.8rem;
+}
+
+.fieldHint {
+  margin: 0.55rem 0 0;
+  color: var(--muted);
+  font-size: 0.6rem;
+}
+
+.preferenceRow {
+  display: grid;
+  grid-template-columns: 1fr minmax(190px, 240px);
+  align-items: end;
+  gap: 1.5rem;
+  margin-top: 1.4rem;
+}
+
+.preferenceRow label {
+  display: grid;
+}
+
+.preferenceRow label > span {
+  margin: 0;
+}
+
+.preferenceRow small,
+.areaPicker small {
+  display: block;
+  margin-top: 0.22rem;
+  color: var(--muted);
+  font-size: 0.62rem;
+}
+
+.preferenceRow select,
+.hardGrid select,
+.generatedLink input,
+.importPanel input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.65rem 0.8rem;
+  color: var(--navy);
+  background: var(--surface);
+  border: 1px solid var(--stone);
+  border-radius: 0.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+}
+
+.hardFieldset {
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.hardGrid {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.45fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 1.5rem;
+}
+
+.hardGrid > label {
+  display: grid;
+  gap: 0.5rem;
+  color: var(--navy);
+  font-size: 0.63rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.areaPicker > span {
+  display: block;
+  margin: 0;
+}
+
+.areaPicker > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.55rem;
+}
+
+.areaPicker button {
+  min-height: 32px;
+  padding: 0.35rem 0.62rem;
+  font-size: 0.62rem;
+}
+
+.addButton {
+  width: 100%;
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  color: var(--navy);
+  background: transparent;
+  border: 1px dashed var(--taupe);
+  border-radius: 0.65rem;
+  cursor: pointer;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  transition: border-color 160ms ease, background 160ms ease;
+}
+
+.addButton:hover:not(:disabled) {
+  background: rgb(200 169 110 / 6%);
+  border-color: var(--gold-ink);
+}
+
+.addButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.addButton span {
+  color: var(--gold-ink);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+}
+
+.resultColumn {
+  position: sticky;
+  top: 1.5rem;
+}
+
+.resultPanel {
+  padding: clamp(1.5rem, 3.5vw, 2.35rem);
+  color: var(--ivory);
+  background:
+    radial-gradient(circle at 100% 0, rgb(200 169 110 / 14%), transparent 18rem),
+    var(--navy);
+  border: 1px solid rgb(200 169 110 / 55%);
+  border-radius: 1rem;
+  box-shadow: 0 24px 65px rgb(11 19 32 / 18%);
+}
+
+.resultPanel > header {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr;
+  align-items: center;
+  gap: 0.9rem;
+  padding-bottom: 1.3rem;
+  border-bottom: 1px solid rgb(200 169 110 / 28%);
+}
+
+.resultPanel header svg {
+  width: 2rem;
+  height: 2rem;
+  color: var(--gold);
+  stroke-width: 1.25;
+}
+
+.resultPanel header span {
+  color: var(--gold);
+}
+
+.resultPanel header h2 {
+  color: var(--ivory);
+  font-size: 1.45rem;
+}
+
+.hardSummary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1.25rem 0 0;
+}
+
+.hardSummary div {
+  min-width: 0;
+}
+
+.hardSummary dt {
+  color: rgb(247 245 241 / 54%);
+  font-size: 0.56rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.hardSummary dd {
+  margin: 0.3rem 0 0;
+  color: var(--ivory);
+  font-size: 0.74rem;
+  line-height: 1.45;
+}
+
+.conflict {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  color: #ffe8dc;
+  background: rgb(125 45 45 / 30%);
+  border: 1px solid rgb(255 188 155 / 38%);
+  border-radius: 0.6rem;
+}
+
+.conflict strong {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.conflict p {
+  margin: 0.35rem 0 0;
+  color: rgb(255 232 220 / 72%);
+  font-size: 0.67rem;
+  line-height: 1.5;
+}
+
+.ranking {
+  display: grid;
+  gap: 0;
+  margin: 1.35rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.emptyRanking {
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  margin-top: 1.35rem;
+  padding: 1.5rem;
+  text-align: center;
+  border-block: 1px solid rgb(200 169 110 / 28%);
+}
+
+.emptyRanking > span {
+  color: var(--gold);
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  letter-spacing: 0.18em;
+}
+
+.emptyRanking p {
+  max-width: 15rem;
+  margin: 0.65rem 0 0;
+  color: rgb(247 245 241 / 56%);
+  font-size: 0.64rem;
+  line-height: 1.55;
+}
+
+.ranking li {
+  min-height: 70px;
+  display: grid;
+  grid-template-columns: 2.2rem 1fr;
+  align-items: center;
+  gap: 0.8rem;
+  border-top: 1px solid rgb(247 245 241 / 12%);
+}
+
+.ranking li:first-child {
+  border-top-color: rgb(200 169 110 / 45%);
+}
+
+.rankNumber {
+  color: var(--gold);
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+}
+
+.ranking li > div {
+  min-width: 0;
+  display: grid;
+  gap: 0.18rem;
+}
+
+.ranking strong {
+  color: var(--ivory);
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+.ranking li > div span {
+  color: rgb(247 245 241 / 52%);
+  font-size: 0.58rem;
+  line-height: 1.4;
+}
+
+.methodNote {
+  margin: 1rem 0 0;
+  color: rgb(247 245 241 / 56%);
+  font-size: 0.62rem;
+  line-height: 1.55;
+}
+
+.shareActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+  margin-top: 1.5rem;
+}
+
+.shareActions button,
+.importPanel button {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.6rem 0.75rem;
+  color: var(--ivory);
+  background: transparent;
+  border: 1px solid rgb(247 245 241 / 28%);
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.shareActions .primaryButton {
+  grid-column: 1 / -1;
+  color: var(--navy);
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+.primaryButton svg {
+  width: 1rem;
+  height: 1rem;
+  stroke-width: 1.75;
+}
+
+.generatedLink {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 1rem;
+}
+
+.generatedLink span {
+  color: rgb(247 245 241 / 58%);
+  font-size: 0.57rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.generatedLink input {
+  min-height: 38px;
+  overflow: hidden;
+  color: rgb(247 245 241 / 74%);
+  background: rgb(247 245 241 / 7%);
+  border-color: rgb(247 245 241 / 18%);
+  font-size: 0.59rem;
+  text-overflow: ellipsis;
+}
+
+.status {
+  min-height: 2.4em;
+  margin: 0.8rem 0 0;
+  color: rgb(247 245 241 / 62%);
+  font-size: 0.59rem;
+  line-height: 1.45;
+}
+
+.importPanel {
+  margin-top: 1rem;
+  padding: 1rem 1.2rem;
+  background: var(--surface);
+  border: 1px solid var(--stone);
+  border-radius: 0.75rem;
+}
+
+.importPanel summary {
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+}
+
+.importPanel > div {
+  display: grid;
+  gap: 0.55rem;
+  padding-top: 0.9rem;
+}
+
+.importPanel label {
+  color: var(--muted);
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.importPanel button {
+  color: var(--ivory);
+  background: var(--navy);
+  border-color: var(--navy);
+}
+
+.importPanel button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.resetButton {
+  display: block;
+  margin: 1rem auto 0;
+  color: var(--error);
+}
+
+@media (max-width: 920px) {
+  .hero,
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    align-items: start;
+    gap: 2.25rem;
+  }
+
+  .privacyPromise {
+    max-width: 620px;
+  }
+
+  .resultColumn {
+    position: static;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(270px, 0.55fr);
+    align-items: start;
+    gap: 1rem;
+  }
+
+  .resetButton {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 2.5rem 16px 7.5rem;
+  }
+
+  .hero {
+    margin-bottom: 3.25rem;
+  }
+
+  .heroCopy h1 {
+    font-size: clamp(2.65rem, 13vw, 4rem);
+  }
+
+  .heroCopy h1 br {
+    display: none;
+  }
+
+  .privacyPromise {
+    grid-template-columns: 2rem 1fr;
+  }
+
+  .sectionHeading {
+    align-items: start;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .sectionHeading > p {
+    margin: 0;
+  }
+
+  .participant {
+    padding-block: 1.75rem;
+  }
+
+  .participantHeader {
+    grid-template-columns: 2.5rem 1fr;
+  }
+
+  .removeButton {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .preferenceRow,
+  .hardGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .preferenceRow {
+    gap: 0.6rem;
+  }
+
+  .choiceGrid {
+    gap: 0.4rem;
+  }
+
+  .choiceGrid button {
+    min-height: 42px;
+  }
+
+  .resultColumn {
+    display: block;
+  }
+
+  .importPanel {
+    margin-top: 1rem;
+  }
+
+  .resetButton {
+    margin-top: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .choiceGrid button,
+  .areaPicker button,
+  .addButton {
+    transition: none;
+  }
+}

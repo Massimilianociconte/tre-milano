@@ -1,0 +1,45 @@
+---
+import EditorialPage from '@/components/editorial/EditorialPage.astro';
+---
+
+<EditorialPage
+  title="La redazione di TRE Milano."
+  metaTitle="Redazione, responsabilità e standard — TRE Milano"
+  description="Chi firma i contenuti di TRE Milano, come vengono revisionati e quali controlli separano fatti, stime e giudizi editoriali."
+  eyebrow="Redazione"
+  answer="La Redazione TRE Milano è responsabile di metodo, selezione, provenienza e aggiornamento. Ogni pagina distingue autore, revisione, data e stato del contenuto; nessun placement commerciale modifica il podio organico."
+  status="Struttura editoriale proposta · identità e credenziali da completare"
+  related={[
+    { href: '/metodologia/', title: 'Metodologia', description: 'Vincoli, ranking e indipendenza commerciale.' },
+    { href: '/fonti/', title: 'Fonti e dati', description: 'Provenienza e freschezza campo per campo.' },
+    { href: '/correzioni/', title: 'Correzioni', description: 'Segnalazioni, conflitti e audit delle decisioni.' },
+  ]}
+  faqs={[
+    { question: 'Chi è responsabile dei contenuti?', answer: 'La responsabilità editoriale è attribuita alla Redazione TRE Milano e viene resa visibile su ogni pagina insieme alla data di revisione.' },
+    { question: 'Un locale può comprare una posizione?', answer: 'No. Gli eventuali contenuti commerciali devono vivere in superfici separate, riconoscibili e non modificare il podio organico.' },
+  ]}
+  noindex={true}
+>
+  <p><strong>Stato della pagina:</strong> il modello di responsabilità è definito, ma nomi, ruoli, competenze, contatti e dichiarazioni di conflitto della redazione reale non sono ancora stati forniti. Queste informazioni devono essere completate e verificate prima dell’indicizzazione.</p>
+
+  <h2>Responsabilità leggibile</h2>
+  <p>La firma editoriale non è decorativa: identifica chi decide tassonomia, criteri di ammissione, standard delle fonti e priorità di aggiornamento. Quando una pagina contiene osservazioni, stime o dati dichiarati dal locale, la natura dell’evidenza deve restare distinguibile.</p>
+
+  <h2>Revisione prima della pubblicazione</h2>
+  <ol>
+    <li>controllo dell’identità del luogo e assenza di conflitti;</li>
+    <li>verifica dei campi critici, con fonte e data per ciascun campo;</li>
+    <li>controllo di immagini, licenze e testo originale;</li>
+    <li>verifica dei collegamenti interni e dei dati strutturati visibili;</li>
+    <li>decisione esplicita tra indicizzazione, noindex o sospensione.</li>
+  </ol>
+
+  <h2>Correzioni e conflitti</h2>
+  <p>Una segnalazione non sovrascrive un dato in silenzio. La redazione confronta la nuova evidenza con quella esistente, registra la decisione e può sospendere una scheda dal ranking mentre verifica chiusure, identità o diritti sui media.</p>
+
+  <h2>Trasparenza e conflitti di interesse</h2>
+  <p>Autori e revisori devono dichiarare collaborazioni, omaggi, inviti, rapporti economici o personali pertinenti. Contenuti sponsorizzati, quando previsti, sono etichettati e separati dalle superfici organiche. La redazione conserva facoltà e responsabilità della decisione finale su accuratezza e idoneità.</p>
+
+  <h2>Contatti editoriali</h2>
+  <p>Responsabile editoriale: <strong>[NOME E CREDENZIALI DA COMPLETARE]</strong>. Contatto: <strong>[EMAIL REDAZIONE]</strong>. Per dati personali usa il contatto indicato nella <a href="/privacy/">Privacy Policy</a>; per schede e diritti usa i flussi di <a href="/correzioni/">correzione</a> o <a href="/rivendica-scheda/">rivendicazione</a>.</p>
+</EditorialPage>

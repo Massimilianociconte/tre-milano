@@ -1,0 +1,28 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.4/schema.json",
+  "files": {
+    "includes": [
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "netlify/**/*.ts",
+      "scripts/**/*.mjs",
+      "*.mjs",
+      "*.cjs",
+      "*.ts",
+      "!**/node_modules",
+      "!dist",
+      "!.astro",
+      "!.netlify"
+    ]
+  },
+  "formatter": { "enabled": false },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "none",
+      "correctness": { "preset": "recommended" },
+      "security": { "preset": "recommended" },
+      "suspicious": { "preset": "recommended" }
+    }
+  }
+}

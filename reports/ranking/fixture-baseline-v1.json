@@ -1,0 +1,888 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-17T11:06:36.412Z",
+  "dataset": {
+    "version": "fixture-baseline-v1",
+    "rankingVersion": "deterministic-local-v2",
+    "catalogSnapshot": "fixture-2026-07-16",
+    "catalogMode": "fixture",
+    "referenceDate": "2026-07-16T12:00:00+02:00",
+    "queryCount": 30,
+    "positiveQueryCount": 24,
+    "expectedEmptyQueryCount": 6
+  },
+  "metrics": {
+    "hardViolationRate": 0,
+    "hardViolationCaseCount": 0,
+    "hardViolationResultCount": 0,
+    "acceptablePodiumRate": 1,
+    "top1AcceptableRate": 1,
+    "explanationSupportRate": 1,
+    "podiumDiversityGain": 0.7,
+    "podiumDiversitySampleCount": 5,
+    "wildcardUtilityRate": 1,
+    "wildcardSampleCount": 1,
+    "normalThirdFallbackRate": 0,
+    "normalThirdFallbackCount": 0,
+    "completePodiumCount": 1,
+    "emptyRate": 0.2,
+    "unexpectedEmptyRate": 0,
+    "expectedEmptyAccuracy": 1,
+    "warmP95LatencyMs": 0.946,
+    "coldP95LatencyMs": 4.707,
+    "warmSampleCount": 600
+  },
+  "gates": [
+    {
+      "metric": "hardViolationRate",
+      "actual": 0,
+      "target": 0,
+      "operator": "<=",
+      "passed": true
+    },
+    {
+      "metric": "acceptablePodiumRate",
+      "actual": 1,
+      "target": 0.95,
+      "operator": ">=",
+      "passed": true
+    },
+    {
+      "metric": "top1AcceptableRate",
+      "actual": 1,
+      "target": 0.8,
+      "operator": ">=",
+      "passed": true
+    },
+    {
+      "metric": "explanationSupportRate",
+      "actual": 1,
+      "target": 0.98,
+      "operator": ">=",
+      "passed": true
+    },
+    {
+      "metric": "warmP95LatencyMs",
+      "actual": 0.9458329999999933,
+      "target": 700,
+      "operator": "<",
+      "passed": true
+    },
+    {
+      "metric": "coldP95LatencyMs",
+      "actual": 4.707,
+      "target": 1500,
+      "operator": "<",
+      "passed": true
+    },
+    {
+      "metric": "datasetAnnotationIssues",
+      "actual": 0,
+      "target": 0,
+      "operator": "<=",
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "fixtureBaseline": true,
+  "cases": [
+    {
+      "id": "core-brera-aperitivo",
+      "query": "aperitivo elegante a Brera",
+      "resultIds": [
+        "lume-brera"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 1,
+      "acceptableResultCount": 1,
+      "requiredAcceptableResultCount": 1,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "lume-brera",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 9.839
+    },
+    {
+      "id": "core-navigli-wine",
+      "query": "wine bar ai Navigli con vista canale",
+      "resultIds": [
+        "corte-naviglio"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 1,
+      "acceptableResultCount": 1,
+      "requiredAcceptableResultCount": 1,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "corte-naviglio",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 1.745
+    },
+    {
+      "id": "core-porta-romana-dinner",
+      "query": "cena romantica elegante a Porta Romana",
+      "resultIds": [
+        "sala-nove"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 1,
+      "acceptableResultCount": 1,
+      "requiredAcceptableResultCount": 1,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "sala-nove",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 2.71
+    },
+    {
+      "id": "core-duomo-rooftop",
+      "query": "rooftop con vista Duomo al tramonto",
+      "resultIds": [
+        "quota-ventuno"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 1,
+      "acceptableResultCount": 1,
+      "requiredAcceptableResultCount": 1,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "quota-ventuno",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 1.363
+    },
+    {
+      "id": "core-isola-brunch",
+      "query": "brunch luminoso per lavorare all'Isola",
+      "resultIds": [
+        "dispensa-isola"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 1,
+      "acceptableResultCount": 1,
+      "requiredAcceptableResultCount": 1,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "dispensa-isola",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 2.538
+    },
+    {
+      "id": "core-moscova-after-dinner",
+      "query": "cocktail bar vivace con musica a Moscova dopo cena",
+      "resultIds": [
+        "ombra-moscova"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 1,
+      "acceptableResultCount": 1,
+      "requiredAcceptableResultCount": 1,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "ombra-moscova",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 3.118
+    },
+    {
+      "id": "budget-under-30",
+      "query": "aperitivo sotto 30 euro",
+      "resultIds": [
+        "corte-naviglio"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 1,
+      "acceptableResultCount": 1,
+      "requiredAcceptableResultCount": 1,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "corte-naviglio",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 1.453
+    },
+    {
+      "id": "hard-only-rooftop",
+      "query": "solo rooftop",
+      "resultIds": [
+        "quota-ventuno"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 1,
+      "acceptableResultCount": 1,
+      "requiredAcceptableResultCount": 1,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "quota-ventuno",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 0.582
+    },
+    {
+      "id": "hard-only-restaurant",
+      "query": "solo ristorante",
+      "resultIds": [
+        "sala-nove"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 1,
+      "acceptableResultCount": 1,
+      "requiredAcceptableResultCount": 1,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "sala-nove",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 0.921
+    },
+    {
+      "id": "hard-only-wine-bar",
+      "query": "solo enoteca",
+      "resultIds": [
+        "corte-naviglio"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 1,
+      "acceptableResultCount": 1,
+      "requiredAcceptableResultCount": 1,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "corte-naviglio",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 0.505
+    },
+    {
+      "id": "hard-only-cafe",
+      "query": "solo caffè",
+      "resultIds": [
+        "dispensa-isola"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 1,
+      "acceptableResultCount": 1,
+      "requiredAcceptableResultCount": 1,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "dispensa-isola",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 0.459
+    },
+    {
+      "id": "hard-only-cocktail",
+      "query": "solo cocktail bar",
+      "resultIds": [
+        "lume-brera",
+        "ombra-moscova"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 2,
+      "acceptableResultCount": 2,
+      "requiredAcceptableResultCount": 2,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "lume-brera",
+          "supported": true,
+          "issues": []
+        },
+        {
+          "venueId": "ombra-moscova",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": 0.5,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 0.572
+    },
+    {
+      "id": "occasion-out-of-town",
+      "query": "aperitivo al Duomo per un ospite fuori città",
+      "resultIds": [
+        "quota-ventuno"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 1,
+      "acceptableResultCount": 1,
+      "requiredAcceptableResultCount": 1,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "quota-ventuno",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 1.13
+    },
+    {
+      "id": "occasion-first-date",
+      "query": "primo appuntamento intimo",
+      "resultIds": [
+        "lume-brera",
+        "sala-nove",
+        "corte-naviglio"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 3,
+      "acceptableResultCount": 3,
+      "requiredAcceptableResultCount": 2,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "lume-brera",
+          "supported": true,
+          "issues": []
+        },
+        {
+          "venueId": "sala-nove",
+          "supported": true,
+          "issues": []
+        },
+        {
+          "venueId": "corte-naviglio",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": 1,
+      "thirdSelection": "wildcard",
+      "wildcardUseful": true,
+      "annotationIssues": [],
+      "coldLatencyMs": 1.242
+    },
+    {
+      "id": "occasion-anniversary",
+      "query": "anniversario con alta cucina",
+      "resultIds": [
+        "sala-nove"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 1,
+      "acceptableResultCount": 1,
+      "requiredAcceptableResultCount": 1,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "sala-nove",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 1.264
+    },
+    {
+      "id": "concept-natural-wine",
+      "query": "vino naturale con tavoli all'aperto",
+      "resultIds": [
+        "corte-naviglio"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 1,
+      "acceptableResultCount": 1,
+      "requiredAcceptableResultCount": 1,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "corte-naviglio",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 1.44
+    },
+    {
+      "id": "concept-author-cocktail",
+      "query": "cocktail d'autore in un posto tranquillo",
+      "resultIds": [
+        "lume-brera"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 1,
+      "acceptableResultCount": 1,
+      "requiredAcceptableResultCount": 1,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "lume-brera",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 0.969
+    },
+    {
+      "id": "occasion-late-music",
+      "query": "dopo cena con musica e dj set",
+      "resultIds": [
+        "ombra-moscova"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 1,
+      "acceptableResultCount": 1,
+      "requiredAcceptableResultCount": 1,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "ombra-moscova",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 1.754
+    },
+    {
+      "id": "occasion-breakfast-work",
+      "query": "colazione con laptop e luce naturale",
+      "resultIds": [
+        "dispensa-isola"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 1,
+      "acceptableResultCount": 1,
+      "requiredAcceptableResultCount": 1,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "dispensa-isola",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 2.923
+    },
+    {
+      "id": "concept-iconic-view",
+      "query": "vista sulla città in un posto elegante",
+      "resultIds": [
+        "quota-ventuno"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 1,
+      "acceptableResultCount": 1,
+      "requiredAcceptableResultCount": 1,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "quota-ventuno",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 1.439
+    },
+    {
+      "id": "hard-exclusions",
+      "query": "aperitivo non ai Navigli e senza musica",
+      "resultIds": [
+        "lume-brera",
+        "quota-ventuno"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 2,
+      "acceptableResultCount": 2,
+      "requiredAcceptableResultCount": 2,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "lume-brera",
+          "supported": true,
+          "issues": []
+        },
+        {
+          "venueId": "quota-ventuno",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": 1,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 3.188
+    },
+    {
+      "id": "hard-budget-distance",
+      "query": "budget 40 euro entro 12 minuti",
+      "resultIds": [
+        "lume-brera",
+        "ombra-moscova"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 2,
+      "acceptableResultCount": 2,
+      "requiredAcceptableResultCount": 2,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "lume-brera",
+          "supported": true,
+          "issues": []
+        },
+        {
+          "venueId": "ombra-moscova",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": 0.5,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 0.819
+    },
+    {
+      "id": "temporal-cocktail-2230",
+      "query": "cocktail bar aperto alle 22:30",
+      "resultIds": [
+        "lume-brera",
+        "ombra-moscova"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 2,
+      "acceptableResultCount": 2,
+      "requiredAcceptableResultCount": 2,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "lume-brera",
+          "supported": true,
+          "issues": []
+        },
+        {
+          "venueId": "ombra-moscova",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": 0.5,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 1.019
+    },
+    {
+      "id": "temporal-dinner-tomorrow",
+      "query": "cena domani alle 20",
+      "resultIds": [
+        "sala-nove"
+      ],
+      "expectedEmpty": false,
+      "returnedEmpty": false,
+      "expectedPodiumSize": 1,
+      "acceptableResultCount": 1,
+      "requiredAcceptableResultCount": 1,
+      "acceptablePodium": true,
+      "top1Acceptable": true,
+      "hardViolations": [],
+      "explanationChecks": [
+        {
+          "venueId": "sala-nove",
+          "supported": true,
+          "issues": []
+        }
+      ],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 0.767
+    },
+    {
+      "id": "adversarial-karaoke",
+      "query": "karaoke",
+      "resultIds": [],
+      "expectedEmpty": true,
+      "returnedEmpty": true,
+      "expectedPodiumSize": null,
+      "acceptableResultCount": null,
+      "requiredAcceptableResultCount": null,
+      "acceptablePodium": null,
+      "top1Acceptable": null,
+      "hardViolations": [],
+      "explanationChecks": [],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 4.707
+    },
+    {
+      "id": "adversarial-sushi",
+      "query": "sushi omakase",
+      "resultIds": [],
+      "expectedEmpty": true,
+      "returnedEmpty": true,
+      "expectedPodiumSize": null,
+      "acceptableResultCount": null,
+      "requiredAcceptableResultCount": null,
+      "acceptablePodium": null,
+      "top1Acceptable": null,
+      "hardViolations": [],
+      "explanationChecks": [],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 0.921
+    },
+    {
+      "id": "adversarial-pizzeria",
+      "query": "pizzeria napoletana",
+      "resultIds": [],
+      "expectedEmpty": true,
+      "returnedEmpty": true,
+      "expectedPodiumSize": null,
+      "acceptableResultCount": null,
+      "requiredAcceptableResultCount": null,
+      "acceptablePodium": null,
+      "top1Acceptable": null,
+      "hardViolations": [],
+      "explanationChecks": [],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 1.034
+    },
+    {
+      "id": "safety-gluten-free",
+      "query": "ristorante senza glutine obbligatorio",
+      "resultIds": [],
+      "expectedEmpty": true,
+      "returnedEmpty": true,
+      "expectedPodiumSize": null,
+      "acceptableResultCount": null,
+      "requiredAcceptableResultCount": null,
+      "acceptablePodium": null,
+      "top1Acceptable": null,
+      "hardViolations": [],
+      "explanationChecks": [],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 1.003
+    },
+    {
+      "id": "safety-wheelchair",
+      "query": "cocktail bar accessibile in sedia a rotelle",
+      "resultIds": [],
+      "expectedEmpty": true,
+      "returnedEmpty": true,
+      "expectedPodiumSize": null,
+      "acceptableResultCount": null,
+      "requiredAcceptableResultCount": null,
+      "acceptablePodium": null,
+      "top1Acceptable": null,
+      "hardViolations": [],
+      "explanationChecks": [],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 0.557
+    },
+    {
+      "id": "hard-impossible-budget",
+      "query": "aperitivo massimo 10 euro",
+      "resultIds": [],
+      "expectedEmpty": true,
+      "returnedEmpty": true,
+      "expectedPodiumSize": null,
+      "acceptableResultCount": null,
+      "requiredAcceptableResultCount": null,
+      "acceptablePodium": null,
+      "top1Acceptable": null,
+      "hardViolations": [],
+      "explanationChecks": [],
+      "podiumDiversityGain": null,
+      "thirdSelection": "none",
+      "wildcardUseful": null,
+      "annotationIssues": [],
+      "coldLatencyMs": 0.4
+    }
+  ]
+}

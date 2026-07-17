@@ -1,0 +1,14 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BottomNav from '@/components/layout/BottomNav.astro';
+import CatalogVenueDetail from '@/components/venue/CatalogVenueDetail';
+---
+
+<BaseLayout
+  title="Scheda locale verificata | TRE Milano"
+  description="Scopri informazioni verificate, orari, contatti, servizi e fonti ufficiali di un locale selezionato nel catalogo editoriale di TRE Milano."
+  noindex={true}
+>
+  <CatalogVenueDetail client:load />
+  <BottomNav />
+</BaseLayout>

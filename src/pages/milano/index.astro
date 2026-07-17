@@ -1,0 +1,46 @@
+---
+import EditorialPage from '@/components/editorial/EditorialPage.astro';
+import DiscoveryExperience from '@/components/discovery/DiscoveryExperience';
+import { SITE } from '@/config/site';
+---
+
+<EditorialPage
+  title="Milano, in tre scelte alla volta."
+  metaTitle="Dove andare a Milano — TRE Milano"
+  description="Un city hub editoriale per scegliere tra cocktail bar, ristoranti, rooftop, caffè e quartieri senza trasformare Milano in una lista infinita."
+  eyebrow="City hub"
+  answer="TRE Milano parte da ciò che vuoi fare e restituisce tre alternative con ruoli diversi: miglior coerenza, alternativa sicura e wildcard controllata."
+  variant="city"
+  quickFacts={[
+    { label: 'Perimetro', value: 'Milano e sei cluster' },
+    { label: 'Decisione', value: 'Tre scelte alla volta' },
+    { label: 'Lettura', value: 'Occasione prima della fama' },
+    { label: 'Dati', value: 'Solo schede idonee' },
+  ]}
+  sections={[
+    { id: 'citta', label: 'Una città, non una classifica' },
+    { id: 'motore', label: 'Trova la top 3' },
+    { id: 'cluster', label: 'I cluster di partenza' },
+  ]}
+  asideCta={{
+    href: '/guide/milano-di-sera/',
+    title: 'Leggi Milano per momento',
+    description: 'Aperitivo, cena e dopocena richiedono segnali diversi.',
+    action: 'Apri la guida',
+  }}
+  related={[
+    { href: '/quartieri/brera/', title: 'Brera', description: 'Aperitivi, conversazione e una densità rara di atmosfere.' },
+    { href: '/occasioni/cena-romantica/', title: 'Cena romantica', description: 'Criteri utili quando l’atmosfera conta davvero.' },
+  ]}
+>
+  <h2 id="citta">Una città, non una classifica</h2>
+  <p>Milano cambia molto tra le 18:30 e mezzanotte, tra una cena di lavoro e un appuntamento, tra cinque minuti a piedi e una corsa dall’altra parte della città. Per questo il contesto pesa più della notorietà.</p>
+  <blockquote>Il valore non è avere cento opzioni. È arrivare a una decisione con sufficiente fiducia.</blockquote>
+  <h2 id="motore">{SITE.preview ? 'Prova il motore dimostrativo' : 'Trova la tua top 3'}</h2>
+  <p>{SITE.preview
+    ? 'Le schede qui sotto usano fixture sintetiche e fotografie create per il prototipo. Servono a validare il flusso, non descrivono locali reali.'
+    : 'Descrivi momento, zona, budget e atmosfera: il motore applica prima i vincoli e poi ordina soltanto schede editoriali verificate.'}</p>
+  <DiscoveryExperience client:visible compact initialQuery="aperitivo tranquillo stasera" />
+  <h2 id="cluster">Sei cluster di partenza</h2>
+  <p>Brera/Moscova, Duomo/Quadrilatero, Porta Nuova/Isola, Navigli/Darsena, Porta Romana e Sempione/Arco della Pace formano il primo perimetro editoriale. Una zona entra nella superficie pubblica solo quando il catalogo verificato è sufficientemente denso.</p>
+</EditorialPage>

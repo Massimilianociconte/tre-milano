@@ -1,0 +1,304 @@
+{
+  "schemaVersion": 1,
+  "assetVersion": "v1",
+  "generator": "scripts/generate-responsive-images.mjs",
+  "generatorVersion": 1,
+  "sharpVersion": "0.35.3",
+  "generationFingerprint": "4e5c580552213fc630c4880b7662e57f0abf17cb35271a690e899dd2c4fa1841",
+  "targetWidths": [
+    480,
+    768,
+    1200,
+    1600
+  ],
+  "formats": [
+    "avif",
+    "webp"
+  ],
+  "images": [
+    {
+      "id": "hero-milano",
+      "source": "/images/hero-milano.jpg",
+      "aliases": [
+        "/images/hero-milano.webp"
+      ],
+      "sourceWidth": 1672,
+      "sourceHeight": 941,
+      "sourceSha256": "4375c7e145d4a7a879ee3eb6a53826d5c4c2005f5aa384e6b37763811194bd1b",
+      "variants": [
+        {
+          "format": "avif",
+          "width": 480,
+          "height": 270,
+          "path": "/images/responsive/v1/hero-milano-480.avif",
+          "bytes": 12999,
+          "sha256": "1c181ad1d38669aac5f051279673b01de65c7f70c17631b2f3bc53d408ce060b"
+        },
+        {
+          "format": "webp",
+          "width": 480,
+          "height": 270,
+          "path": "/images/responsive/v1/hero-milano-480.webp",
+          "bytes": 15516,
+          "sha256": "10228868ab4d8a5f62860df6ec15afb2f3ef0092b4a8c5ce6d025c9d743a4988"
+        },
+        {
+          "format": "avif",
+          "width": 768,
+          "height": 432,
+          "path": "/images/responsive/v1/hero-milano-768.avif",
+          "bytes": 29734,
+          "sha256": "4c3fd89459a8e3fa8d5422a887bde1ffb87ef0ffb7d9935837e404371423ad3e"
+        },
+        {
+          "format": "webp",
+          "width": 768,
+          "height": 432,
+          "path": "/images/responsive/v1/hero-milano-768.webp",
+          "bytes": 35432,
+          "sha256": "361486aa860517c2985cd32ce038a76510ad745078ac74f9901d415ca30a0f23"
+        },
+        {
+          "format": "avif",
+          "width": 1200,
+          "height": 675,
+          "path": "/images/responsive/v1/hero-milano-1200.avif",
+          "bytes": 61347,
+          "sha256": "59c8d9a24e6b9ff849236207ad3ccc2093aa1071f6d4a0882113501d4c68f71e"
+        },
+        {
+          "format": "webp",
+          "width": 1200,
+          "height": 675,
+          "path": "/images/responsive/v1/hero-milano-1200.webp",
+          "bytes": 74878,
+          "sha256": "fdb096c37b32956c86560aac2b2cf706ffa77886b8a9a03d0655196a768164db"
+        },
+        {
+          "format": "avif",
+          "width": 1600,
+          "height": 900,
+          "path": "/images/responsive/v1/hero-milano-1600.avif",
+          "bytes": 91424,
+          "sha256": "921a1822befe2398e575113b8d7eb1b014bdaa21b5b3c0c3fb8461dacd7dfcbd"
+        },
+        {
+          "format": "webp",
+          "width": 1600,
+          "height": 900,
+          "path": "/images/responsive/v1/hero-milano-1600.webp",
+          "bytes": 112892,
+          "sha256": "3cba259dc7f21e797c418d3b0b5fc8235bf1aa29c1e1de949d5e64c2b911a9f9"
+        }
+      ]
+    },
+    {
+      "id": "galleria-milano",
+      "source": "/images/galleria-milano.jpg",
+      "aliases": [
+        "/images/galleria-milano.webp"
+      ],
+      "sourceWidth": 1600,
+      "sourceHeight": 1066,
+      "sourceSha256": "3e50a5c99338b38101ca25bd340ac8e22d1457996ff52fac5e65986627d424e2",
+      "variants": [
+        {
+          "format": "avif",
+          "width": 480,
+          "height": 320,
+          "path": "/images/responsive/v1/galleria-milano-480.avif",
+          "bytes": 23126,
+          "sha256": "32447d81e3cb2b0dc34cfedec4f74fff61eed1c2c519a7ebdfd204b3e838af96"
+        },
+        {
+          "format": "webp",
+          "width": 480,
+          "height": 320,
+          "path": "/images/responsive/v1/galleria-milano-480.webp",
+          "bytes": 30044,
+          "sha256": "6bc8fe340c24237cab7bcb7a1db05778ea7ca09b1ed0d35e2fe791d3754d09a4"
+        },
+        {
+          "format": "avif",
+          "width": 768,
+          "height": 512,
+          "path": "/images/responsive/v1/galleria-milano-768.avif",
+          "bytes": 54013,
+          "sha256": "2de806b1187adba482453d6315f18c28c634d067bb2048a31051aab76998b72f"
+        },
+        {
+          "format": "webp",
+          "width": 768,
+          "height": 512,
+          "path": "/images/responsive/v1/galleria-milano-768.webp",
+          "bytes": 68562,
+          "sha256": "7101ded45bdbc8c0a8feeec2ed81a89f13b6561ce06554e11c9f471b34e429fb"
+        },
+        {
+          "format": "avif",
+          "width": 1200,
+          "height": 800,
+          "path": "/images/responsive/v1/galleria-milano-1200.avif",
+          "bytes": 113466,
+          "sha256": "e5bc3aa5076202f341597687f45b0f41e2738db44e39b9194e2a1004959c72bf"
+        },
+        {
+          "format": "webp",
+          "width": 1200,
+          "height": 800,
+          "path": "/images/responsive/v1/galleria-milano-1200.webp",
+          "bytes": 143092,
+          "sha256": "6ddf6b91a42c6c5f48824c096ee1009de2246cfbaa338f9cfe809e30cafa13df"
+        },
+        {
+          "format": "avif",
+          "width": 1600,
+          "height": 1066,
+          "path": "/images/responsive/v1/galleria-milano-1600.avif",
+          "bytes": 175647,
+          "sha256": "87ed0559c302b6e5de79840923e0daac90cefc77308074e2e6253d1b151a3473"
+        },
+        {
+          "format": "webp",
+          "width": 1600,
+          "height": 1066,
+          "path": "/images/responsive/v1/galleria-milano-1600.webp",
+          "bytes": 221352,
+          "sha256": "a75132418f1791332fdebb14e06933376c6877940c6eabc44fb3c2484f767343"
+        }
+      ]
+    },
+    {
+      "id": "venue-cocktail",
+      "source": "/images/venue-cocktail.jpg",
+      "aliases": [
+        "/images/venue-cocktail.webp"
+      ],
+      "sourceWidth": 900,
+      "sourceHeight": 1124,
+      "sourceSha256": "7210f24e4f1338c2126743299ea9b484e6245685fb862ae3dd47cd90b49023c3",
+      "variants": [
+        {
+          "format": "avif",
+          "width": 480,
+          "height": 599,
+          "path": "/images/responsive/v1/venue-cocktail-480.avif",
+          "bytes": 22285,
+          "sha256": "3018b73b0991e503a3b0243083e39da2090c046351f5385c4166738f09f8edc2"
+        },
+        {
+          "format": "webp",
+          "width": 480,
+          "height": 599,
+          "path": "/images/responsive/v1/venue-cocktail-480.webp",
+          "bytes": 26234,
+          "sha256": "a8759589f2b36cf2ff188b276004cdecf25a27e78737ed33cfb7a42454d7ea03"
+        },
+        {
+          "format": "avif",
+          "width": 768,
+          "height": 959,
+          "path": "/images/responsive/v1/venue-cocktail-768.avif",
+          "bytes": 42971,
+          "sha256": "943fb35d67f791654d6a2bdbe225a2918b2dd9204b0d80705817d903a0dedf37"
+        },
+        {
+          "format": "webp",
+          "width": 768,
+          "height": 959,
+          "path": "/images/responsive/v1/venue-cocktail-768.webp",
+          "bytes": 48416,
+          "sha256": "26cd98b6bf486ac96d72e9fb26c6bd9043d679f827d7f83b27277049cfc2848e"
+        }
+      ]
+    },
+    {
+      "id": "venue-navigli",
+      "source": "/images/venue-navigli.jpg",
+      "aliases": [
+        "/images/venue-navigli.webp"
+      ],
+      "sourceWidth": 900,
+      "sourceHeight": 1124,
+      "sourceSha256": "f33bb7847a19dc6440f45048080cb10ba983014a10ffebd445d85fd6cfaaa74f",
+      "variants": [
+        {
+          "format": "avif",
+          "width": 480,
+          "height": 599,
+          "path": "/images/responsive/v1/venue-navigli-480.avif",
+          "bytes": 27758,
+          "sha256": "9c3a1e20fdccbff91ab9c1e69ef10bad9a9e204d56a87e09dd139b81f85d986c"
+        },
+        {
+          "format": "webp",
+          "width": 480,
+          "height": 599,
+          "path": "/images/responsive/v1/venue-navigli-480.webp",
+          "bytes": 32344,
+          "sha256": "00e93344ebe2202ffd5b39a95512cb01310d19ed1ca7cc0cde25f4a3a52cc7cc"
+        },
+        {
+          "format": "avif",
+          "width": 768,
+          "height": 959,
+          "path": "/images/responsive/v1/venue-navigli-768.avif",
+          "bytes": 50869,
+          "sha256": "e07d48de42d87ec8e851da3dd7cc21d8f776872dfede776eb283b2f4ca943a6c"
+        },
+        {
+          "format": "webp",
+          "width": 768,
+          "height": 959,
+          "path": "/images/responsive/v1/venue-navigli-768.webp",
+          "bytes": 59020,
+          "sha256": "b1f63428e481fbcef552806d10fab7010012bfd79a1e2212b9f899829c140bf1"
+        }
+      ]
+    },
+    {
+      "id": "venue-ristorante",
+      "source": "/images/venue-ristorante.jpg",
+      "aliases": [
+        "/images/venue-ristorante.webp"
+      ],
+      "sourceWidth": 900,
+      "sourceHeight": 1124,
+      "sourceSha256": "34ec1a9b628405a77f72549fc689b5d745cbd0739934f8cf16b611a5545b0bb9",
+      "variants": [
+        {
+          "format": "avif",
+          "width": 480,
+          "height": 599,
+          "path": "/images/responsive/v1/venue-ristorante-480.avif",
+          "bytes": 16575,
+          "sha256": "17ba308b2b9fa7e9792420812ed2a8c9253ec997fc989565d6c33c591e44309c"
+        },
+        {
+          "format": "webp",
+          "width": 480,
+          "height": 599,
+          "path": "/images/responsive/v1/venue-ristorante-480.webp",
+          "bytes": 19826,
+          "sha256": "da57bddc8724904dc78af9eb7281ae992f8842bc717e6cee70d17afdca1301b2"
+        },
+        {
+          "format": "avif",
+          "width": 768,
+          "height": 959,
+          "path": "/images/responsive/v1/venue-ristorante-768.avif",
+          "bytes": 30236,
+          "sha256": "a7838c2b282c0d6141e78d45b2e517e9e7ebb14ee984c4d3bb01123e5f7feb63"
+        },
+        {
+          "format": "webp",
+          "width": 768,
+          "height": 959,
+          "path": "/images/responsive/v1/venue-ristorante-768.webp",
+          "bytes": 36198,
+          "sha256": "b29b4dcc1b12d01b4a278da1b3d9206557c528623de1d5e4435c5b2fc0910c83"
+        }
+      ]
+    }
+  ]
+}

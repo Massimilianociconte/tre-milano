@@ -1,0 +1,33 @@
+{
+  "name": "TRE Milano",
+  "short_name": "TRE",
+  "description": "Tre scelte motivate per decidere dove andare a Milano.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f5f1",
+  "theme_color": "#0b1320",
+  "lang": "it-IT",
+  "categories": ["lifestyle", "travel", "food"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Trova la top 3",
+      "short_name": "Cerca",
+      "url": "/cerca/",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Esplora Milano",
+      "short_name": "Milano",
+      "url": "/milano/",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}

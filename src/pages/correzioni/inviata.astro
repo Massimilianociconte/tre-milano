@@ -1,0 +1,102 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BottomNav from '@/components/layout/BottomNav.astro';
+---
+
+<BaseLayout
+  title="Segnalazione ricevuta — TRE Milano"
+  description="Conferma di ricezione della proposta di correzione inviata alla redazione TRE Milano, con indicazioni sui tempi e sul processo di verifica."
+  noindex={true}
+>
+  <section class="correction-success shell" aria-labelledby="correction-success-title">
+    <div class="correction-success__mark" aria-hidden="true">✓</div>
+    <span>Proposta acquisita</span>
+    <h1 id="correction-success-title">Segnalazione ricevuta.</h1>
+    <p>Grazie. L’invio apre una verifica editoriale e non modifica automaticamente la scheda, il ranking o le raccomandazioni. La redazione confronterà il dato con fonti adeguate prima di qualsiasi aggiornamento.</p>
+    <div class="correction-success__actions">
+      <a href="/">Torna alla home</a>
+      <a href="/correzioni/">Invia un’altra segnalazione</a>
+    </div>
+  </section>
+  <BottomNav />
+</BaseLayout>
+
+<style>
+  .correction-success {
+    min-height: min(680px, calc(100vh - 110px));
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: clamp(4rem, 10vw, 8rem);
+    text-align: center;
+  }
+
+  .correction-success__mark {
+    width: 3.5rem;
+    height: 3.5rem;
+    display: grid;
+    place-items: center;
+    color: var(--navy);
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+  }
+
+  .correction-success > span {
+    margin-top: 1.2rem;
+    color: var(--gold-ink);
+    font-size: 0.62rem;
+    font-weight: 650;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .correction-success h1 {
+    margin: 0.55rem 0 1rem;
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 7vw, 5.5rem);
+    font-weight: 400;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  .correction-success p {
+    max-width: 660px;
+    margin: 0;
+    color: var(--muted);
+    font-size: clamp(0.88rem, 1.3vw, 1rem);
+    line-height: 1.7;
+  }
+
+  .correction-success__actions {
+    display: flex;
+    justify-content: center;
+    gap: 0.7rem;
+    margin-top: 1.8rem;
+  }
+
+  .correction-success__actions a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.45rem 1rem;
+    color: var(--navy);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-size: 0.62rem;
+    font-weight: 650;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .correction-success__actions a:first-child { color: var(--ivory); background: var(--navy); border-color: var(--navy); }
+
+  @media (max-width: 520px) {
+    .correction-success { width: calc(100% - 2rem); min-height: calc(100svh - 170px); }
+    .correction-success__actions { width: 100%; flex-direction: column; }
+  }
+</style>

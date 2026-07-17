@@ -1,0 +1,55 @@
+import { readdirSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+import { describe, expect, it } from 'vitest';
+
+const projectRoot = path.resolve(import.meta.dirname, '../..');
+const read = (relativePath: string) => readFileSync(path.join(projectRoot, relativePath), 'utf8');
+
+describe('production deployment security contract', () => {
+  it('does not publish test files as top-level Netlify Functions', () => {
+    const functionEntries = readdirSync(path.join(projectRoot, 'netlify/functions'), { withFileTypes: true })
+      .filter((entry) => entry.isFile())
+      .map((entry) => entry.name);
+
+    expect(functionEntries.filter((name) => /\.(?:test|spec)\.[cm]?[jt]sx?$/.test(name))).toEqual([]);
+  });
+
+  it('keeps every catalog table inside the fail-closed RLS block', () => {
+    const migrationDirectory = path.join(projectRoot, 'supabase/migrations');
+    const migrations = readdirSync(migrationDirectory)
+      .filter((name) => name.endsWith('.sql'))
+      .sort()
+      .map((name) => readFileSync(path.join(migrationDirectory, name), 'utf8'));
+    const allSql = migrations.join('\n');
+    const createdTables = [...allSql.matchAll(/create\s+table\s+public\.([a-z_]+)/gi)]
+      .map((match) => match[1])
+      .sort();
+    const securityMigration = read('supabase/migrations/20260716215042_catalog_api_security.sql');
+    const rlsBlock = securityMigration.match(/Data API is explicitly service-only[\s\S]*?array\[([\s\S]*?)\]\s*loop/i)?.[1] ?? '';
+    const protectedTables = [...rlsBlock.matchAll(/'([a-z_]+)'/g)]
+      .map((match) => match[1])
+      .sort();
+
+    expect(protectedTables).toEqual(createdTables);
+    expect(securityMigration).toContain("revoke all on table public.%I from public, anon, authenticated");
+    expect(securityMigration).toContain("alter table public.%I force row level security");
+  });
+
+  it('keeps modern Supabase credentials server-only and legacy keys out of the Netlify template', () => {
+    for (const template of ['.env.example', '.env.production']) {
+      const source = read(template);
+      expect(source).toMatch(/^SUPABASE_SECRET_KEY=/m);
+      expect(source).not.toMatch(/^PUBLIC_SUPABASE_(?:SECRET|SERVICE_ROLE)_KEY=/m);
+      expect(source).not.toMatch(/^PUBLIC_DEEPSEEK_API_KEY=/m);
+      expect(source).not.toMatch(/^PUBLIC_TURNSTILE_SECRET_KEY=/m);
+    }
+    expect(read('.env.example')).toMatch(/^SUPABASE_SERVICE_ROLE_KEY=/m);
+    expect(read('.env.production')).not.toMatch(/^SUPABASE_SERVICE_ROLE_KEY=/m);
+  });
+
+  it('keeps the tracked Netlify template from injecting a placeholder canonical', () => {
+    const source = read('.env.production');
+    expect(source).toMatch(/^PUBLIC_SITE_URL=$/m);
+    expect(source).not.toMatch(/^PUBLIC_SITE_URL=https?:\/\//m);
+  });
+});

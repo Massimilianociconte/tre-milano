@@ -1,0 +1,134 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BottomNav from '@/components/layout/BottomNav.astro';
+import Breadcrumbs from '@/components/navigation/Breadcrumbs.astro';
+import ResponsiveImage from '@/components/media/ResponsiveImage.astro';
+import VenueActionLayer, { type VerifiedVenueActionLinks } from '@/components/venue/VenueActionLayer';
+import { SITE } from '@/config/site';
+import { venues } from '@/data/venues';
+import { getVenueCatalogStatus, getVerifiedVenuePublicationActions, isVenuePublishable, type Venue } from '@/domain/venue';
+import { createVenueDirectionsUrl } from '@/domain/venue-action-links';
+
+export function getStaticPaths() {
+  return venues.map((venue) => ({ params: { slug: venue.slug }, props: { venue } }));
+}
+
+type Props = { venue: Venue };
+const { venue } = Astro.props;
+const categoryHref = venue.category === 'Cocktail bar' ? '/categorie/cocktail-bar/' : '/milano/';
+const neighborhoodHref = venue.neighborhood === 'Brera' ? '/quartieri/brera/' : '/milano/';
+const publishable = isVenuePublishable(venue);
+const catalogStatus = getVenueCatalogStatus(venue);
+const verifiedActions = getVerifiedVenuePublicationActions(venue);
+const actionLinks: VerifiedVenueActionLinks = {
+  ...(verifiedActions.official ? { official: verifiedActions.official.url } : {}),
+  ...(verifiedActions.menu ? { menu: verifiedActions.menu.url } : {}),
+  ...(verifiedActions.reservation ? { reservation: verifiedActions.reservation.url } : {}),
+  ...(verifiedActions.telephone ? { telephone: verifiedActions.telephone.telephone } : {}),
+  ...(verifiedActions.directions ? { directions: createVenueDirectionsUrl(verifiedActions.directions) } : {}),
+};
+if (SITE.publicIndexing && !venue.fixtureOnly && !publishable) {
+  throw new Error(`Scheda Gold incompleta per ${venue.slug}: aggiungere URL ufficiale e indirizzo verificato prima della pubblicazione.`);
+}
+const canonical = new URL(Astro.url.pathname, SITE.url).toString();
+const verificationDate = new Intl.DateTimeFormat('it-IT', { dateStyle: 'long' }).format(new Date(`${venue.verifiedAt}T12:00:00Z`));
+const breadcrumbSchema = {
+  '@type': 'BreadcrumbList',
+  '@id': `${canonical}#breadcrumb`,
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', SITE.url).toString() },
+    { '@type': 'ListItem', position: 2, name: 'Milano', item: new URL('/milano/', SITE.url).toString() },
+    { '@type': 'ListItem', position: 3, name: venue.neighborhood, item: new URL(neighborhoodHref, SITE.url).toString() },
+    { '@type': 'ListItem', position: 4, name: venue.name, item: canonical },
+  ],
+};
+const localBusinessSchema = publishable ? {
+  '@type': venue.publication.schemaType,
+  '@id': `${canonical}#place`,
+  name: venue.name,
+  url: canonical,
+  sameAs: venue.publication.officialUrl,
+  image: new URL(venue.image, SITE.url).toString(),
+  priceRange: '€'.repeat(venue.priceLevel),
+  address: {
+    '@type': 'PostalAddress',
+    ...venue.publication.address,
+  },
+  ...(venue.publication.telephone ? { telephone: venue.publication.telephone } : {}),
+  ...(venue.publication.openingHours ? { openingHours: venue.publication.openingHours } : {}),
+  ...(venue.publication.geo ? { geo: { '@type': 'GeoCoordinates', ...venue.publication.geo } } : {}),
+} : undefined;
+---
+
+<BaseLayout
+  title={venue.fixtureOnly ? `${venue.name} — scheda demo | TRE Milano` : `${venue.name}, ${venue.neighborhood} — TRE Milano`}
+  description={venue.fixtureOnly
+    ? `Scheda dimostrativa di ${venue.name}, ${venue.category.toLocaleLowerCase('it-IT')} in zona ${venue.neighborhood}: atmosfera, fascia di spesa, distanza, caratteristiche e stato dei dati.`
+    : `${venue.name} a ${venue.neighborhood}, Milano: atmosfera, fascia di spesa, occasioni, caratteristiche e data dell’ultima verifica editoriale.`}
+  image={venue.image}
+  imageAlt={venue.imageAlt}
+  imageWidth={venue.imageWidth}
+  imageHeight={venue.imageHeight}
+  noindex={!publishable}
+  structuredData={localBusinessSchema ? [breadcrumbSchema, localBusinessSchema] : breadcrumbSchema}
+>
+  <article class="venue-passport">
+    <div class="shell">
+      <Breadcrumbs items={[
+        { name: 'Home', href: '/' },
+        { name: 'Milano', href: '/milano/' },
+        { name: venue.neighborhood, href: neighborhoodHref },
+        { name: venue.name },
+      ]} />
+    </div>
+    <div class="shell venue-passport__hero">
+      <div class="venue-passport__media">
+        <ResponsiveImage
+          src={venue.image}
+          alt={venue.imageAlt}
+          width={venue.imageWidth}
+          height={venue.imageHeight}
+          sizes="(max-width: 760px) calc(100vw - 2rem), (max-width: 1260px) 50vw, 600px"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+      <div class="venue-passport__content">
+        <div>
+          <span class="editorial-eyebrow">Venue passport{venue.fixtureOnly ? ' · demo' : ' · verificato'}</span>
+          <h1>{venue.name}</h1>
+          <p class="venue-meta">{venue.category} · {venue.neighborhood} · Livello {venue.maturityTier}</p>
+          <p>{venue.fixtureOnly
+            ? 'Un esempio di scheda orientata alla decisione: fatti, atmosfera, freschezza e limiti vengono distinti invece di imitare una pagina di recensioni.'
+            : 'Una scheda orientata alla decisione: informazioni verificabili, atmosfera, freschezza e limiti sono distinti con chiarezza.'}</p>
+          <div class="venue-facts">
+            <div><span>Spesa stimata</span><strong>€{venue.averageSpend}</strong></div>
+            <div><span>{venue.fixtureOnly ? 'Tempo demo dal Duomo' : 'Ultima verifica'}</span><strong>{venue.fixtureOnly ? `${venue.travelEstimate.minutes} min a piedi` : venue.verifiedAt}</strong></div>
+            <div><span>Confidenza</span><strong>{Math.round(venue.confidence * 100)}%</strong></div>
+          </div>
+          <p><strong>Atmosfera:</strong> {venue.atmosphere.join(', ')}.</p>
+          <p><strong>Fit:</strong> {venue.occasions.join(', ')}.</p>
+          <p><strong>Meno adatto se:</strong> cerchi una scelta fuori fascia di spesa, oltre il tempo massimo o con caratteristiche non verificate.</p>
+          <p><strong>Caratteristiche:</strong> {venue.features.join(', ')}.</p>
+          <p class="venue-verification"><strong>{venue.fixtureOnly ? 'Ultimo controllo fixture' : 'Ultima verifica editoriale'}:</strong> <time datetime={venue.verifiedAt}>{verificationDate}</time>.</p>
+          <VenueActionLayer client:load venueName={venue.name} actions={actionLinks} />
+          <nav class="venue-links" aria-label="Esplora contenuti correlati">
+            <a href={neighborhoodHref}>Guida a {venue.neighborhood}</a>
+            <a href={categoryHref}>{venue.category} a Milano</a>
+            <a href="/guide/milano-di-sera/">Milano di sera</a>
+            <a href="/correzioni/">Segnala una correzione</a>
+          </nav>
+          <div class="demo-warning" data-catalog-status={catalogStatus.value} role="note">
+            <p><strong>Stato catalogo: {catalogStatus.label}.</strong> {catalogStatus.description}</p>
+            {venue.fixtureOnly ? (
+              <p><strong>Dati non operativi.</strong> Nome, orari, prezzo e attributi sono fixture sintetiche. Questa pagina resta noindex e non include JSON-LD LocalBusiness.</p>
+            ) : (
+              <p><strong>Informazioni verificabili.</strong> Controlla sempre disponibilità e condizioni sul sito ufficiale; puoi segnalarci qualsiasi variazione dalla pagina correzioni.</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+  <BottomNav />
+</BaseLayout>

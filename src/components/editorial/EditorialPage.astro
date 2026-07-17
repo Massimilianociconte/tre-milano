@@ -1,0 +1,295 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BottomNav from '@/components/layout/BottomNav.astro';
+import Breadcrumbs from '@/components/navigation/Breadcrumbs.astro';
+import ResponsiveImage from '@/components/media/ResponsiveImage.astro';
+import { SITE } from '@/config/site';
+
+type Related = { href: string; title: string; description: string };
+type Faq = { question: string; answer: string };
+type Breadcrumb = { name: string; href?: string };
+type PageSection = { id: string; label: string };
+type QuickFact = { label: string; value: string };
+type AsideCta = { href: string; title: string; description: string; action: string };
+type Props = {
+  title: string;
+  metaTitle: string;
+  description: string;
+  eyebrow: string;
+  image?: string;
+  imageAlt?: string;
+  answer: string;
+  published?: string;
+  publishedISO?: string;
+  updated?: string;
+  updatedISO?: string;
+  owner?: string;
+  reviewer?: string;
+  status?: string;
+  related?: Related[];
+  faqs?: Faq[];
+  breadcrumbs?: Breadcrumb[];
+  sections?: PageSection[];
+  quickFacts?: QuickFact[];
+  asideCta?: AsideCta;
+  variant?: 'default' | 'district' | 'guide' | 'method' | 'city';
+  noindex?: boolean;
+};
+
+const {
+  title,
+  metaTitle,
+  description,
+  eyebrow,
+  image = '/images/galleria-milano.webp',
+  imageAlt = 'Architettura milanese in luce serale',
+  answer,
+  published = '16 luglio 2026',
+  publishedISO = '2026-07-16',
+  updated = '16 luglio 2026',
+  updatedISO = '2026-07-16',
+  owner = 'Redazione TRE Milano',
+  reviewer = 'Revisione editoriale TRE Milano',
+  status = 'Contenuto editoriale originale · revisione umana',
+  related = [],
+  faqs = [],
+  breadcrumbs,
+  sections = [],
+  quickFacts = [],
+  asideCta,
+  variant = 'default',
+  noindex,
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, SITE.url).toString();
+const organizationId = new URL('/#organization', SITE.url).toString();
+const websiteId = new URL('/#website', SITE.url).toString();
+const sectionParent = ['Quartiere', 'Categoria', 'Occasione', 'Guida editoriale', 'City hub'].includes(eyebrow)
+  ? { name: 'Milano', href: '/milano/' }
+  : undefined;
+const breadcrumbItems = breadcrumbs || [
+  { name: 'Home', href: '/' },
+  ...(sectionParent ? [sectionParent] : []),
+  { name: title },
+];
+const breadcrumbSchema = breadcrumbItems.map((item, index) => ({
+  '@type': 'ListItem',
+  position: index + 1,
+  name: item.name,
+  item: new URL(item.href || Astro.url.pathname, SITE.url).toString(),
+}));
+const imageDimensions = image.includes('/venue-')
+  ? { width: 900, height: 1124 }
+  : image.includes('/hero-')
+    ? { width: 1672, height: 941 }
+    : { width: 1400, height: 933 };
+const socialImage = image.endsWith('.webp') ? image.replace(/\.webp$/, '.jpg') : image;
+const socialImageDimensions = socialImage.includes('/venue-')
+  ? { width: 900, height: 1124 }
+  : socialImage.includes('/hero-')
+    ? { width: 1672, height: 941 }
+    : { width: 1600, height: 1066 };
+const structuredData = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    '@id': `${canonical}#article`,
+    headline: title,
+    description,
+    datePublished: publishedISO,
+    dateModified: updatedISO,
+    author: { '@type': 'Organization', name: owner, url: new URL('/redazione/', SITE.url).toString() },
+    reviewedBy: { '@type': 'Organization', name: reviewer, url: new URL('/redazione/', SITE.url).toString() },
+    publisher: { '@id': organizationId },
+    isPartOf: { '@id': websiteId },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+    image: {
+      '@type': 'ImageObject',
+      url: new URL(image, SITE.url).toString(),
+      width: imageDimensions.width,
+      height: imageDimensions.height,
+      caption: imageAlt,
+    },
+    about: [{ '@type': 'City', name: 'Milano' }, { '@type': 'Thing', name: eyebrow }],
+    inLanguage: SITE.language,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: breadcrumbSchema,
+  },
+  ...(faqs.length ? [{
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+    })),
+  }] : []),
+];
+---
+
+<BaseLayout
+  title={metaTitle}
+  description={description}
+  image={socialImage}
+  imageAlt={imageAlt}
+  imageWidth={socialImageDimensions.width}
+  imageHeight={socialImageDimensions.height}
+  pageType="article"
+  publishedTime={publishedISO}
+  modifiedTime={updatedISO}
+  structuredData={structuredData}
+  noindex={noindex}
+>
+  <article>
+    <header class:list={['editorial-hero', `editorial-hero--${variant}`]}>
+      <div class="shell">
+        <Breadcrumbs items={breadcrumbItems} />
+        <div class="editorial-hero__inner">
+          <div>
+            <span class="editorial-eyebrow">{eyebrow}</span>
+            <h1>{title}</h1>
+            <p>{description}</p>
+          </div>
+          <div class="editorial-hero__image">
+            <ResponsiveImage
+              src={image}
+              alt={imageAlt}
+              width={imageDimensions.width}
+              height={imageDimensions.height}
+              sizes="(max-width: 760px) calc(100vw - 2rem), 42vw"
+              loading="eager"
+              fetchpriority="high"
+            />
+          </div>
+        </div>
+        {quickFacts.length > 0 && (
+          <dl class="editorial-hero__facts" aria-label="Informazioni rapide">
+            {quickFacts.map((fact) => (
+              <div>
+                <dt>{fact.label}</dt>
+                <dd>{fact.value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+      </div>
+    </header>
+
+    <div class="editorial-body">
+      <div class="shell editorial-body__grid">
+        <aside class="editorial-aside" aria-label="Indice e informazioni editoriali">
+          <details class="editorial-aside__panel" open>
+            <summary>Indice e informazioni</summary>
+            <div>
+              {sections.length > 0 && (
+                <nav class="editorial-index" aria-label="Indice della pagina" data-editorial-index>
+                  <span>In questa pagina</span>
+                  <ol>
+                    {sections.map((section, index) => (
+                      <li><a href={`#${section.id}`} aria-current={index === 0 ? 'true' : undefined}>{section.label}</a></li>
+                    ))}
+                  </ol>
+                </nav>
+              )}
+              <div class="editorial-meta">
+                <span>Autore</span>
+                <p><a href="/redazione/">{owner}</a></p>
+                <span>Revisione</span>
+                <p><a href="/redazione/">{reviewer}</a></p>
+                <span>Pubblicato</span>
+                <p><time datetime={publishedISO}>{published}</time></p>
+                <span>Ultimo controllo</span>
+                <p><time datetime={updatedISO}>{updated}</time></p>
+                <span>Stato</span>
+                <p>{status}</p>
+              </div>
+              {asideCta && (
+                <a class="editorial-aside__cta" href={asideCta.href}>
+                  <span>{asideCta.title}</span>
+                  <p>{asideCta.description}</p>
+                  <strong>{asideCta.action} <span aria-hidden="true">→</span></strong>
+                </a>
+              )}
+            </div>
+          </details>
+        </aside>
+
+        <div class="prose">
+          <div class="answer-block">
+            <strong>Risposta in breve</strong>
+            <p>{answer}</p>
+          </div>
+          <slot />
+          {faqs.length > 0 && (
+            <section class="editorial-faq" aria-labelledby="faq-title">
+              <h2 id="faq-title">Domande frequenti</h2>
+              {faqs.map((faq) => (
+                <details>
+                  <summary>{faq.question}</summary>
+                  <p>{faq.answer}</p>
+                </details>
+              ))}
+            </section>
+          )}
+        </div>
+
+        <aside class="editorial-related" aria-label="Approfondimenti correlati">
+          {related.length > 0 && <h2>Continua a esplorare</h2>}
+          {related.map((item) => (
+            <div class="related-card">
+              <a href={item.href}>{item.title}</a>
+              <p>{item.description}</p>
+            </div>
+          ))}
+        </aside>
+      </div>
+    </div>
+  </article>
+  <BottomNav />
+</BaseLayout>
+
+<script>
+  const editorialAsidePanel = document.querySelector<HTMLDetailsElement>('.editorial-aside__panel');
+  const editorialMobile = window.matchMedia('(max-width: 760px)');
+  const syncEditorialAside = () => {
+    if (!editorialAsidePanel) return;
+    if (editorialMobile.matches) editorialAsidePanel.removeAttribute('open');
+    else editorialAsidePanel.setAttribute('open', '');
+  };
+  syncEditorialAside();
+  editorialMobile.addEventListener('change', syncEditorialAside);
+
+  const editorialIndex = document.querySelector<HTMLElement>('[data-editorial-index]');
+  if (editorialIndex) {
+    const indexLinks = Array.from(editorialIndex.querySelectorAll<HTMLAnchorElement>('a[href^="#"]'));
+    const indexedSections = indexLinks
+      .map((link) => document.querySelector<HTMLElement>(link.hash))
+      .filter((section): section is HTMLElement => Boolean(section));
+    const setCurrentSection = (id: string) => {
+      indexLinks.forEach((link) => {
+        if (link.hash === `#${id}`) link.setAttribute('aria-current', 'true');
+        else link.removeAttribute('aria-current');
+      });
+    };
+    let editorialScrollFrame = 0;
+    const updateCurrentSection = () => {
+      editorialScrollFrame = 0;
+      const readingLine = Math.max(150, window.innerHeight * 0.34);
+      const current = indexedSections.reduce((selected, section) => (
+        section.getBoundingClientRect().top <= readingLine ? section : selected
+      ), indexedSections[0]);
+      if (current?.id) setCurrentSection(current.id);
+    };
+    const scheduleCurrentSection = () => {
+      if (editorialScrollFrame) return;
+      editorialScrollFrame = window.requestAnimationFrame(updateCurrentSection);
+    };
+    indexLinks.forEach((link) => link.addEventListener('click', () => setCurrentSection(link.hash.slice(1))));
+    window.addEventListener('scroll', scheduleCurrentSection, { passive: true });
+    window.addEventListener('resize', scheduleCurrentSection, { passive: true });
+    updateCurrentSection();
+  }
+</script>

@@ -1,0 +1,63 @@
+---
+import EditorialPage from '@/components/editorial/EditorialPage.astro';
+---
+
+<EditorialPage
+  title="Informativa per correzioni, claim e reclami."
+  metaTitle="Informativa dati dei moduli — TRE Milano"
+  description="Bozza dell’informativa ex articolo 13 GDPR per i dati inviati nei moduli di correzione, rivendicazione, rimozione e reclamo."
+  eyebrow="Informativa dati"
+  answer="I moduli raccolgono solo i dati necessari a identificare la scheda, verificare la richiesta e ricontattare il richiedente. Non caricare documenti d’identità o dati sensibili: un’eventuale verifica ulteriore avverrà tramite un canale separato e proporzionato."
+  status="Bozza ex art. 13 GDPR · da completare e approvare"
+  related={[
+    { href: '/correzioni/', title: 'Segnala una correzione', description: 'Per errori fattuali e dati obsoleti.' },
+    { href: '/rivendica-scheda/', title: 'Rivendica una scheda', description: 'Per titolari e rappresentanti autorizzati.' },
+    { href: '/privacy/', title: 'Privacy generale', description: 'Navigazione, ricerca e fornitori.' },
+  ]}
+  noindex={true}
+>
+  <p><strong>Bozza non definitiva.</strong> Il titolare deve completare i dati identificativi, approvare basi giuridiche e tempi, sottoscrivere gli accordi con Netlify e attivare una procedura di cancellazione delle submission. Il modulo pubblico usa attualmente Netlify Forms; la API Supabase/Turnstile descritta sotto è soltanto predisposta e non riceve le submission del sito.</p>
+
+  <h2>Titolare e contatti</h2>
+  <p><strong>[TITOLARE, SEDE, P. IVA/C.F., EMAIL PRIVACY E DPO SE NOMINATO — DA COMPLETARE]</strong>.</p>
+
+  <h2>Dati raccolti</h2>
+  <ul>
+    <li>scheda, URL, locale e campo interessato;</li>
+    <li>tipo, contenuto e fonte pubblica della richiesta;</li>
+    <li>nome, ruolo, impresa, sito ufficiale ed email professionale quando necessari per una rivendicazione;</li>
+    <li>dichiarazioni sull’autorità a rappresentare l’attività;</li>
+    <li>metadati tecnici e antispam trattati da Netlify per ricevere e proteggere il modulo;</li>
+    <li>comunicazioni, verifiche e decisioni collegate alla pratica.</li>
+  </ul>
+  <p>Email e dati identificativi sono facoltativi per una semplice correzione, salvo che siano necessari per chiarimenti. Sono necessari per rivendicare una scheda, perché senza di essi non è possibile verificare la legittimazione.</p>
+
+  <h2>Finalità e basi giuridiche proposte</h2>
+  <ul>
+    <li>ricevere e gestire la richiesta, compiere verifiche e rispondere: misure richieste dall’interessato o legittimo interesse alla correttezza del catalogo (art. 6.1.b/f GDPR, da confermare per ciascun flusso);</li>
+    <li>prevenire frodi, impersonificazione e abusi: legittimo interesse (art. 6.1.f);</li>
+    <li>gestire obblighi, contestazioni e difesa di diritti: obbligo legale o legittimo interesse (art. 6.1.c/f);</li>
+    <li>comunicazioni promozionali: non previste e non autorizzate da questi moduli.</li>
+  </ul>
+  <p>La presa visione dell’informativa è obbligatoria, ma non viene presentata come consenso quando il trattamento si fonda sulla gestione della richiesta o sul legittimo interesse.</p>
+
+  <h2>Destinatari e trasferimenti</h2>
+  <p>I dati del flusso pubblico attuale sono accessibili a personale autorizzato e a Netlify quale fornitore di hosting e Forms, oltre a consulenti o autorità quando necessario. Netlify dichiara possibili trasferimenti internazionali e relativi meccanismi di garanzia. I contenuti dei moduli non vengono inviati a DeepSeek.</p>
+  <p>Se la futura API claim verrà attivata e collegata all’interfaccia, Supabase tratterà la pratica nel database e Cloudflare Turnstile tratterà i segnali tecnici necessari al controllo anti-abuso. Prima del cutover devono essere selezionata e documentata una regione Supabase UE, verificati DPA/sub-responsabili/trasferimenti di entrambi i fornitori, pubblicato il riferimento al <a href="https://www.cloudflare.com/en-in/turnstile-privacy-policy/" rel="external">Turnstile Privacy Addendum</a> e aggiornato il modulo.</p>
+
+  <h2>Conservazione proposta</h2>
+  <ul>
+    <li>correzioni ordinarie: massimo 12 mesi dalla chiusura;</li>
+    <li>claim, rimozioni, contestazioni di identità o diritti: massimo 24 mesi dalla chiusura;</li>
+    <li>futura API claim Supabase: default tecnico di 365 giorni dalla ricezione, configurabile tra 30 e 1.095 giorni, con cancellazione giornaliera alla scadenza;</li>
+    <li>pratiche con controversie o obblighi: per il tempo necessario previsto dalla legge o alla difesa.</li>
+  </ul>
+  <p>I limiti del flusso attivo devono essere attuati con una revisione periodica nel pannello Netlify Forms. Prima di usare la futura API occorre anche definire come prorogare, motivare o chiudere una pratica ancora aperta prima della scadenza automatica. L’assenza delle procedure di cancellazione è un blocco operativo.</p>
+
+  <h2>Verifica dell’identità</h2>
+  <p>Il modulo pubblico non accetta file. TRE Milano può chiedere una verifica tramite dominio ufficiale, email aziendale, codice pubblicato sul sito del locale, delega essenziale o altro mezzo proporzionato. Documenti integrali, quando eccezionalmente necessari, devono essere raccolti tramite canale sicuro, con oscuramento dei dati non pertinenti e tempi dedicati.</p>
+
+  <h2>Diritti e reclamo</h2>
+  <p>Puoi esercitare accesso, rettifica, cancellazione, limitazione, portabilità ove applicabile, opposizione e revoca del consenso per i soli trattamenti fondati sul consenso scrivendo a <strong>[EMAIL PRIVACY]</strong>. Resta il diritto di reclamo al <a href="https://www.garanteprivacy.it/diritti/come-agire-per-tutelare-i-tuoi-dati-personali/reclamo" rel="external">Garante per la protezione dei dati personali</a>.</p>
+  <p>Bozza v0.2 — 16 luglio 2026.</p>
+</EditorialPage>

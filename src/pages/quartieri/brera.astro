@@ -1,0 +1,91 @@
+---
+import EditorialPage from '@/components/editorial/EditorialPage.astro';
+---
+
+<EditorialPage
+  title="Brera, quando conta l’atmosfera."
+  metaTitle="Brera: aperitivi e locali per atmosfera — TRE Milano"
+  description="Guida a Brera per scegliere aperitivi e locali in base a occasione, conversazione, budget, atmosfera, prenotazione e tempo a piedi."
+  eyebrow="Quartiere"
+  image="/images/venue-cocktail.webp"
+  imageAlt="Cocktail su una terrazza milanese in luce blu"
+  answer="Brera funziona bene per aperitivi curati, appuntamenti e ospiti fuori città; la scelta cambia soprattutto con rumore, prenotazione e fascia di spesa."
+  variant="district"
+  quickFacts={[
+    { label: 'Vocazione', value: 'Aperitivo e conversazione' },
+    { label: 'Ritmo', value: 'Intenso dalle 18:30' },
+    { label: 'Da verificare', value: 'Rumore e prenotazione' },
+    { label: 'Connessioni', value: 'Lanza · Moscova · Duomo' },
+  ]}
+  sections={[
+    { id: 'carattere', label: 'Il carattere di Brera' },
+    { id: 'mappa-zona', label: 'Mappa e microzone' },
+    { id: 'momenti', label: 'Come cambia la serata' },
+    { id: 'criteri', label: 'Criteri di scelta' },
+    { id: 'stato', label: 'Stato editoriale' },
+  ]}
+  asideCta={{
+    href: '/cerca/',
+    title: 'Trova il tuo Brera',
+    description: 'Descrivi atmosfera, budget e tempo a piedi: il motore restituisce soltanto tre scelte motivate.',
+    action: 'Crea il podio',
+  }}
+  related={[
+    { href: '/categorie/cocktail-bar/', title: 'Cocktail bar', description: 'Una categoria letta attraverso occasione e atmosfera.' },
+    { href: '/metodologia/', title: 'Il nostro metodo', description: 'Come separiamo fatti, preferenze e trade-off.' },
+  ]}
+>
+  <p class="editorial-lead">Brera si percorre in pochi minuti, ma cambia tono quasi a ogni isolato: il valore della scelta sta nel leggere microzona, momento e grado di conversazione possibile.</p>
+
+  <h2 id="carattere">Il carattere di Brera</h2>
+  <p>Le vie più riconoscibili convivono con sale raccolte, cortili, banconi e terrazze. Il quartiere è compatto, ma non uniforme: pochi metri possono cambiare rumore, affollamento e frizione di prenotazione.</p>
+  <div class="editorial-stat-grid" aria-label="Tre chiavi di lettura di Brera">
+    <article><span>01</span><h3>Conversazione</h3><p>Sale, tavoli e musica contano più della sola popolarità quando l’obiettivo è parlare.</p></article>
+    <article><span>02</span><h3>Transizione</h3><p>L’aperitivo può diventare cena: disponibilità e ritmo del servizio vanno letti insieme.</p></article>
+    <article><span>03</span><h3>Friczione</h3><p>La differenza tra spontaneo e prenotato determina quanto una proposta sia davvero utile.</p></article>
+  </div>
+
+  <h2 id="mappa-zona">Una mappa fatta di microzone</h2>
+  <p>La mappa editoriale non sostituisce il routing: serve a visualizzare prossimità e passaggi naturali tra Brera, Moscova, Lanza e il centro storico.</p>
+  <div class="district-map" role="img" aria-label="Mappa editoriale di Brera con collegamenti a Moscova, Lanza e Duomo">
+    <svg viewBox="0 0 700 380" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M-30 88 178 121l171-44 184 61 210-13M26 284l184-66 151 12 168-84 198 58M154-20l23 141 33 97-17 182M352-25l-3 102 12 153 71 179M560-20l-27 158-4 8 62 252" />
+      <path class="district-map__core" d="M228 101 375 79l132 78-72 123-165 11-78-105Z" />
+    </svg>
+    <span class="district-map__label district-map__label--brera">Brera</span>
+    <span class="district-map__label district-map__label--moscova">Moscova</span>
+    <span class="district-map__label district-map__label--lanza">Lanza</span>
+    <span class="district-map__label district-map__label--duomo">Duomo</span>
+    <div class="district-map__legend"><strong>Perimetro editoriale, non amministrativo</strong><small>Le distanze pubblicate richiedono una fonte di routing aggiornata.</small></div>
+  </div>
+
+  <h2 id="momenti">Come cambia la serata</h2>
+  <div class="editorial-gallery" aria-label="Atmosfere utili per leggere Brera">
+    <figure><img src="/images/venue-cocktail.webp" alt="Cocktail in una terrazza milanese al tramonto" width="900" height="1124" loading="lazy" /><figcaption>Aperitivo · vista e ritmo</figcaption></figure>
+    <figure><img src="/images/galleria-milano.webp" alt="Architettura milanese illuminata in una serata quieta" width="1400" height="933" loading="lazy" /><figcaption>Passeggiata · transizione</figcaption></figure>
+    <figure><img src="/images/venue-ristorante.webp" alt="Tavolo raccolto per una cena elegante" width="900" height="1124" loading="lazy" /><figcaption>Cena · conversazione</figcaption></figure>
+  </div>
+  <div class="editorial-table-wrap" role="region" aria-label="Confronto dei momenti della serata a Brera" tabindex="0">
+    <table class="editorial-table">
+      <thead><tr><th>Momento</th><th>Priorità</th><th>Trade-off da dichiarare</th></tr></thead>
+      <tbody>
+        <tr><td>18:00–19:30</td><td>Accesso spontaneo e luce</td><td>Servizio in transizione</td></tr>
+        <tr><td>19:30–22:00</td><td>Prenotazione e conversazione</td><td>Affollamento</td></tr>
+        <tr><td>Dopo le 22:00</td><td>Orario verificato e rientro</td><td>Rumore e tempi a piedi</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="criteri">Criteri che usiamo</h2>
+  <ul>
+    <li>possibilità reale di conversare;</li>
+    <li>distanza a piedi dal punto scelto;</li>
+    <li>fascia di spesa dichiarata come stima;</li>
+    <li>orari e prenotazione con data della verifica;</li>
+    <li>una wildcard che può cambiare atmosfera, non i vincoli duri.</li>
+  </ul>
+  <div class="editorial-callout"><h3>Un quartiere non è un filtro estetico</h3><p>Se il dato non dimostra apertura, prezzo o caratteristica richiesta, la vicinanza a Brera non basta per entrare nel podio.</p></div>
+
+  <h2 id="stato">Stato della pagina</h2>
+  <p>Questo template dimostra la struttura editoriale e l’internal linking. Prima della pubblicazione richiede almeno otto schede Gold, fonti attribuite e immagini autorizzate.</p>
+</EditorialPage>

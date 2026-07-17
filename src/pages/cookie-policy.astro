@@ -1,0 +1,68 @@
+---
+import EditorialPage from '@/components/editorial/EditorialPage.astro';
+---
+
+<EditorialPage
+  title="Cookie e memoria locale, senza zone grigie."
+  metaTitle="Cookie Policy e strumenti tecnici — TRE Milano"
+  description="Bozza della Cookie Policy di TRE Milano: cookie assenti nel codice applicativo, memoria locale tecnica, cache e regole per eventuali strumenti futuri."
+  eyebrow="Cookie Policy"
+  answer="Il codice TRE Milano non installa cookie pubblicitari, di profilazione o analytics. Usa localStorage, sessionStorage e Cache Storage per funzioni richieste dall’utente; nessuna categoria opzionale deve essere attivata senza un sistema di consenso preventivo."
+  status="Bozza legale · inventario tecnico verificato sul codice"
+  related={[
+    { href: '/privacy/', title: 'Privacy Policy', description: 'Trattamenti, fornitori, diritti e trasferimenti.' },
+    { href: '/informativa-dati/', title: 'Informativa sui moduli', description: 'Dati inviati volontariamente alla redazione.' },
+    { href: '/termini/', title: 'Termini di utilizzo', description: 'Condizioni del servizio informativo.' },
+  ]}
+  faqs={[
+    { question: 'Perché non compare un banner cookie?', answer: 'Nell’implementazione attuale non sono attivi cookie o tracciatori opzionali. Se verranno introdotti analytics non esenti, marketing o profilazione, dovranno restare bloccati fino a una scelta dell’utente.' },
+    { question: 'Come elimino preferiti e profilo?', answer: 'Puoi rimuoverli dalle rispettive pagine o cancellare i dati del sito dalle impostazioni del browser.' },
+  ]}
+  noindex={true}
+>
+  <p><strong>Bozza da revisione legale.</strong> L’inventario seguente riflette il codice al 16 luglio 2026. Deve essere ripetuto sul dominio definitivo, includendo eventuali header o strumenti aggiunti da Netlify, DNS, CDN, mappe, immagini, monitoraggio e fornitori configurati dopo il deploy.</p>
+
+  <h2>1. Cosa intendiamo per strumenti di memorizzazione</h2>
+  <p>I cookie sono piccoli dati salvati dal browser. Norme analoghe possono applicarsi anche a tecnologie che scrivono o leggono informazioni sul dispositivo, come localStorage, sessionStorage e identificatori. Per questo TRE Milano documenta anche gli strumenti che non sono cookie.</p>
+
+  <h2>2. Inventario attuale</h2>
+  <table>
+    <thead><tr><th>Strumento</th><th>Finalità</th><th>Durata</th><th>Ambito</th></tr></thead>
+    <tbody>
+      <tr><td>`tre-saved-venues`</td><td>Memorizzare i preferiti scelti dall’utente</td><td>Fino alla rimozione o pulizia del browser</td><td>localStorage, solo dispositivo</td></tr>
+      <tr><td>`tre-milano:taste-profile:v1`</td><td>Applicare il profilo di gusto richiesto</td><td>Fino alla disattivazione/eliminazione</td><td>localStorage, solo dispositivo</td></tr>
+      <tr><td>`tre-milano:last-podium:v1`</td><td>Ripristinare il podio recente</td><td>Quattro ore</td><td>localStorage, solo dispositivo</td></tr>
+      <tr><td>handoff ricerca</td><td>Passare query e filtri alla pagina di ricerca senza inserirli nell’URL</td><td>Fino alla lettura o fine sessione</td><td>sessionStorage</td></tr>
+      <tr><td>Cache Storage del service worker</td><td>Continuità della shell e asset statici</td><td>Versionata; sostituita agli aggiornamenti</td><td>Cache tecnica del browser</td></tr>
+    </tbody>
+  </table>
+  <p>Il codice applicativo non usa `document.cookie`, beacon, pixel, SDK pubblicitari o trasporto analytics. Gli eventi di misurazione esistenti sono `CustomEvent` locali e, senza un listener remoto, non lasciano il browser.</p>
+
+  <h2>3. Strumenti tecnici e funzioni richieste</h2>
+  <p>Le memorie sopra elencate sono attivate da un’azione o da una funzione richiesta: salvare un luogo, applicare preferenze, continuare una ricerca o rendere disponibile la shell. Non vengono usate per seguire l’utente tra siti, costruire pubblici pubblicitari o vendere dati.</p>
+  <p>La qualificazione giuridica dell’esenzione, in particolare per preferiti e profilo persistente, deve essere confermata nel controllo legale finale e verificata rispetto alla configurazione reale del dominio.</p>
+
+  <h2>4. Gestione del consenso</h2>
+  <p>Nella configurazione attuale le categorie <strong>analitica opzionale</strong>, <strong>personalizzazione remota</strong> e <strong>marketing/profilazione</strong> sono disattivate; non c’è quindi una scelta opzionale da conservare e il sito non mostra un banner puramente formale.</p>
+  <p>Prima di introdurre strumenti non necessari, TRE Milano dovrà implementare un centro preferenze disponibile da ogni pagina che:</p>
+  <ul>
+    <li>blocchi ogni script o chiamata opzionale prima della scelta;</li>
+    <li>offra “rifiuta” e “accetta” con pari evidenza, oltre alla scelta granulare;</li>
+    <li>non preselezioni categorie opzionali e non condizioni il servizio essenziale;</li>
+    <li>registri versione, categorie e momento della scelta senza memorizzare dati eccedenti;</li>
+    <li>permetta di cambiare o revocare la scelta in qualsiasi momento;</li>
+    <li>rispetti segnali tecnici applicabili e riproponga la scelta solo quando necessario.</li>
+  </ul>
+  <p>Questa policy non autorizza l’attivazione automatica di Google Analytics, Meta Pixel, mappe o media incorporati di terzi.</p>
+
+  <h2>5. Come controllare i dati sul dispositivo</h2>
+  <p>Preferiti e profilo possono essere rimossi dalle funzioni dell’applicazione. In alternativa, le impostazioni del browser consentono di vedere o cancellare cookie, dati dei siti, localStorage e cache. La cancellazione può rimuovere preferiti, profilo e contenuti offline.</p>
+
+  <h2>6. Riferimenti</h2>
+  <ul>
+    <li><a href="https://www.garanteprivacy.it/web/guest/home/docweb/-/docweb-display/docweb/9677876" rel="external">Linee guida cookie e altri strumenti di tracciamento — Garante, 10 giugno 2021</a>;</li>
+    <li><a href="https://eur-lex.europa.eu/legal-content/IT/TXT/?uri=CELEX:32002L0058" rel="external">Direttiva 2002/58/CE</a>;</li>
+    <li><a href="https://eur-lex.europa.eu/legal-content/it/TXT/?uri=CELEX:32016R0679" rel="external">Regolamento (UE) 2016/679</a>.</li>
+  </ul>
+  <p>Bozza v0.1 — ultimo aggiornamento 16 luglio 2026.</p>
+</EditorialPage>

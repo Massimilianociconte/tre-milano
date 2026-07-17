@@ -1,0 +1,22 @@
+---
+type BreadcrumbItem = {
+  name: string;
+  href?: string;
+};
+
+type Props = {
+  items: BreadcrumbItem[];
+};
+
+const { items } = Astro.props;
+---
+
+<nav class="breadcrumbs" aria-label="Percorso di navigazione">
+  <ol>
+    {items.map((item, index) => (
+      <li>
+        {item.href && index < items.length - 1 ? <a href={item.href}>{item.name}</a> : <span aria-current={index === items.length - 1 ? 'page' : undefined}>{item.name}</span>}
+      </li>
+    ))}
+  </ol>
+</nav>

@@ -1,0 +1,170 @@
+[
+  {
+    "path": "/",
+    "segment": "hubs",
+    "status": "draft",
+    "lastmod": "2026-07-16",
+    "changefreq": "weekly",
+    "priority": 1
+  },
+  {
+    "path": "/milano/",
+    "segment": "hubs",
+    "status": "draft",
+    "lastmod": "2026-07-16",
+    "changefreq": "weekly",
+    "priority": 0.9
+  },
+  {
+    "path": "/quartieri/brera/",
+    "segment": "discovery",
+    "status": "draft",
+    "lastmod": "2026-07-16",
+    "changefreq": "weekly",
+    "priority": 0.8
+  },
+  {
+    "path": "/categorie/cocktail-bar/",
+    "segment": "discovery",
+    "status": "draft",
+    "lastmod": "2026-07-16",
+    "changefreq": "weekly",
+    "priority": 0.8
+  },
+  {
+    "path": "/occasioni/cena-romantica/",
+    "segment": "discovery",
+    "status": "draft",
+    "lastmod": "2026-07-16",
+    "changefreq": "weekly",
+    "priority": 0.8
+  },
+  {
+    "path": "/guide/milano-di-sera/",
+    "segment": "editorial",
+    "status": "draft",
+    "lastmod": "2026-07-16",
+    "changefreq": "monthly",
+    "priority": 0.8
+  },
+  {
+    "path": "/metodologia/",
+    "segment": "trust",
+    "status": "ready",
+    "lastmod": "2026-07-16",
+    "changefreq": "monthly",
+    "priority": 0.7
+  },
+  {
+    "path": "/fonti/",
+    "segment": "trust",
+    "status": "draft",
+    "lastmod": "2026-07-16",
+    "changefreq": "monthly",
+    "priority": 0.7
+  },
+  {
+    "path": "/redazione/",
+    "segment": "entities",
+    "status": "draft",
+    "lastmod": "2026-07-16",
+    "changefreq": "monthly",
+    "priority": 0.6
+  },
+  {
+    "path": "/privacy/",
+    "segment": "trust",
+    "status": "draft",
+    "lastmod": "2026-07-16",
+    "changefreq": "monthly",
+    "priority": 0.4
+  },
+  {
+    "path": "/cookie-policy/",
+    "segment": "trust",
+    "status": "draft",
+    "lastmod": "2026-07-16",
+    "changefreq": "monthly",
+    "priority": 0.4
+  },
+  {
+    "path": "/termini/",
+    "segment": "trust",
+    "status": "draft",
+    "lastmod": "2026-07-16",
+    "changefreq": "monthly",
+    "priority": 0.4
+  },
+  {
+    "path": "/informativa-dati/",
+    "segment": "trust",
+    "status": "draft",
+    "lastmod": "2026-07-16",
+    "changefreq": "monthly",
+    "priority": 0.3
+  },
+  {
+    "path": "/correzioni/",
+    "segment": "trust",
+    "status": "draft",
+    "lastmod": "2026-07-16",
+    "changefreq": "monthly",
+    "priority": 0.4
+  },
+  {
+    "path": "/rivendica-scheda/",
+    "segment": "trust",
+    "status": "draft",
+    "lastmod": "2026-07-16",
+    "changefreq": "monthly",
+    "priority": 0.4
+  },
+  {
+    "path": "/locali/lume-brera/",
+    "segment": "entities",
+    "status": "draft",
+    "lastmod": "2026-07-10",
+    "changefreq": "weekly",
+    "priority": 0.7
+  },
+  {
+    "path": "/locali/corte-naviglio/",
+    "segment": "entities",
+    "status": "draft",
+    "lastmod": "2026-07-08",
+    "changefreq": "weekly",
+    "priority": 0.7
+  },
+  {
+    "path": "/locali/sala-nove/",
+    "segment": "entities",
+    "status": "draft",
+    "lastmod": "2026-07-09",
+    "changefreq": "weekly",
+    "priority": 0.7
+  },
+  {
+    "path": "/locali/quota-ventuno/",
+    "segment": "entities",
+    "status": "draft",
+    "lastmod": "2026-07-07",
+    "changefreq": "weekly",
+    "priority": 0.7
+  },
+  {
+    "path": "/locali/dispensa-isola/",
+    "segment": "entities",
+    "status": "draft",
+    "lastmod": "2026-07-05",
+    "changefreq": "weekly",
+    "priority": 0.7
+  },
+  {
+    "path": "/locali/ombra-moscova/",
+    "segment": "entities",
+    "status": "draft",
+    "lastmod": "2026-07-06",
+    "changefreq": "weekly",
+    "priority": 0.7
+  }
+]

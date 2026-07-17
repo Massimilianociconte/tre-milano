@@ -1,0 +1,15 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BottomNav from '@/components/layout/BottomNav.astro';
+import GroupSessionPlanner from '@/components/group/GroupSessionPlanner';
+---
+
+<BaseLayout
+  title="Scegliere insieme — TRE Milano"
+  description="Crea una sessione locale e anonima per confrontare preferenze e vincoli di un gruppo da due a sei persone."
+  noindex={true}
+>
+  <GroupSessionPlanner client:load />
+  <BottomNav />
+</BaseLayout>
+

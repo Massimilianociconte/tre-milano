@@ -1,0 +1,86 @@
+---
+import EditorialPage from '@/components/editorial/EditorialPage.astro';
+import { SITE } from '@/config/site';
+---
+
+<EditorialPage
+  title="Milano di sera, scelta con criterio."
+  metaTitle="Milano di sera: guida per atmosfera e occasione — TRE Milano"
+  description={SITE.preview
+    ? 'Una guida editoriale dimostrativa per orientarsi tra aperitivo, cena e dopocena senza seguire soltanto notorietà e volume di recensioni.'
+    : 'Guida editoriale a Milano di sera: criteri verificabili per scegliere tra aperitivo, cena e dopocena in base a occasione e atmosfera.'}
+  eyebrow="Guida editoriale"
+  answer="La serata migliore dipende dal suo scopo: parlare, sorprendere, accogliere un ospite o scoprire un quartiere. La guida collega ogni scenario a criteri verificabili."
+  variant="guide"
+  image="/images/hero-milano.webp"
+  imageAlt="Milano e il Duomo nella luce blu della sera"
+  quickFacts={[
+    { label: 'Finestra', value: '18:00–02:00' },
+    { label: 'Tre capitoli', value: 'Aperitivo · cena · dopocena' },
+    { label: 'Priorità', value: 'Atmosfera e logistica' },
+    { label: 'Formato', value: 'Guida aggiornata e citabile' },
+  ]}
+  sections={[
+    { id: 'momenti', label: 'Tre momenti' },
+    { id: 'itinerario', label: 'Itinerario della sera' },
+    { id: 'scelta', label: 'Matrice di scelta' },
+    { id: 'aggiornamento', label: 'Come aggiorniamo' },
+    { id: 'trasparenza', label: 'Trasparenza' },
+  ]}
+  asideCta={{
+    href: '/cerca/',
+    title: 'Decidi senza liste infinite',
+    description: 'Inserisci occasione, zona e atmosfera. TRE restituisce una top 3 con differenze leggibili.',
+    action: 'Trova la serata',
+  }}
+  related={[
+    { href: '/occasioni/cena-romantica/', title: 'Cena romantica', description: 'Quando atmosfera e conversazione sono vincoli.' },
+    { href: '/categorie/cocktail-bar/', title: 'Cocktail bar', description: 'Come leggere una categoria molto diversa al suo interno.' },
+  ]}
+>
+  <p class="editorial-lead">Milano di notte non è una categoria: è una sequenza di decisioni. Questa guida accompagna il passaggio dall’aperitivo al rientro, mettendo in primo piano ciò che cambia davvero.</p>
+
+  <h2 id="momenti">Tre momenti, tre logiche</h2>
+  <p>L’aperitivo privilegia accessibilità, sedute e ritmo. La cena richiede più fiducia su servizio, durata e prezzo. Il dopocena rende decisivi orari, rumore e facilità di spostamento.</p>
+  <div class="editorial-moment-grid" aria-label="I tre momenti della sera">
+    <article><span>18:30</span><h3>Aperitivo</h3><p>Contano accesso, sedute, luce e possibilità di proseguire senza cambiare zona.</p></article>
+    <article><span>20:30</span><h3>Cena</h3><p>Prezzo, durata, prenotazione e livello di conversazione diventano vincoli reali.</p></article>
+    <article><span>23:00</span><h3>Dopocena</h3><p>Orari verificati, rumore, trasporti e distanza dal punto di rientro pesano di più.</p></article>
+  </div>
+  <blockquote>Una guida utile non nasconde il trade-off: lo rende parte della decisione.</blockquote>
+
+  <h2 id="itinerario">Un itinerario che resta flessibile</h2>
+  <div class="guide-route" aria-label="Sequenza editoriale della serata">
+    <article><time datetime="18:30">18:30</time><div><h3>Punto di incontro</h3><p>Una zona riconoscibile e un locale con accesso leggibile riducono la frizione iniziale.</p></div></article>
+    <article><time datetime="20:30">20:30</time><div><h3>Scelta principale</h3><p>La prima posizione massimizza il fit; la seconda conserva i vincoli con una differenza utile.</p></div></article>
+    <article><time datetime="23:00">23:00</time><div><h3>Continuità o cambio</h3><p>La wildcard ha senso solo se cambia un aspetto non critico e resta compatibile con il rientro.</p></div></article>
+  </div>
+
+  <h2 id="scelta">Scegliere per intenzione</h2>
+  <div class="editorial-table-wrap" role="region" aria-label="Matrice per scegliere la serata" tabindex="0">
+    <table class="editorial-table">
+      <thead><tr><th>Intenzione</th><th>Segnali prioritari</th><th>Attenzione a</th></tr></thead>
+      <tbody>
+        <tr><td>Parlare bene</td><td>Rumore, distanza tra tavoli, ritmo</td><td>Musica ed eventi</td></tr>
+        <tr><td>Sorprendere</td><td>Vista, firma gastronomica, contesto</td><td>Prezzo e prenotazione</td></tr>
+        <tr><td>Ospite fuori città</td><td>Accessibilità, identità, semplicità</td><td>Tempi di spostamento</td></tr>
+        <tr><td>Scoprire un quartiere</td><td>Camminabilità e continuità</td><td>Rientro dopo l’ultima tappa</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="editorial-gallery" aria-label="Tre atmosfere della Milano serale">
+    <figure><img src="/images/hero-milano.webp" alt="Terrazza milanese aperta verso il Duomo nella luce della sera" width="1672" height="941" loading="lazy" /><figcaption>Panorama · arrivo</figcaption></figure>
+    <figure><img src="/images/venue-cocktail.webp" alt="Cocktail ambrato in un ambiente milanese elegante" width="900" height="1124" loading="lazy" /><figcaption>Aperitivo · ritmo</figcaption></figure>
+    <figure><img src="/images/venue-ristorante.webp" alt="Tavolo apparecchiato per una cena raccolta" width="900" height="1124" loading="lazy" /><figcaption>Cena · misura</figcaption></figure>
+  </div>
+
+  <h2 id="aggiornamento">Come aggiorniamo</h2>
+  <p>Le pagine editoriali riportano autore, revisore, data di controllo e fonti. Un cambiamento reale aggiorna il campo e il <code>lastmod</code>; una semplice nuova build non finge freschezza.</p>
+  <div class="editorial-callout"><h3>Prima il dato operativo</h3><p>Una bella atmosfera non compensa un orario scaduto, una fascia di prezzo non verificata o una distanza presentata come certa senza routing.</p></div>
+
+  <h2 id="trasparenza">Trasparenza</h2>
+  <p>{SITE.preview
+    ? 'Questa è una guida di prototipo. Le fotografie sono state create per la demo e i nomi dei luoghi non descrivono attività reali. Il template è pronto per contenuti originali e verificati.'
+    : 'La guida distingue osservazioni editoriali, dati operativi e limiti delle fonti. Ogni aggiornamento sostanziale modifica la data di revisione e il relativo lastmod.'}</p>
+</EditorialPage>

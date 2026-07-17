@@ -1,0 +1,170 @@
+---
+import '@fontsource/playfair-display/latin-400.css';
+import '@fontsource/playfair-display/latin-500.css';
+import '@fontsource/inter/latin-400.css';
+import '@fontsource/inter/latin-500.css';
+import '@fontsource/inter/latin-600.css';
+import '@/styles/global.css';
+import Header from '@/components/layout/Header.astro';
+import Footer from '@/components/layout/Footer.astro';
+import { SITE } from '@/config/site';
+import { isRouteIndexable } from '@/config/indexing';
+import { serializeJsonLd } from '@/utils/serialize-json-ld';
+
+type Props = {
+  title: string;
+  description?: string;
+  image?: string;
+  imageAlt?: string;
+  imageWidth?: number;
+  imageHeight?: number;
+  noindex?: boolean;
+  pageType?: 'website' | 'article';
+  publishedTime?: string;
+  modifiedTime?: string;
+  structuredData?: Record<string, unknown> | Array<Record<string, unknown>>;
+  hideFooter?: boolean;
+};
+
+const {
+  title,
+  description = SITE.description,
+  image = '/images/hero-milano.jpg',
+  imageAlt = 'TRE Milano, selezioni curate per vivere Milano',
+  imageWidth = 1672,
+  imageHeight = 941,
+  noindex = false,
+  pageType = 'website',
+  publishedTime,
+  modifiedTime,
+  structuredData,
+  hideFooter = false,
+} = Astro.props;
+const canonical = new URL(Astro.url.pathname, SITE.url).toString();
+const socialImage = new URL(image, SITE.url).toString();
+const robotsNoindex = noindex || !isRouteIndexable(Astro.url.pathname);
+const organizationId = new URL('/#organization', SITE.url).toString();
+const websiteId = new URL('/#website', SITE.url).toString();
+const baseEntities = [
+  {
+    '@type': 'Organization',
+    '@id': organizationId,
+    name: SITE.name,
+    url: SITE.url,
+    description: SITE.description,
+    logo: {
+      '@type': 'ImageObject',
+      url: new URL('/icon-512.png', SITE.url).toString(),
+      width: 512,
+      height: 512,
+    },
+    areaServed: { '@type': 'City', name: 'Milano' },
+    knowsAbout: ['Milano', 'ristoranti', 'cocktail bar', 'rooftop', 'occasioni e atmosfera'],
+  },
+  {
+    '@type': 'WebSite',
+    '@id': websiteId,
+    name: SITE.name,
+    url: SITE.url,
+    inLanguage: SITE.language,
+    publisher: { '@id': organizationId },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: new URL('/cerca/?q={search_term_string}', SITE.url).toString(),
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  },
+];
+const suppliedEntities = structuredData ? (Array.isArray(structuredData) ? structuredData : [structuredData]) : [];
+const schema = {
+  '@context': 'https://schema.org',
+  '@graph': [...baseEntities, ...suppliedEntities.map((entity) => {
+    const { '@context': _context, ...withoutContext } = entity;
+    return withoutContext;
+  })],
+};
+const serializedSchema = serializeJsonLd(schema);
+---
+
+<!doctype html>
+<html lang={SITE.language}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="theme-color" content="#0b1320" />
+    <meta name="description" content={description} />
+    <meta name="robots" content={robotsNoindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'} />
+    <script is:inline>
+      (() => {
+        const parameters = new URLSearchParams(window.location.search);
+        const hasDiscoveryState = ['q', 'zona', 'budget', 'aperto'].some((key) => parameters.has(key));
+        if (!hasDiscoveryState || window.location.pathname === '/cerca/') return;
+        const robots = document.querySelector('meta[name="robots"]');
+        if (robots) robots.setAttribute('content', 'noindex, follow');
+        if (parameters.has('q')) window.location.replace(`/cerca/${window.location.search}${window.location.hash}`);
+      })();
+    </script>
+    <link rel="canonical" href={canonical} />
+    {SITE.publicIndexing && <link rel="sitemap" href="/sitemap-index.xml" />}
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:type" content={pageType} />
+    <meta property="og:locale" content={SITE.locale} />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={socialImage} />
+    <meta property="og:image:secure_url" content={socialImage} />
+    <meta property="og:image:width" content={String(imageWidth)} />
+    <meta property="og:image:height" content={String(imageHeight)} />
+    <meta property="og:image:alt" content={imageAlt} />
+    {pageType === 'article' && publishedTime && <meta property="article:published_time" content={publishedTime} />}
+    {pageType === 'article' && modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage} />
+    <meta name="twitter:image:alt" content={imageAlt} />
+    <title>{title}</title>
+    <script is:inline type="application/ld+json" set:html={serializedSchema} />
+  </head>
+  <body>
+    <Header />
+    {SITE.preview && (
+      <div class="preview-bar" role="status">
+        <span>Anteprima online</span>
+        <span>Catalogo verificato quando disponibile · indicizzazione disattivata</span>
+      </div>
+    )}
+    <main id="contenuto">
+      <slot />
+    </main>
+    {!hideFooter && <Footer />}
+    {!SITE.preview && (
+      <script>
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+        }
+      </script>
+    )}
+    {SITE.preview && (
+      <script>
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then((registrations) => {
+            registrations.forEach((registration) => registration.unregister());
+          });
+        }
+        if ('caches' in window) {
+          caches.keys().then((keys) => {
+            keys.filter((key) => key.startsWith('tre-milano-shell-')).forEach((key) => caches.delete(key));
+          });
+        }
+      </script>
+    )}
+  </body>
+</html>

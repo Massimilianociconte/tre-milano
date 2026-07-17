@@ -1,0 +1,165 @@
+.layer {
+  margin: 1.8rem 0 0;
+  padding: 1.35rem;
+  background: rgb(247 245 241 / 72%);
+  border: 1px solid var(--line);
+  border-radius: 0.85rem;
+}
+
+.layer > header {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.75fr) minmax(0, 1.25fr);
+  align-items: end;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.layer header span {
+  color: var(--gold-ink);
+  font-size: 0.57rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.layer h2 {
+  margin: 0.15rem 0 0;
+  color: var(--navy);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.layer header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.64rem;
+  line-height: 1.5;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(76px, 1fr));
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.actions a,
+.actions button {
+  min-width: 0;
+  min-height: 54px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.55rem;
+  color: var(--navy);
+  background: var(--surface);
+  border: 1px solid var(--stone);
+  border-radius: 0.55rem;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.57rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 160ms ease, background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.actions a:hover,
+.actions button:hover {
+  color: var(--ivory);
+  background: var(--navy);
+  border-color: var(--navy);
+  transform: translateY(-1px);
+}
+
+.actions .shareButton {
+  color: var(--ivory);
+  background: var(--navy);
+  border-color: var(--navy);
+}
+
+.actions .shareButton:disabled {
+  cursor: progress;
+  opacity: 0.68;
+  transform: none;
+}
+
+.actions .shareButton:only-child {
+  grid-column: 1 / -1;
+  flex-direction: row;
+}
+
+.actions svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  color: var(--gold-ink);
+  stroke-width: 1.45;
+}
+
+.shareButton svg,
+.actions a:hover svg,
+.actions button:hover svg {
+  color: var(--gold);
+}
+
+.manualLink {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.85rem;
+}
+
+.manualLink span {
+  color: var(--muted);
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.manualLink input {
+  width: 100%;
+  min-height: 40px;
+  padding: 0.55rem 0.7rem;
+  color: var(--navy);
+  background: var(--surface);
+  border: 1px solid var(--stone);
+  border-radius: 0.45rem;
+  font-family: var(--font-sans);
+  font-size: 0.64rem;
+}
+
+.status {
+  min-height: 1.4em;
+  margin: 0.6rem 0 0;
+  color: var(--muted);
+  font-size: 0.59rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 520px) {
+  .layer {
+    padding: 1rem;
+  }
+
+  .layer > header {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 0.45rem;
+  }
+
+  .actions {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .actions a,
+  .actions button {
+    transition: none;
+  }
+}

@@ -1,0 +1,151 @@
+---
+import EditorialPage from '@/components/editorial/EditorialPage.astro';
+---
+
+<EditorialPage
+  title="Rivendica, aggiorna o rimuovi una scheda."
+  metaTitle="Rivendica una scheda locale — TRE Milano"
+  description="Procedura verificabile per titolari e rappresentanti autorizzati che vogliono rivendicare, aggiornare o chiedere la rimozione di una scheda TRE Milano."
+  eyebrow="Titolari"
+  answer="La rivendicazione non compra visibilità e non modifica automaticamente il ranking. Serve a verificare chi può proporre dati ufficiali; ogni modifica resta soggetta a controllo di identità, fonte, freschezza e diritti."
+  status="Flusso manuale in preview · backend di moderazione non attivo"
+  related={[
+    { href: '/correzioni/', title: 'Segnala una correzione', description: 'Per una segnalazione fattuale senza rivendicare la scheda.' },
+    { href: '/informativa-dati/', title: 'Informativa sui moduli', description: 'Dati, basi giuridiche e retention proposte.' },
+    { href: '/fonti/', title: 'Policy delle fonti', description: 'Come vengono verificate le modifiche.' },
+  ]}
+  faqs={[
+    { question: 'Rivendicare una scheda cambia il podio?', answer: 'No. La rivendicazione consente di proporre dati ufficiali e ricevere richieste di verifica; non modifica pesi, ranking o posizione organica.' },
+    { question: 'Devo caricare un documento?', answer: 'No. Il modulo non accetta file. La verifica parte da email e dominio ufficiali; se servisse altro, verrà usato un canale separato e verranno richiesti solo dati proporzionati.' },
+    { question: 'Posso chiedere la rimozione?', answer: 'Sì. La richiesta viene valutata considerando identità, diritti, accuratezza, obblighi applicabili e interesse informativo. Contenuti o media contestati possono essere sospesi durante la verifica.' },
+  ]}
+  noindex={true}
+>
+  <h2>Prima dell’invio</h2>
+  <p>Questo modulo è destinato a titolari, legali rappresentanti e persone espressamente autorizzate. Non inviare documenti d’identità, visure, credenziali, dati sanitari, informazioni sui dipendenti o documenti riservati. La preview usa Netlify Forms e apre una pratica manuale; non esiste ancora un pannello autenticato per i titolari.</p>
+
+  <form
+    class="claim-form"
+    name="tre-rivendicazione"
+    method="POST"
+    action="/correzioni/inviata/"
+    data-netlify="true"
+    netlify-honeypot="bot-field"
+    aria-describedby="claim-form-note"
+  >
+    <input type="hidden" name="form-name" value="tre-rivendicazione" />
+    <p class="claim-form__honeypot" aria-hidden="true">
+      <label>Non compilare questo campo <input name="bot-field" tabindex="-1" autocomplete="off" /></label>
+    </p>
+
+    <p id="claim-form-note" class="claim-form__note">Campi con * obbligatori. Useremo i dati soltanto per verificare e gestire questa richiesta.</p>
+
+    <div class="claim-form__grid">
+      <label class="claim-form__field claim-form__field--wide">
+        <span>Scheda o attività <strong aria-hidden="true">*</strong></span>
+        <input type="text" name="scheda" required maxlength="500" placeholder="URL della scheda oppure nome e indirizzo del locale" />
+      </label>
+
+      <label class="claim-form__field">
+        <span>Tipo di richiesta <strong aria-hidden="true">*</strong></span>
+        <select name="tipo-richiesta" required>
+          <option value="" selected disabled>Scegli</option>
+          <option value="rivendicazione">Rivendicare la scheda</option>
+          <option value="aggiornamento">Aggiornare dati ufficiali</option>
+          <option value="rimozione">Chiedere la rimozione</option>
+          <option value="diritti-media">Contestare media o marchi</option>
+        </select>
+      </label>
+
+      <label class="claim-form__field">
+        <span>Ruolo <strong aria-hidden="true">*</strong></span>
+        <select name="ruolo" required>
+          <option value="" selected disabled>Scegli</option>
+          <option value="titolare">Titolare</option>
+          <option value="legale-rappresentante">Legale rappresentante</option>
+          <option value="delegato">Delegato autorizzato</option>
+          <option value="titolare-diritti">Titolare o licenziatario dei diritti</option>
+        </select>
+      </label>
+
+      <label class="claim-form__field">
+        <span>Nome e cognome <strong aria-hidden="true">*</strong></span>
+        <input type="text" name="nome-richiedente" required maxlength="120" autocomplete="name" />
+      </label>
+
+      <label class="claim-form__field">
+        <span>Impresa o attività <strong aria-hidden="true">*</strong></span>
+        <input type="text" name="impresa" required maxlength="160" autocomplete="organization" />
+      </label>
+
+      <label class="claim-form__field">
+        <span>Email professionale <strong aria-hidden="true">*</strong></span>
+        <input type="email" name="email-professionale" required maxlength="254" autocomplete="email" placeholder="nome@dominio-ufficiale.it" />
+      </label>
+
+      <label class="claim-form__field">
+        <span>Sito ufficiale <em>se disponibile</em></span>
+        <input type="url" name="sito-ufficiale" maxlength="500" autocomplete="url" placeholder="https://www.dominio-ufficiale.it" />
+      </label>
+
+      <label class="claim-form__field claim-form__field--wide">
+        <span>Richiesta ed elementi verificabili <strong aria-hidden="true">*</strong></span>
+        <textarea name="dettaglio" required minlength="30" maxlength="2000" rows="7" placeholder="Spiega che cosa chiedi, il tuo rapporto con l’attività e quali fonti pubbliche permettono di verificare le informazioni."></textarea>
+        <small>Non inserire documenti, numeri identificativi personali, credenziali o informazioni riservate.</small>
+      </label>
+    </div>
+
+    <label class="claim-form__check">
+      <input type="checkbox" name="dichiarazione-autorita" value="confermo" required />
+      <span>Dichiaro di essere autorizzato a presentare la richiesta e che le informazioni fornite sono accurate.</span>
+    </label>
+    <label class="claim-form__check">
+      <input type="checkbox" name="presa-visione-privacy" value="confermo" required />
+      <span>Confermo di aver letto l’<a href="/informativa-dati/">informativa sui dati dei moduli</a>. Questa presa visione non autorizza comunicazioni promozionali.</span>
+    </label>
+
+    <div class="claim-form__actions">
+      <button type="submit">Invia la richiesta</button>
+      <small>L’invio non modifica automaticamente la scheda.</small>
+    </div>
+  </form>
+
+  <h2>Verifica e decisione</h2>
+  <ol>
+    <li>controllo di completezza, abuso e identità della scheda;</li>
+    <li>verifica tramite dominio, email ufficiale o altra evidenza proporzionata;</li>
+    <li>confronto campo per campo con le fonti esistenti;</li>
+    <li>approvazione, richiesta di chiarimenti, rifiuto motivato o sospensione;</li>
+    <li>registrazione della decisione e nuova data di controllo.</li>
+  </ol>
+  <p>I dati dichiarati dal titolare restano contrassegnati come tali e non sostituiscono automaticamente evidenze istituzionali o verifiche indipendenti. La redazione può rimuovere temporaneamente immagini o informazioni operative quando esiste un conflitto plausibile.</p>
+</EditorialPage>
+
+<style>
+  .claim-form { margin: 1.6rem 0 3rem; padding: clamp(1.1rem, 3vw, 2rem); background: var(--surface); border: 1px solid var(--line); border-top: 2px solid var(--gold); box-shadow: var(--shadow-card); }
+  .claim-form__honeypot { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .claim-form__note { margin: 0 0 1.25rem; padding-bottom: 1rem; color: var(--muted); border-bottom: 1px solid var(--line); font-size: 0.75rem; }
+  .claim-form__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+  .claim-form__field { min-width: 0; display: grid; gap: 0.42rem; }
+  .claim-form__field--wide { grid-column: 1 / -1; }
+  .claim-form__field > span { color: var(--navy); font-size: 0.66rem; font-weight: 650; letter-spacing: 0.08em; text-transform: uppercase; }
+  .claim-form__field strong { color: var(--gold-ink); }
+  .claim-form__field em { color: var(--muted); font-size: 0.56rem; font-style: normal; letter-spacing: 0; text-transform: none; }
+  .claim-form input:not([type='checkbox']), .claim-form select, .claim-form textarea { width: 100%; min-height: 48px; padding: 0.72rem 0.8rem; color: var(--navy); background: var(--ivory); border: 1px solid var(--line); border-radius: 0.55rem; font: inherit; font-size: 0.82rem; }
+  .claim-form textarea { min-height: 150px; resize: vertical; line-height: 1.55; }
+  .claim-form input:focus-visible, .claim-form select:focus-visible, .claim-form textarea:focus-visible { border-color: var(--gold-ink); outline: 2px solid color-mix(in srgb, var(--gold) 45%, transparent); outline-offset: 2px; }
+  .claim-form__field small, .claim-form__actions small { color: var(--muted); font-size: 0.65rem; line-height: 1.45; }
+  .claim-form__check { display: flex; align-items: flex-start; gap: 0.65rem; margin-top: 1rem; color: #413e39; font-size: 0.75rem; line-height: 1.5; }
+  .claim-form__check input { width: 1.1rem; height: 1.1rem; flex: 0 0 1.1rem; margin-top: 0.12rem; accent-color: var(--gold-ink); }
+  .claim-form__check a { color: var(--gold-ink); font-weight: 600; }
+  .claim-form__actions { display: flex; align-items: center; gap: 1rem; margin-top: 1.35rem; }
+  .claim-form__actions button { min-height: 48px; padding: 0.5rem 1.2rem; color: var(--ivory); background: var(--navy); border: 1px solid var(--navy); border-radius: 999px; cursor: pointer; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+  .claim-form__actions button:hover { color: var(--navy); background: transparent; }
+  @media (max-width: 620px) {
+    .claim-form { margin-inline: -0.15rem; padding: 1rem; }
+    .claim-form__grid { grid-template-columns: 1fr; }
+    .claim-form__field--wide { grid-column: auto; }
+    .claim-form__actions { align-items: stretch; flex-direction: column; }
+    .claim-form__actions button { width: 100%; }
+  }
+</style>

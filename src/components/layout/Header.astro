@@ -1,0 +1,49 @@
+---
+import BrandMark from '@/components/brand/BrandMark.astro';
+
+const currentPath = Astro.url.pathname;
+const navItems = [
+  { href: '/milano/', label: 'Scopri' },
+  { href: '/quartieri/brera/', label: 'Quartieri' },
+  { href: '/guide/milano-di-sera/', label: 'Guide' },
+  { href: '/metodologia/', label: 'Metodo' },
+];
+---
+
+<header class="site-header">
+  <a class="skip-link" href="#contenuto">Vai al contenuto</a>
+  <div class="site-header__inner shell">
+    <a class="site-header__brand" href="/" aria-label="TRE Milano, home">
+      <BrandMark compact />
+      <span class="site-header__tagline">La tua top 3 perfetta</span>
+    </a>
+
+    <nav class="site-nav" aria-label="Navigazione principale">
+      {navItems.map((item) => (
+        <a href={item.href} aria-current={currentPath === item.href ? 'page' : undefined}>{item.label}</a>
+      ))}
+    </nav>
+
+    <div class="site-header__actions">
+      <a class="header-action header-action--text" href="/preferiti/" aria-label="Apri i preferiti">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20.8 4.7a5.5 5.5 0 0 0-7.8 0L12 5.8l-1.1-1.1a5.5 5.5 0 1 0-7.8 7.8l1.1 1.1L12 21l7.8-7.4 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" /></svg>
+        <span>Preferiti</span>
+      </a>
+      <a class="profile-link" href="/profilo/" aria-label="Apri il profilo">
+        <span class="profile-link__avatar" aria-hidden="true">MC</span>
+        <span>Profilo</span>
+      </a>
+    </div>
+
+    <details class="mobile-menu">
+      <summary aria-label="Apri il menu">
+        <span></span><span></span><span></span>
+      </summary>
+      <nav aria-label="Menu principale mobile">
+        {navItems.map((item) => <a href={item.href} aria-current={currentPath === item.href ? 'page' : undefined}>{item.label}</a>)}
+        <a href="/preferiti/">Preferiti</a>
+        <a href="/profilo/">Profilo</a>
+      </nav>
+    </details>
+  </div>
+</header>

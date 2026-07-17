@@ -1,0 +1,100 @@
+---
+import EditorialPage from '@/components/editorial/EditorialPage.astro';
+---
+
+<EditorialPage
+  title="Tre scelte, con una ragione leggibile."
+  metaTitle="Metodologia e ranking — TRE Milano"
+  description="Come TRE Milano separa vincoli, preferenze, qualità del dato e diversità per costruire un podio spiegabile."
+  eyebrow="Metodologia"
+  answer="Il motore filtra prima i vincoli duri, ordina poi i candidati idonei e sceglie seconda e terza alternativa con diversità controllata. Nessun pagamento modifica il podio organico."
+  variant="method"
+  image="/images/galleria-milano.webp"
+  imageAlt="Geometrie della Galleria Vittorio Emanuele II come metafora di un metodo leggibile"
+  quickFacts={[
+    { label: 'Ordine', value: 'Vincoli → fit → diversità' },
+    { label: 'Output', value: 'Tre ruoli spiegati' },
+    { label: 'Controllo', value: 'Ranking deterministico' },
+    { label: 'Commerciale', value: 'Separato dal podio' },
+  ]}
+  sections={[
+    { id: 'vincoli', label: 'Vincoli prima di tutto' },
+    { id: 'comprensione', label: 'Comprensione ibrida' },
+    { id: 'ruoli', label: 'I tre ruoli' },
+    { id: 'spiegazioni', label: 'Spiegazioni verificabili' },
+    { id: 'indipendenza', label: 'Indipendenza commerciale' },
+    { id: 'indicizzazione', label: 'Indicizzazione e AI' },
+  ]}
+  asideCta={{
+    href: '/fonti/',
+    title: 'Verifica il dato',
+    description: 'Consulta come TRE registra provenienza, freschezza, confidenza e limiti delle informazioni.',
+    action: 'Apri fonti e dati',
+  }}
+  related={[
+    { href: '/fonti/', title: 'Fonti e dati', description: 'Provenienza, freschezza e livelli di confidenza.' },
+    { href: '/correzioni/', title: 'Segnala una correzione', description: 'Il percorso previsto per contestare un dato.' },
+  ]}
+  faqs={[
+    { question: 'Come viene scelta la top 3?', answer: 'Il motore applica prima i vincoli duri, poi misura la coerenza semantica e infine diversifica seconda e terza scelta senza violare budget, distanza, apertura o esclusioni.' },
+    { question: 'La ricerca usa un modello remoto?', answer: 'Solo quando il parser locale non copre bene una richiesta complessa. DeepSeek V4 Flash traduce il testo in criteri della tassonomia TRE; non vede il catalogo, non sceglie i locali e non può superare i vincoli del ranking deterministico.' },
+    { question: 'Un pagamento può cambiare il ranking?', answer: 'No. Eventuali placement commerciali devono essere separati e dichiarati; non modificano il podio organico.' },
+  ]}
+>
+  <p class="editorial-lead">Il metodo TRE è progettato per rendere ogni consiglio contestabile: si deve capire cosa è stato filtrato, perché un locale è salito e quale compromesso distingue le alternative.</p>
+
+  <div class="method-flow" aria-label="Flusso del ranking TRE Milano">
+    <article><span>01</span><h3>Idoneità</h3><p>Il catalogo e le fonti decidono quali schede possono essere considerate, prima ancora della query.</p></article>
+    <article><span>02</span><h3>Coerenza</h3><p>Vincoli e preferenze ordinano soltanto i candidati idonei, senza inventare attributi mancanti.</p></article>
+    <article><span>03</span><h3>Diversità utile</h3><p>Seconda e terza posizione aggiungono scelta reale mantenendo intatti i requisiti duri.</p></article>
+  </div>
+
+  <h2 id="vincoli">1. Vincoli prima delle preferenze</h2>
+  <p>Budget massimo, orario, distanza, categorie escluse e necessità esplicite sono filtri duri. Se una scheda non può dimostrare di rispettarli, non entra nel podio.</p>
+  <div class="editorial-table-wrap" role="region" aria-label="Livelli e comportamento del ranking" tabindex="0">
+    <table class="editorial-table">
+      <thead><tr><th>Livello</th><th>Esempi</th><th>Comportamento</th></tr></thead>
+      <tbody>
+        <tr><td>Vincolo duro</td><td>Budget, apertura, esclusione, distanza</td><td>Filtra; non può essere rilassato silenziosamente</td></tr>
+        <tr><td>Preferenza</td><td>Atmosfera, occasione, caratteristica</td><td>Ordina i candidati idonei</td></tr>
+        <tr><td>Qualità del dato</td><td>Fonte, data, confidenza, maturità</td><td>Limita pubblicazione e raccomandazione</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="comprensione">2. Comprensione ibrida, ranking deterministico</h2>
+  <p>Il primo livello usa tassonomia, sinonimi italiani, concetti curati e similarità lessicale ispezionabile. Le richieste già comprese restano sul dispositivo. Solo una query complessa o poco coperta può passare a DeepSeek V4 Flash, in modalità non-thinking, per essere convertita in un oggetto JSON limitato alla tassonomia TRE.</p>
+  <p>Il modello non riceve il catalogo, non restituisce nomi o identificativi di locali e non calcola il podio. Il suo output viene validato e diventa soltanto un insieme di criteri; disponibilità dei dati, idoneità Gold, vincoli hard, punteggio e diversità 1–2–3 restano nel motore locale. Timeout, risposta non valida o servizio non disponibile attivano immediatamente il fallback deterministico.</p>
+  <div class="method-boundary" aria-label="Confine tra interprete linguistico e motore TRE">
+    <section><h3>L’interprete può</h3><ul><li>riconoscere intenzioni e sinonimi;</li><li>mappare il testo sulla tassonomia ammessa;</li><li>restituire JSON validabile.</li></ul></section>
+    <section><h3>L’interprete non può</h3><ul><li>vedere o scegliere i locali;</li><li>alterare budget, distanza o apertura;</li><li>decidere punteggi, ruoli o podio.</li></ul></section>
+  </div>
+
+  <h2 id="ruoli">3. Il ruolo di ogni posizione</h2>
+  <ul>
+    <li><strong>#1 Best Fit:</strong> massima coerenza complessiva.</li>
+    <li><strong>#2 Safe Alternative:</strong> fit alto e differenza utile rispetto alla prima.</li>
+    <li><strong>#3 Smart Wildcard:</strong> divergenza dichiarata su una sola dimensione non critica.</li>
+  </ul>
+  <div class="method-principles" aria-label="I tre principi del podio">
+    <article><span>#1</span><h3>Best fit</h3><p>La massima coerenza complessiva fra criteri ammessi e dati disponibili.</p></article>
+    <article><span>#2</span><h3>Safe alternative</h3><p>Una seconda strada solida, diversa abbastanza da essere utile.</p></article>
+    <article><span>#3</span><h3>Smart wildcard</h3><p>Una sorpresa controllata su una sola dimensione non critica.</p></article>
+  </div>
+
+  <h2 id="spiegazioni">4. Spiegazioni verificabili</h2>
+  <p>Le microcopy derivano da reason code deterministici. Ogni motivo deve essere supportato da un attributo visibile; confidenza e freschezza sono sempre separate dalla qualità estetica del consiglio.</p>
+  <div class="editorial-callout"><h3>La spiegazione fa parte del prodotto</h3><p>Se una ragione non può essere ricondotta a un dato visibile e alla sua fonte, non deve essere presentata come fatto.</p></div>
+
+  <h2 id="indipendenza">5. Indipendenza commerciale</h2>
+  <p>I partner possono acquistare strumenti o distribuzione dichiarata, non una posizione nel podio organico. Eventuali placement vivono in superfici separate e riconoscibili.</p>
+  <h2 id="indicizzazione">6. Indicizzazione e superfici AI</h2>
+  <p>Non usiamo scorciatoie “GEO” non verificabili. Le pagine pubbliche devono prima essere utili, originali, accessibili al crawler, coerenti con i dati strutturati e idonee a ricevere uno snippet. Una URL entra nella sitemap soltanto dopo un controllo editoriale esplicito.</p>
+  <h3>Riferimenti tecnici</h3>
+  <ul>
+    <li><a href="https://developers.google.com/search/docs/fundamentals/ai-optimization-guide" rel="external">Google Search: AI features and your website</a>;</li>
+    <li><a href="https://developers.google.com/search/docs/appearance/structured-data/carousels-beta" rel="external">Google Search: host carousel structured data</a>;</li>
+    <li><a href="https://developers.openai.com/api/docs/bots" rel="external">OpenAI: crawler e user agent</a>;</li>
+    <li><a href="https://www.indexnow.org/documentation" rel="external">IndexNow: protocollo di notifica URL</a>.</li>
+  </ul>
+</EditorialPage>

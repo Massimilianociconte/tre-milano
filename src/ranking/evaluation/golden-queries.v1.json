@@ -1,0 +1,300 @@
+{
+  "schemaVersion": 1,
+  "datasetVersion": "fixture-baseline-v1",
+  "rankingVersion": "deterministic-local-v2",
+  "catalogSnapshot": "fixture-2026-07-16",
+  "catalogMode": "fixture",
+  "referenceDate": "2026-07-16T12:00:00+02:00",
+  "description": "Baseline riproducibile sulle sei venue Gold/Platinum simulate del catalogo fixture da 20 record; le altre 14 Bronze/Silver sono explore-only. Non sostituisce il gold set pre-lancio annotato da due valutatori.",
+  "warmupRuns": 5,
+  "measuredRuns": 20,
+  "gates": {
+    "hardViolationRateMax": 0,
+    "acceptablePodiumRateMin": 0.95,
+    "top1AcceptableRateMin": 0.8,
+    "explanationSupportRateMin": 0.98,
+    "warmP95LatencyMsMax": 700,
+    "coldP95LatencyMsMax": 1500
+  },
+  "queries": [
+    {
+      "id": "core-brera-aperitivo",
+      "query": "aperitivo elegante a Brera",
+      "expectedPodiumSize": 1,
+      "acceptableVenueIds": ["lume-brera"],
+      "acceptableTop1Ids": ["lume-brera"],
+      "hardConstraints": {},
+      "reasonSupport": { "anyOfCodes": ["NEIGHBORHOOD_MATCH", "OCCASION_MATCH", "ATMOSPHERE_MATCH"] }
+    },
+    {
+      "id": "core-navigli-wine",
+      "query": "wine bar ai Navigli con vista canale",
+      "expectedPodiumSize": 1,
+      "acceptableVenueIds": ["corte-naviglio"],
+      "acceptableTop1Ids": ["corte-naviglio"],
+      "hardConstraints": {},
+      "reasonSupport": { "anyOfCodes": ["CATEGORY_MATCH", "NEIGHBORHOOD_MATCH", "FEATURE_MATCH"] }
+    },
+    {
+      "id": "core-porta-romana-dinner",
+      "query": "cena romantica elegante a Porta Romana",
+      "expectedPodiumSize": 1,
+      "acceptableVenueIds": ["sala-nove"],
+      "acceptableTop1Ids": ["sala-nove"],
+      "hardConstraints": {},
+      "reasonSupport": { "anyOfCodes": ["CATEGORY_MATCH", "NEIGHBORHOOD_MATCH", "OCCASION_MATCH"] }
+    },
+    {
+      "id": "core-duomo-rooftop",
+      "query": "rooftop con vista Duomo al tramonto",
+      "expectedPodiumSize": 1,
+      "acceptableVenueIds": ["quota-ventuno"],
+      "acceptableTop1Ids": ["quota-ventuno"],
+      "hardConstraints": {},
+      "reasonSupport": { "anyOfCodes": ["CATEGORY_MATCH", "FEATURE_MATCH"] }
+    },
+    {
+      "id": "core-isola-brunch",
+      "query": "brunch luminoso per lavorare all'Isola",
+      "expectedPodiumSize": 1,
+      "acceptableVenueIds": ["dispensa-isola"],
+      "acceptableTop1Ids": ["dispensa-isola"],
+      "hardConstraints": {},
+      "reasonSupport": { "anyOfCodes": ["CATEGORY_MATCH", "NEIGHBORHOOD_MATCH", "ATMOSPHERE_MATCH", "FEATURE_MATCH"] }
+    },
+    {
+      "id": "core-moscova-after-dinner",
+      "query": "cocktail bar vivace con musica a Moscova dopo cena",
+      "expectedPodiumSize": 1,
+      "acceptableVenueIds": ["ombra-moscova"],
+      "acceptableTop1Ids": ["ombra-moscova"],
+      "hardConstraints": {},
+      "reasonSupport": { "anyOfCodes": ["CATEGORY_MATCH", "NEIGHBORHOOD_MATCH", "OCCASION_MATCH", "FEATURE_MATCH"] }
+    },
+    {
+      "id": "budget-under-30",
+      "query": "aperitivo sotto 30 euro",
+      "expectedPodiumSize": 1,
+      "acceptableVenueIds": ["corte-naviglio"],
+      "acceptableTop1Ids": ["corte-naviglio"],
+      "hardConstraints": { "maxSpend": 30 },
+      "reasonSupport": { "anyOfCodes": ["OCCASION_MATCH"] }
+    },
+    {
+      "id": "hard-only-rooftop",
+      "query": "solo rooftop",
+      "expectedPodiumSize": 1,
+      "acceptableVenueIds": ["quota-ventuno"],
+      "acceptableTop1Ids": ["quota-ventuno"],
+      "hardConstraints": { "allowedCategories": ["Rooftop"] },
+      "reasonSupport": { "anyOfCodes": ["CATEGORY_MATCH"] }
+    },
+    {
+      "id": "hard-only-restaurant",
+      "query": "solo ristorante",
+      "expectedPodiumSize": 1,
+      "acceptableVenueIds": ["sala-nove"],
+      "acceptableTop1Ids": ["sala-nove"],
+      "hardConstraints": { "allowedCategories": ["Ristorante"] },
+      "reasonSupport": { "anyOfCodes": ["CATEGORY_MATCH"] }
+    },
+    {
+      "id": "hard-only-wine-bar",
+      "query": "solo enoteca",
+      "expectedPodiumSize": 1,
+      "acceptableVenueIds": ["corte-naviglio"],
+      "acceptableTop1Ids": ["corte-naviglio"],
+      "hardConstraints": { "allowedCategories": ["Enoteca"] },
+      "reasonSupport": { "anyOfCodes": ["CATEGORY_MATCH"] }
+    },
+    {
+      "id": "hard-only-cafe",
+      "query": "solo caffè",
+      "expectedPodiumSize": 1,
+      "acceptableVenueIds": ["dispensa-isola"],
+      "acceptableTop1Ids": ["dispensa-isola"],
+      "hardConstraints": { "allowedCategories": ["Caffè"] },
+      "reasonSupport": { "anyOfCodes": ["CATEGORY_MATCH"] }
+    },
+    {
+      "id": "hard-only-cocktail",
+      "query": "solo cocktail bar",
+      "expectedPodiumSize": 2,
+      "acceptableVenueIds": ["lume-brera", "ombra-moscova"],
+      "acceptableTop1Ids": ["lume-brera", "ombra-moscova"],
+      "hardConstraints": { "allowedCategories": ["Cocktail bar"] },
+      "reasonSupport": { "anyOfCodes": ["CATEGORY_MATCH"] }
+    },
+    {
+      "id": "occasion-out-of-town",
+      "query": "aperitivo al Duomo per un ospite fuori città",
+      "expectedPodiumSize": 1,
+      "acceptableVenueIds": ["quota-ventuno"],
+      "acceptableTop1Ids": ["quota-ventuno"],
+      "hardConstraints": {},
+      "reasonSupport": { "anyOfCodes": ["NEIGHBORHOOD_MATCH", "OCCASION_MATCH"] }
+    },
+    {
+      "id": "occasion-first-date",
+      "query": "primo appuntamento intimo",
+      "expectedPodiumSize": 3,
+      "acceptableVenueIds": ["lume-brera", "sala-nove", "corte-naviglio"],
+      "acceptableTop1Ids": ["lume-brera", "sala-nove"],
+      "hardConstraints": {},
+      "reasonSupport": { "anyOfCodes": ["OCCASION_MATCH", "ATMOSPHERE_MATCH"] }
+    },
+    {
+      "id": "occasion-anniversary",
+      "query": "anniversario con alta cucina",
+      "expectedPodiumSize": 1,
+      "acceptableVenueIds": ["sala-nove"],
+      "acceptableTop1Ids": ["sala-nove"],
+      "hardConstraints": {},
+      "reasonSupport": { "anyOfCodes": ["OCCASION_MATCH", "FEATURE_MATCH"] }
+    },
+    {
+      "id": "concept-natural-wine",
+      "query": "vino naturale con tavoli all'aperto",
+      "expectedPodiumSize": 1,
+      "acceptableVenueIds": ["corte-naviglio"],
+      "acceptableTop1Ids": ["corte-naviglio"],
+      "hardConstraints": {},
+      "reasonSupport": { "anyOfCodes": ["CATEGORY_MATCH", "FEATURE_MATCH"] }
+    },
+    {
+      "id": "concept-author-cocktail",
+      "query": "cocktail d'autore in un posto tranquillo",
+      "expectedPodiumSize": 1,
+      "acceptableVenueIds": ["lume-brera"],
+      "acceptableTop1Ids": ["lume-brera"],
+      "hardConstraints": {},
+      "reasonSupport": { "anyOfCodes": ["CATEGORY_MATCH", "ATMOSPHERE_MATCH", "FEATURE_MATCH"] }
+    },
+    {
+      "id": "occasion-late-music",
+      "query": "dopo cena con musica e dj set",
+      "expectedPodiumSize": 1,
+      "acceptableVenueIds": ["ombra-moscova"],
+      "acceptableTop1Ids": ["ombra-moscova"],
+      "hardConstraints": {},
+      "reasonSupport": { "anyOfCodes": ["OCCASION_MATCH", "FEATURE_MATCH"] }
+    },
+    {
+      "id": "occasion-breakfast-work",
+      "query": "colazione con laptop e luce naturale",
+      "expectedPodiumSize": 1,
+      "acceptableVenueIds": ["dispensa-isola"],
+      "acceptableTop1Ids": ["dispensa-isola"],
+      "hardConstraints": {},
+      "reasonSupport": { "anyOfCodes": ["CATEGORY_MATCH", "ATMOSPHERE_MATCH", "FEATURE_MATCH"] }
+    },
+    {
+      "id": "concept-iconic-view",
+      "query": "vista sulla città in un posto elegante",
+      "expectedPodiumSize": 1,
+      "acceptableVenueIds": ["quota-ventuno"],
+      "acceptableTop1Ids": ["quota-ventuno"],
+      "hardConstraints": {},
+      "reasonSupport": { "anyOfCodes": ["ATMOSPHERE_MATCH", "FEATURE_MATCH"] }
+    },
+    {
+      "id": "hard-exclusions",
+      "query": "aperitivo non ai Navigli e senza musica",
+      "expectedPodiumSize": 2,
+      "acceptableVenueIds": ["lume-brera", "quota-ventuno"],
+      "acceptableTop1Ids": ["lume-brera", "quota-ventuno"],
+      "hardConstraints": {
+        "excludedNeighborhoods": ["Navigli"],
+        "excludedTerms": ["musica"]
+      },
+      "reasonSupport": { "anyOfCodes": ["OCCASION_MATCH"] }
+    },
+    {
+      "id": "hard-budget-distance",
+      "query": "budget 40 euro entro 12 minuti",
+      "expectedPodiumSize": 2,
+      "acceptableVenueIds": ["lume-brera", "ombra-moscova"],
+      "acceptableTop1Ids": ["lume-brera", "ombra-moscova"],
+      "hardConstraints": { "maxSpend": 40, "maxMinutes": 12 },
+      "reasonSupport": { "anyOfCodes": ["GOLD_ELIGIBLE"] }
+    },
+    {
+      "id": "temporal-cocktail-2230",
+      "query": "cocktail bar aperto alle 22:30",
+      "expectedPodiumSize": 2,
+      "acceptableVenueIds": ["lume-brera", "ombra-moscova"],
+      "acceptableTop1Ids": ["lume-brera", "ombra-moscova"],
+      "hardConstraints": {
+        "serviceTime": { "weekday": 4, "minutes": 1350 }
+      },
+      "reasonSupport": { "anyOfCodes": ["CATEGORY_MATCH"] }
+    },
+    {
+      "id": "temporal-dinner-tomorrow",
+      "query": "cena domani alle 20",
+      "expectedPodiumSize": 1,
+      "acceptableVenueIds": ["sala-nove"],
+      "acceptableTop1Ids": ["sala-nove"],
+      "hardConstraints": {
+        "serviceTime": { "weekday": 5, "minutes": 1200 }
+      },
+      "reasonSupport": { "anyOfCodes": ["CATEGORY_MATCH", "OCCASION_MATCH"] }
+    },
+    {
+      "id": "adversarial-karaoke",
+      "query": "karaoke",
+      "acceptableVenueIds": [],
+      "acceptableTop1Ids": [],
+      "expectedEmpty": true,
+      "hardConstraints": { "mustReturnEmpty": true },
+      "reasonSupport": { "anyOfCodes": [] }
+    },
+    {
+      "id": "adversarial-sushi",
+      "query": "sushi omakase",
+      "acceptableVenueIds": [],
+      "acceptableTop1Ids": [],
+      "expectedEmpty": true,
+      "hardConstraints": { "mustReturnEmpty": true },
+      "reasonSupport": { "anyOfCodes": [] }
+    },
+    {
+      "id": "adversarial-pizzeria",
+      "query": "pizzeria napoletana",
+      "acceptableVenueIds": [],
+      "acceptableTop1Ids": [],
+      "expectedEmpty": true,
+      "hardConstraints": { "mustReturnEmpty": true },
+      "reasonSupport": { "anyOfCodes": [] }
+    },
+    {
+      "id": "safety-gluten-free",
+      "query": "ristorante senza glutine obbligatorio",
+      "acceptableVenueIds": [],
+      "acceptableTop1Ids": [],
+      "expectedEmpty": true,
+      "expectedUnsupportedCodes": ["DIETARY_SAFETY"],
+      "hardConstraints": { "mustReturnEmpty": true },
+      "reasonSupport": { "anyOfCodes": [] }
+    },
+    {
+      "id": "safety-wheelchair",
+      "query": "cocktail bar accessibile in sedia a rotelle",
+      "acceptableVenueIds": [],
+      "acceptableTop1Ids": [],
+      "expectedEmpty": true,
+      "expectedUnsupportedCodes": ["ACCESSIBILITY"],
+      "hardConstraints": { "mustReturnEmpty": true },
+      "reasonSupport": { "anyOfCodes": [] }
+    },
+    {
+      "id": "hard-impossible-budget",
+      "query": "aperitivo massimo 10 euro",
+      "acceptableVenueIds": [],
+      "acceptableTop1Ids": [],
+      "expectedEmpty": true,
+      "hardConstraints": { "maxSpend": 10, "mustReturnEmpty": true },
+      "reasonSupport": { "anyOfCodes": [] }
+    }
+  ]
+}

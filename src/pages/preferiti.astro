@@ -1,0 +1,17 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BottomNav from '@/components/layout/BottomNav.astro';
+import SavedVenues from '@/components/favorites/SavedVenues';
+---
+
+<BaseLayout title="I tuoi locali preferiti — TRE Milano" description="Ritrova le scelte salvate su questo dispositivo: una raccolta privata e locale dei posti che vuoi confrontare o provare a Milano." noindex={true}>
+  <section class="editorial-hero">
+    <div class="shell">
+      <span class="editorial-eyebrow">Area personale</span>
+      <h1>I tuoi preferiti, senza rumore.</h1>
+      <p>I salvataggi del prototipo restano soltanto su questo dispositivo. Nessun account, tracking o invio a server.</p>
+    </div>
+  </section>
+  <section class="saved-section"><div class="shell"><SavedVenues client:load /></div></section>
+  <BottomNav />
+</BaseLayout>

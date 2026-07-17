@@ -1,0 +1,26 @@
+---
+const currentPath = Astro.url.pathname;
+const items = [
+  { href: '/', label: 'Home', icon: 'home' },
+  { href: '/milano/', label: 'Esplora', icon: 'search' },
+  { href: '/preferiti/', label: 'Preferiti', icon: 'heart' },
+  { href: '/guide/milano-di-sera/', label: 'Guide', icon: 'calendar' },
+  { href: '/profilo/', label: 'Profilo', icon: 'user' },
+];
+const icons = {
+  home: '<path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10M9 20v-6h6v6"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/>',
+  heart: '<path d="M20.8 4.7a5.5 5.5 0 0 0-7.8 0L12 5.8l-1.1-1.1a5.5 5.5 0 1 0-7.8 7.8l1.1 1.1L12 21l7.8-7.4 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/>',
+  calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/>',
+};
+---
+
+<nav class="bottom-nav" aria-label="Navigazione rapida mobile">
+  {items.map((item) => (
+    <a href={item.href} aria-current={currentPath === item.href ? 'page' : undefined}>
+      <svg aria-hidden="true" viewBox="0 0 24 24" set:html={icons[item.icon as keyof typeof icons]} />
+      <span>{item.label}</span>
+    </a>
+  ))}
+</nav>

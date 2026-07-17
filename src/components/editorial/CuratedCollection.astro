@@ -1,0 +1,455 @@
+---
+import { venues } from '@/data/venues';
+import type { Venue } from '@/domain/venue';
+import { CURATED_COLLECTIONS } from '@/config/collections';
+import ResponsiveImage from '@/components/media/ResponsiveImage.astro';
+
+const definition = CURATED_COLLECTIONS.find(({ id }) => id === 'milano-by-night')!;
+
+const collection = definition.venueSlugs
+  .map((slug) => venues.find((venue) => venue.slug === slug))
+  .filter((venue): venue is Venue => Boolean(venue));
+
+const includesFixtures = collection.some((venue) => venue.fixtureOnly);
+---
+
+<section class="collection shell" aria-labelledby="milano-by-night-title">
+  <div class="collection__frame">
+    <header class="collection__header">
+      <div class="collection__copy">
+        <span class="collection__kicker">Collections &amp; Guides</span>
+        <h2 id="milano-by-night-title">{definition.title}</h2>
+        <p>{definition.description}</p>
+        <a class="collection__cta" href={definition.guideHref}>
+          Esplora la guida
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M5 12h14M14 7l5 5-5 5"></path>
+          </svg>
+        </a>
+      </div>
+
+      <div class="collection__hero-media">
+        <ResponsiveImage
+          src="/images/hero-milano.webp"
+          alt="Terrazza milanese al tramonto con il Duomo sullo sfondo"
+          width={1672}
+          height={941}
+          sizes="(max-width: 760px) 100vw, (max-width: 1260px) 58vw, 700px"
+          loading="lazy"
+          fetchpriority="low"
+        />
+        <span aria-hidden="true">Milano, dopo il tramonto</span>
+      </div>
+    </header>
+
+    <ul class="collection__rail" aria-label="Locali nella collezione Milano by Night">
+      {collection.map((venue, index) => (
+        <li>
+          <article class="collection-card">
+            <a
+              href={`/locali/${venue.slug}/`}
+              aria-label={`Apri la scheda di ${venue.name}, ${venue.category} in zona ${venue.neighborhood}`}
+            >
+              <div class="collection-card__media">
+                <ResponsiveImage
+                  src={venue.image}
+                  alt={venue.imageAlt}
+                  width={venue.imageWidth}
+                  height={venue.imageHeight}
+                  sizes="(max-width: 760px) 72vw, (max-width: 1079px) 32vw, 220px"
+                  loading="lazy"
+                  fetchpriority="low"
+                />
+                <span class="collection-card__index" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+              </div>
+              <div class="collection-card__body">
+                <h3>{venue.name}</h3>
+                <p>{venue.category} <span aria-hidden="true">·</span> {venue.neighborhood}</p>
+                <svg class="collection-card__arrow" aria-hidden="true" viewBox="0 0 24 24">
+                  <path d="M5 12h14M14 7l5 5-5 5"></path>
+                </svg>
+              </div>
+            </a>
+          </article>
+        </li>
+      ))}
+    </ul>
+
+    {includesFixtures && (
+      <p class="collection__notice" role="note">
+        Anteprima editoriale: i nomi e i dati dei locali sono fixture dichiarate, non informazioni pubblicabili come reali.
+        <a href="/metodologia/">Come gestiamo i dati</a>
+      </p>
+    )}
+  </div>
+</section>
+
+<style>
+  .collection {
+    padding: 0 0 clamp(4.5rem, 7vw, 7rem);
+  }
+
+  .collection__frame {
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid color-mix(in srgb, var(--gold) 32%, var(--line));
+    border-radius: 1.1rem;
+    box-shadow: 0 22px 60px rgb(11 19 32 / 9%);
+  }
+
+  .collection__header {
+    min-height: 280px;
+    display: grid;
+    grid-template-columns: minmax(340px, 0.82fr) minmax(0, 1.18fr);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .collection__copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: clamp(2rem, 4.5vw, 3.75rem);
+  }
+
+  .collection__kicker {
+    color: var(--gold-ink);
+    font-size: 0.62rem;
+    font-weight: 650;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .collection h2 {
+    margin: 0.45rem 0 0.8rem;
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, 4.8vw, 4.5rem);
+    font-weight: 400;
+    letter-spacing: -0.04em;
+    line-height: 0.98;
+  }
+
+  .collection__copy > p {
+    max-width: 440px;
+    margin: 0;
+    color: var(--muted);
+    font-size: clamp(0.82rem, 1.1vw, 0.92rem);
+    line-height: 1.7;
+  }
+
+  .collection__cta {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-top: 1.35rem;
+    padding: 0.25rem 1.15rem;
+    color: var(--ivory);
+    background: var(--navy);
+    border: 1px solid var(--navy);
+    border-radius: 999px;
+    font-size: 0.61rem;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 180ms ease, background 180ms ease, transform 180ms ease;
+  }
+
+  .collection__cta svg {
+    width: 0.95rem;
+    height: 0.95rem;
+    transition: transform 180ms ease;
+  }
+
+  .collection__cta:hover {
+    color: var(--navy);
+    background: transparent;
+    transform: translateY(-1px);
+  }
+
+  .collection__cta:hover svg {
+    transform: translateX(3px);
+  }
+
+  .collection__hero-media {
+    position: relative;
+    min-height: 280px;
+    overflow: hidden;
+    background: var(--navy);
+  }
+
+  .collection__hero-media::after {
+    position: absolute;
+    inset: auto 0 0;
+    height: 42%;
+    content: '';
+    background: linear-gradient(to top, rgb(11 19 32 / 62%), transparent);
+    pointer-events: none;
+  }
+
+  .collection__hero-media :global(.responsive-image) {
+    height: 100%;
+  }
+
+  .collection__hero-media :global(img) {
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+    object-fit: cover;
+    object-position: 63% 48%;
+    transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .collection__frame:hover .collection__hero-media :global(img) {
+    transform: scale(1.015);
+  }
+
+  .collection__hero-media > span {
+    position: absolute;
+    z-index: 1;
+    right: clamp(1.1rem, 3vw, 2.1rem);
+    bottom: 1.25rem;
+    color: var(--ivory);
+    font-size: 0.55rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .collection__rail {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(188px, 1fr);
+    gap: 0.8rem;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    margin: 0;
+    padding: 1rem 1rem 1.15rem;
+    list-style: none;
+    scroll-padding-inline: 1rem;
+    scroll-snap-type: inline proximity;
+    scrollbar-color: color-mix(in srgb, var(--gold) 70%, transparent) transparent;
+    scrollbar-width: thin;
+    touch-action: pan-x;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .collection__rail > li {
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+
+  .collection-card,
+  .collection-card > a {
+    height: 100%;
+  }
+
+  .collection-card {
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.65rem;
+    transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+  }
+
+  .collection-card:hover {
+    border-color: color-mix(in srgb, var(--gold) 70%, var(--line));
+    box-shadow: 0 12px 28px rgb(11 19 32 / 10%);
+    transform: translateY(-3px);
+  }
+
+  .collection-card:focus-within {
+    border-color: var(--gold-ink);
+    box-shadow: 0 12px 28px rgb(11 19 32 / 10%);
+  }
+
+  .collection-card > a {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+  }
+
+  .collection-card__media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--navy-soft);
+  }
+
+  .collection-card__media::after {
+    position: absolute;
+    inset: 0;
+    content: '';
+    border: 1px solid rgb(255 255 255 / 10%);
+    pointer-events: none;
+  }
+
+  .collection-card__media :global(.responsive-image) {
+    height: 100%;
+  }
+
+  .collection-card__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 420ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .collection-card:hover .collection-card__media :global(img) {
+    transform: scale(1.045);
+  }
+
+  .collection-card__index {
+    position: absolute;
+    left: 0.7rem;
+    top: 0.7rem;
+    min-width: 2rem;
+    height: 2rem;
+    display: grid;
+    place-items: center;
+    color: var(--gold);
+    background: rgb(11 19 32 / 82%);
+    border: 1px solid rgb(200 169 110 / 68%);
+    border-radius: 50%;
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    backdrop-filter: blur(7px);
+  }
+
+  .collection-card__body {
+    position: relative;
+    flex: 1;
+    padding: 0.95rem 2.3rem 0.9rem 0.9rem;
+  }
+
+  .collection-card h3 {
+    margin: 0 0 0.3rem;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+  }
+
+  .collection-card p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.53rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    line-height: 1.45;
+    text-transform: uppercase;
+  }
+
+  .collection-card__arrow {
+    position: absolute;
+    right: 0.85rem;
+    top: 50%;
+    width: 0.95rem;
+    height: 0.95rem;
+    color: var(--gold-ink);
+    transform: translateY(-50%);
+    transition: transform 180ms ease;
+  }
+
+  .collection-card:hover .collection-card__arrow {
+    transform: translate(3px, -50%);
+  }
+
+  .collection__notice {
+    margin: 0;
+    padding: 0.75rem 1rem 0.9rem;
+    color: var(--muted);
+    border-top: 1px solid var(--line);
+    font-size: 0.62rem;
+    line-height: 1.55;
+    text-align: center;
+  }
+
+  .collection__notice a {
+    color: var(--gold-ink);
+    font-weight: 600;
+    text-underline-offset: 0.18em;
+  }
+
+  @media (min-width: 1080px) {
+    .collection__rail {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-auto-flow: initial;
+      overflow: visible;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .collection {
+      width: 100%;
+      padding-bottom: 4rem;
+    }
+
+    .collection__frame {
+      border-inline: 0;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    .collection__header {
+      min-height: 0;
+      display: flex;
+      flex-direction: column-reverse;
+    }
+
+    .collection__copy {
+      padding: 1.65rem 1rem 1.8rem;
+    }
+
+    .collection h2 {
+      font-size: clamp(2.7rem, 14vw, 3.65rem);
+    }
+
+    .collection__copy > p {
+      max-width: 38rem;
+      font-size: 0.8rem;
+    }
+
+    .collection__hero-media,
+    .collection__hero-media :global(.responsive-image),
+    .collection__hero-media :global(img) {
+      min-height: 220px;
+    }
+
+    .collection__hero-media > span {
+      right: 1rem;
+      bottom: 0.85rem;
+    }
+
+    .collection__rail {
+      grid-auto-columns: minmax(205px, 72vw);
+      gap: 0.65rem;
+      padding: 0.85rem 1rem 1rem;
+      scroll-snap-type: inline mandatory;
+    }
+
+    .collection-card__body {
+      min-height: 76px;
+    }
+
+    .collection__notice {
+      padding-inline: 1rem;
+      text-align: left;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .collection__cta,
+    .collection__cta svg,
+    .collection__hero-media :global(img),
+    .collection-card,
+    .collection-card__media :global(img),
+    .collection-card__arrow {
+      transition: none;
+    }
+  }
+</style>

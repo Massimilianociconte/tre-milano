@@ -1,0 +1,73 @@
+---
+import responsiveConfig from '@/config/responsive-images.json';
+
+type Loading = 'eager' | 'lazy';
+type Decoding = 'async' | 'sync' | 'auto';
+type FetchPriority = 'high' | 'low' | 'auto';
+
+type Props = {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  sizes: string;
+  loading?: Loading;
+  decoding?: Decoding;
+  fetchpriority?: FetchPriority;
+  decorative?: boolean;
+  class?: string;
+};
+
+const {
+  src,
+  alt,
+  width,
+  height,
+  sizes,
+  loading = 'lazy',
+  decoding = 'async',
+  fetchpriority = 'auto',
+  decorative = false,
+  class: className,
+} = Astro.props;
+
+const image = responsiveConfig.images.find((candidate) => candidate.source === src || candidate.aliases.includes(src));
+if (!image) throw new Error(`ResponsiveImage: asset non registrato: ${src}`);
+if (decorative && alt) throw new Error(`ResponsiveImage: un'immagine decorativa deve avere alt vuoto: ${src}`);
+
+const widths = responsiveConfig.targetWidths.filter((candidate) => candidate <= image.width);
+if (!widths.length) throw new Error(`ResponsiveImage: nessuna larghezza applicabile per ${src}`);
+const variantPath = (candidateWidth: number, format: 'avif' | 'webp') =>
+  `/images/responsive/${responsiveConfig.assetVersion}/${image.id}-${candidateWidth}.${format}`;
+const srcset = (format: 'avif' | 'webp') => widths
+  .map((candidateWidth) => `${variantPath(candidateWidth, format)} ${candidateWidth}w`)
+  .join(', ');
+const fallback = variantPath(widths.at(-1)!, 'webp');
+---
+
+<picture class:list={['responsive-image', className]} aria-hidden={decorative ? 'true' : undefined}>
+  <source type="image/avif" srcset={srcset('avif')} {sizes} />
+  <source type="image/webp" srcset={srcset('webp')} {sizes} />
+  <img
+    src={fallback}
+    alt={alt || ''}
+    {width}
+    {height}
+    {sizes}
+    {loading}
+    {decoding}
+    {fetchpriority}
+    role={decorative ? 'presentation' : undefined}
+  />
+</picture>
+
+<style>
+  .responsive-image {
+    width: 100%;
+    display: block;
+  }
+
+  .responsive-image > img {
+    display: block;
+  }
+</style>
