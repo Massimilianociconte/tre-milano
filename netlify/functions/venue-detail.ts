@@ -21,7 +21,10 @@ export default async (request: Request, context: Context) => {
       route: 'catalog:detail', limit, windowSeconds: 60,
     });
     if (!rate.allowed) return problem(429, 'Troppe richieste', { requestId: context.requestId, headers: { 'Retry-After': String(rate.retryAfterSeconds) } });
-    const detail = await client.rpc<Record<string, unknown> | null>('get_venue_detail', { p_slug: slug });
+    // Anche le schede explore-only bronze hanno un venue passport pubblico:
+    // la proiezione marca chiaramente verification/maturity e il client le
+    // esclude comunque dal ranking del podio.
+    const detail = await client.rpc<Record<string, unknown> | null>('get_venue_detail', { p_slug: slug, p_include_unverified: true });
     if (!detail) return problem(404, 'Locale non trovato', { requestId: context.requestId });
     const response: CatalogDetailResponse = { version: CATALOG_API_VERSION, data: detail };
     const etag = await responseEtag(response);

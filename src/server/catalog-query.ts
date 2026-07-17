@@ -27,6 +27,7 @@ export type ParsedCatalogQuery = {
   sort: CatalogSort;
   cursor: CatalogCursor | null;
   limit: number;
+  includeUnverified: boolean;
 };
 
 const parseNumber = (value: string | null, field: string) => {
@@ -111,6 +112,11 @@ export function parseCatalogQuery(url: URL): ParsedCatalogQuery {
   const limit = parseNumber(url.searchParams.get('limit'), 'limit') ?? 24;
   if (!Number.isInteger(limit) || limit < 1 || limit > 50) throw new CatalogQueryError('limit', 'Il limite deve essere tra 1 e 50.');
 
+  const includeUnverifiedValue = url.searchParams.get('include_unverified');
+  if (includeUnverifiedValue !== null && includeUnverifiedValue !== '1' && includeUnverifiedValue !== '0') {
+    throw new CatalogQueryError('include_unverified', 'include_unverified accetta solo 0 o 1.');
+  }
+
   return {
     query,
     categorySlugs: parseSlugs(url.searchParams.getAll('category'), 'category'),
@@ -125,5 +131,6 @@ export function parseCatalogQuery(url: URL): ParsedCatalogQuery {
     sort: sortCandidate,
     cursor: decodeCatalogCursor(url.searchParams.get('cursor')),
     limit,
+    includeUnverified: includeUnverifiedValue === '1',
   };
 }

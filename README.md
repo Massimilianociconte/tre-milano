@@ -7,6 +7,7 @@ Vertical slice PWA, content-first e SEO/GEO-ready costruita sui due PRD 2026 di 
 - Homepage responsive aderente al sistema visivo navy, ivory e champagne gold.
 - Ricerca semantica locale in italiano con sinonimi, accenti, occasioni, atmosfere, quartieri e concetti curati.
 - Tassonomia quartieri unificata (`src/domain/neighborhoods.ts`): 22 zone con alias colloquiali (Montenapoleone, corso Como, Chinatown…) condivise da parser locale, contratto DeepSeek, snapshot del podio e selettore zona, incluse le zone del catalogo reale Porta Venezia, Monumentale e Quadrilatero della moda.
+- Catalogo esplorativo pubblicato: 7.407 schede bronze non verificate promosse dalle anagrafiche comunali (dedup, categorie mappate, fonte e data dichiarate), raggiungibili via `/api/catalog?include_unverified=1` e `/locale/?slug=…`; il podio resta riservato alle sole schede Gold/Platinum verificate. Vedi `docs/DATA_PIPELINE.md`.
 - Interprete remoto opzionale e privacy-first per le query davvero ambigue: DeepSeek traduce soltanto verso la tassonomia controllata, mentre selezione, vincoli e podio restano nel ranker locale. Vedi [`docs/SEARCH_INTERPRETER.md`](docs/SEARCH_INTERPRETER.md).
 - Negazioni, esclusioni e requisiti espliciti (`solo`, `deve avere`) applicati come vincoli duri prima del ranking.
 - Ranking deterministico con `Best Fit`, `Safe Alternative`, `Smart Wildcard`, tie-break stabile e diversità controllata.

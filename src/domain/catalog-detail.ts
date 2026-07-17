@@ -44,7 +44,7 @@ export type CatalogVenueDetail = {
     qualityScore: number;
     completenessScore: number;
     confidenceScore: number;
-    verifiedAt: string;
+    verifiedAt: string | null;
     staleAfter: string | null;
   };
   address: {
@@ -312,7 +312,7 @@ export function parseCatalogDetailResponse(value: unknown): CatalogVenueDetail |
     || verification.completenessScore < 0 || verification.completenessScore > 100
     || !isFiniteNumber(verification.confidenceScore)
     || verification.confidenceScore < 0 || verification.confidenceScore > 1
-    || !isTimestamp(verification.verifiedAt)
+    || nullableTimestamp(verification.verifiedAt) === undefined
     || nullableTimestamp(verification.staleAfter) === undefined
     || !text(address.formatted, 500)
     || !isValidMilanPublicationGeo({ latitude: address.latitude, longitude: address.longitude })) return null;
@@ -340,7 +340,7 @@ export function parseCatalogDetailResponse(value: unknown): CatalogVenueDetail |
       qualityScore: verification.qualityScore,
       completenessScore: verification.completenessScore,
       confidenceScore: verification.confidenceScore,
-      verifiedAt: verification.verifiedAt,
+      verifiedAt: nullableTimestamp(verification.verifiedAt) as string | null,
       staleAfter: nullableTimestamp(verification.staleAfter) as string | null,
     },
     address: {

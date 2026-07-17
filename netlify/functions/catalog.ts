@@ -54,6 +54,7 @@ export function createCatalogHandler() {
         p_after_value: query.cursor?.value ?? null,
         p_after_id: query.cursor?.id ?? null,
         p_limit: query.limit + 1,
+        p_include_unverified: query.includeUnverified,
       });
       const hasMore = rows.length > query.limit;
       const visible = rows.slice(0, query.limit);

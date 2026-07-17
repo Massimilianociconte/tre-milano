@@ -155,7 +155,9 @@ function VenuePassport({ venue }: { venue: VenueDetail }) {
           </figure>
           <div className="catalog-detail__intro">
             <div className="catalog-detail__kicker">
-              <span className="editorial-eyebrow">Venue passport · verificato</span>
+              <span className="editorial-eyebrow">
+                {venue.verification.status === 'verified' ? 'Venue passport · verificato' : 'Scheda importata · non verificata'}
+              </span>
               <span className="catalog-detail__confidence">{Math.round(venue.verification.confidenceScore * 100)}% confidenza</span>
             </div>
             <h1>{venue.name}</h1>
@@ -165,7 +167,9 @@ function VenuePassport({ venue }: { venue: VenueDetail }) {
 
             <dl className="catalog-detail__facts">
               <div><dt>Spesa media</dt><dd>{exactSpend ? formatCurrency(exactSpend) : 'Prezzo da verificare'}</dd></div>
-              <div><dt>Ultima verifica</dt><dd><time dateTime={venue.verification.verifiedAt}>{formatDate(venue.verification.verifiedAt)}</time></dd></div>
+              <div><dt>Ultima verifica</dt><dd>{venue.verification.verifiedAt
+                ? <time dateTime={venue.verification.verifiedAt}>{formatDate(venue.verification.verifiedAt)}</time>
+                : 'Non ancora verificato'}</dd></div>
               <div><dt>Completezza</dt><dd>{Math.round(venue.verification.completenessScore)}%</dd></div>
             </dl>
 

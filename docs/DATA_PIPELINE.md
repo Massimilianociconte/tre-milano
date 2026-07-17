@@ -81,3 +81,23 @@ Il writer usa batch da massimo 500 osservazioni. L’import NDJSON accetta al ma
 ## Revisione manuale minima
 
 Prima di `active/verified/gold`: nome ufficiale, indirizzo/geocodifica, contatto ufficiale, orari freschi, fascia prezzo, fonte per ogni claim, immagine con licenza, controllo duplicati e data di prossima verifica. Le valutazioni devono indicare fonte, scala, conteggio, URL e data; non copiare testi delle recensioni.
+
+## Pubblicazione esplorativa del catalogo amministrativo (17 luglio 2026)
+
+La migrazione `20260717150000_explore_catalog_publication.sql` e lo script
+`pnpm exec node scripts/data-promote-observations.mjs` promuovono le
+osservazioni comunali in venue pubbliche **bronze/unverified explore-only**:
+
+- dry-run per default; scrittura solo con `DATA_IMPORT_DRY_RUN=false` + `--confirm-write`;
+- dedup per nome normalizzato + indirizzo/coordinate (priorità DS58 > DS59 > DS250) e guardia anti-duplicato contro i locali esistenti (fingerprint o stesso nome entro 150 m);
+- mappatura delle categorie amministrative sulla tassonomia TRE (`caffe`, `ristorante`, `pasticceria`, `gelateria`, `enoteca`, `pub`, `club`, `hotel`, `altro`);
+- insegne generiche ("PASTICCERIA", "BAR"…) escluse dalla promozione (`20260717153000`); i 124 record già promossi con nome generico sono stati riportati a draft;
+- ogni scheda promossa dichiara fonte e data del dato ("anagrafica Comune di Milano, dati al 31/12/2023") nella descrizione e resta `recommendation_eligible=false`.
+
+Esito della promozione del 17 luglio 2026: **7.531 venue promosse**, 124 de-pubblicate per insegna generica → **7.407 schede bronze pubbliche** + 6 verificate Gold/Platinum.
+
+Le API le espongono solo su richiesta esplicita: `GET /api/catalog?include_unverified=1`
+(default invariato: solo verificate). Le schede runtime `/locale/?slug=…` servono anche
+le bronze, marcate "Scheda importata · non verificata", con placeholder di categoria
+come visual. Il podio e il ranking restano riservati a Gold/Platinum verificate:
+l'adapter client scarta ogni record senza `verifiedAt`.
