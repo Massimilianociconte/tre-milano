@@ -78,6 +78,16 @@ Le credenziali amministrative (`SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_ID`, `
 
 I comandi dati preferiscono `.env.pipeline` e accettano `--env=<percorso>`. Prima dei comandi `supabase ...`, esportare invece le variabili dal secret store CI o dalla shell: la CLI non carica automaticamente il template della pipeline.
 
+## 4bis. Continuous deployment da GitHub
+
+Il sito Netlify `tre-milano-preview-160726` è collegato a `github.com/Massimilianociconte/tre-milano` (branch `main`):
+
+- clone autenticato tramite deploy key Netlify registrata read-only sul repository GitHub;
+- webhook GitHub verso `https://api.netlify.com/hooks/github` per `push`, `pull_request` e `delete`;
+- comando build da `netlify.toml` (`node scripts/run-netlify-build.mjs`, publish `dist`, Node 22, pnpm 11.9.0).
+
+Ogni push su `main` produce quindi un deploy automatico. I default restano fail-closed `preview/fixture`; il cutover Gold continua a passare esclusivamente dalle Environment Variables Netlify e dai gate di build.
+
 ## 5. Preview e smoke test
 
 Mantenere `PUBLIC_SITE_MODE=preview` e `PUBLIC_DATA_MODE=fixture` durante la prova. Dopo deploy verificare:
