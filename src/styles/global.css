@@ -26,6 +26,9 @@
 }
 
 html {
+  /* Palette chiara deliberata: dichiararla evita inversioni forzate errate
+     (forced dark mode) su alcuni browser mobile. */
+  color-scheme: light;
   scroll-behavior: smooth;
   background: var(--ivory);
 }
