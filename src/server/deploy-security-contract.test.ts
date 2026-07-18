@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -35,21 +35,31 @@ describe('production deployment security contract', () => {
     expect(securityMigration).toContain("alter table public.%I force row level security");
   });
 
-  it('keeps modern Supabase credentials server-only and legacy keys out of the Netlify template', () => {
-    for (const template of ['.env.example', '.env.production']) {
-      const source = read(template);
-      expect(source).toMatch(/^SUPABASE_SECRET_KEY=/m);
-      expect(source).not.toMatch(/^PUBLIC_SUPABASE_(?:SECRET|SERVICE_ROLE)_KEY=/m);
-      expect(source).not.toMatch(/^PUBLIC_DEEPSEEK_API_KEY=/m);
-      expect(source).not.toMatch(/^PUBLIC_TURNSTILE_SECRET_KEY=/m);
-    }
-    expect(read('.env.example')).toMatch(/^SUPABASE_SERVICE_ROLE_KEY=/m);
-    expect(read('.env.production')).not.toMatch(/^SUPABASE_SERVICE_ROLE_KEY=/m);
+  it('keeps modern Supabase credentials server-only and legacy keys out of the tracked template', () => {
+    // `.env.production` non è più un template tracciato: il contratto vive su
+    // `.env.example`. Il file locale, quando presente sulla macchina di chi
+    // sviluppa, resta comunque vincolato dal test successivo.
+    const source = read('.env.example');
+    expect(source).toMatch(/^SUPABASE_SECRET_KEY=/m);
+    expect(source).toMatch(/^SUPABASE_SERVICE_ROLE_KEY=/m);
+    expect(source).not.toMatch(/^PUBLIC_SUPABASE_(?:SECRET|SERVICE_ROLE)_KEY=/m);
+    expect(source).not.toMatch(/^PUBLIC_DEEPSEEK_API_KEY=/m);
+    expect(source).not.toMatch(/^PUBLIC_TURNSTILE_SECRET_KEY=/m);
   });
 
-  it('keeps the tracked Netlify template from injecting a placeholder canonical', () => {
+  it('keeps .env.production untracked and, when present locally, free of client-exposed secrets', () => {
+    // Il gitignore deve coprire `.env.*` senza mai reintrodurre la negazione
+    // `!.env.production`: è l'invariante che tiene le credenziali di deploy
+    // fuori dalla history pubblica.
+    const gitignore = read('.gitignore');
+    expect(gitignore).toMatch(/^\.env\.\*$/m);
+    expect(gitignore).not.toMatch(/^!\.env\.production$/m);
+
+    if (!existsSync(path.join(projectRoot, '.env.production'))) return;
     const source = read('.env.production');
-    expect(source).toMatch(/^PUBLIC_SITE_URL=$/m);
-    expect(source).not.toMatch(/^PUBLIC_SITE_URL=https?:\/\//m);
+    expect(source).not.toMatch(/^PUBLIC_SUPABASE_(?:SECRET|SERVICE_ROLE)_KEY=/m);
+    expect(source).not.toMatch(/^PUBLIC_DEEPSEEK_API_KEY=/m);
+    expect(source).not.toMatch(/^PUBLIC_TURNSTILE_SECRET_KEY=/m);
+    expect(source).not.toMatch(/^SUPABASE_SERVICE_ROLE_KEY=/m);
   });
 });
