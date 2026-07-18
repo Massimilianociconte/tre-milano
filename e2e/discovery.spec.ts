@@ -50,10 +50,16 @@ test('il podio mantiene DOM semantico 1–2–3 e composizione visuale 2–1–3
     await expect(crownFrames.nth(index)).toHaveAttribute('data-crown-lobes', '3');
   }
 
-  const crownPaths = await cards.locator('clipPath path').evaluateAll((paths) => paths.map((path) => (
-    path.getAttribute('d')?.match(/\bC\b/g)?.length ?? 0
-  )));
-  expect(crownPaths).toEqual([8, 8, 8]);
+  const crownGeometry = await cards.evaluateAll((items) => items.map((item) => ({
+    cap: item.querySelector('.podium-card__crown-cap')?.getAttribute('d') ?? '',
+    outline: item.querySelector('.podium-card__outline')?.getAttribute('d') ?? '',
+  })));
+  expect(crownGeometry.every(({ cap, outline }) => (
+    cap.startsWith('M ')
+    && outline.startsWith('M ')
+    && (cap.match(/\bC\b/g)?.length ?? 0) >= 3
+    && (outline.match(/\bC\b/g)?.length ?? 0) >= 6
+  ))).toBe(true);
 
   const crownStyles = await cards.evaluateAll((items) => items.map((item) => {
     const frame = item.querySelector<HTMLElement>('.podium-card__frame');
@@ -78,6 +84,34 @@ test('il podio mantiene DOM semantico 1–2–3 e composizione visuale 2–1–3
     && style.outlineStroke !== 'none'
     && style.rankInsideCrown
     && style.crownIsShallow
+  ))).toBe(true);
+
+  const cardAnatomy = await cards.evaluateAll((items) => items.map((item) => {
+    const rank = item.getAttribute('data-rank');
+    const title = item.querySelector<HTMLElement>('h3');
+    const facts = item.querySelector<HTMLElement>('.podium-card__facts');
+    const action = item.querySelector<HTMLElement>('.podium-card__open');
+    if (!title || !facts || !action) return null;
+    const titleStyle = getComputedStyle(title);
+    const actionStyle = getComputedStyle(action);
+    return {
+      rank,
+      factCount: facts.children.length,
+      titleAlign: titleStyle.textAlign,
+      titleTransform: titleStyle.textTransform,
+      titleFamily: titleStyle.fontFamily,
+      actionRadius: Number.parseFloat(actionStyle.borderRadius),
+      actionBackground: actionStyle.backgroundColor,
+    };
+  }));
+  expect(cardAnatomy.every((card) => (
+    card
+    && card.factCount === (card.rank === '1' ? 4 : 3)
+    && card.titleAlign === 'left'
+    && card.titleTransform === 'uppercase'
+    && /inter|sans/i.test(card.titleFamily)
+    && card.actionRadius <= 8
+    && card.actionBackground === 'rgb(8, 19, 33)'
   ))).toBe(true);
 
   const domRanks = await cards.evaluateAll((items) => items.map((item) => item.getAttribute('data-rank')));

@@ -51,6 +51,12 @@
   background: rgb(8 18 31 / 72%);
 }
 
+@media (min-width: 761px) and (max-width: 1050px) {
+  .home-shell .site-header {
+    background: linear-gradient(180deg, rgb(5 12 21 / 94%) 0%, rgb(5 12 21 / 76%) 100%);
+  }
+}
+
 .home-shell .home-hero {
   position: relative;
   min-height: 680px;

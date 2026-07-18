@@ -1,18 +1,42 @@
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
-import { applyRankingOverrides, parseIntent, rankVenues, type RankingContext, type RankingOverrides } from '@/ranking/rank';
-import { isPublicHttpsUrl, type DiscoveryCoordinates, type RankedVenue, type Venue } from '@/domain/venue';
-import { venues as catalogVenues } from '@/data/venues';
+import { type KeyboardEvent as ReactKeyboardEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { createAnalyticsDispatcher, type WildcardDimension } from '@/analytics/events';
 import { SITE } from '@/config/site';
+import { venues as catalogVenues } from '@/data/venues';
 import { buildSessionTravelEstimates, isWithinMilanDiscoveryArea } from '@/domain/discovery-location';
 import { FAVORITES_STORAGE_KEY } from '@/domain/favorites';
 import {
   clearLastPodium,
+  type LastPodiumSnapshotV1,
   lastPodiumIntentToOverrides,
   readLastPodium,
   writeLastPodium,
-  type LastPodiumSnapshotV1,
 } from '@/domain/last-podium';
-import { createAnalyticsDispatcher, type WildcardDimension } from '@/analytics/events';
+import {
+  isTasteProfileActive,
+  parseTasteProfile,
+  readTasteProfile,
+  TASTE_PROFILE_CHANGE_EVENT,
+  TASTE_PROFILE_STORAGE_KEY,
+  type TasteProfile,
+  type TasteProfileChangeDetail,
+  tasteProfileSignalCount,
+} from '@/domain/taste-profile';
+import { type DiscoveryCoordinates, isPublicHttpsUrl, type RankedVenue, type Venue } from '@/domain/venue';
+import { applyRankingOverrides, parseIntent, type RankingContext, type RankingOverrides, rankVenues } from '@/ranking/rank';
+import {
+  hasSearchPrivacyRisk,
+  interpretationToRankingOverrides,
+  isSearchInterpretationResponseV1,
+  SEARCH_INTERPRETATION_VERSION,
+  type SearchInterpretationFallbackReason,
+  shouldUseRemoteInterpretation,
+  validateSearchQuery,
+} from '@/search/interpretation-contract';
+import {
+  buildCatalogCandidateRequestUrl,
+  catalogPayloadToVenues,
+  parseCatalogVenuePayload,
+} from './catalog-venue-adapter';
 import {
   buildIntentChips,
   buildIntentRemovalOverrides,
@@ -20,30 +44,6 @@ import {
   type IntentChip,
   type LocalSuggestion,
 } from './intent-ui';
-import {
-  TASTE_PROFILE_CHANGE_EVENT,
-  TASTE_PROFILE_STORAGE_KEY,
-  isTasteProfileActive,
-  parseTasteProfile,
-  readTasteProfile,
-  tasteProfileSignalCount,
-  type TasteProfile,
-  type TasteProfileChangeDetail,
-} from '@/domain/taste-profile';
-import {
-  SEARCH_INTERPRETATION_VERSION,
-  hasSearchPrivacyRisk,
-  interpretationToRankingOverrides,
-  isSearchInterpretationResponseV1,
-  shouldUseRemoteInterpretation,
-  validateSearchQuery,
-  type SearchInterpretationFallbackReason,
-} from '@/search/interpretation-contract';
-import {
-  buildCatalogCandidateRequestUrl,
-  catalogPayloadToVenues,
-  parseCatalogVenuePayload,
-} from './catalog-venue-adapter';
 
 type Props = {
   initialQuery?: string;
@@ -162,13 +162,23 @@ function buildMapPositions(results: RankedVenue[]): Map<string, MapPosition> {
 }
 
 /*
- * One continuous, three-lobed crown: two restrained side lobes frame the
- * taller central lobe that carries the rank medallion. The silhouette is
- * applied only to the fixed-height visual — never to the full card — so its
- * proportions stay architectural instead of stretching with the copy.
+ * The accepted mockup uses one architectural crown, not a circular badge:
+ * broad shoulders rise from two quiet shelves and meet a navy leaf-shaped
+ * crest. The three paths share the same anchors so clip, fill and outline
+ * remain optically continuous at every card width.
  */
-const PODIUM_CROWN_CLIP_PATH = 'M 0 .18 C 0 .14 .04 .115 .095 .115 C .15 .115 .19 .14 .19 .18 C .19 .19 .21 .20 .235 .20 L .30 .20 C .32 .075 .40 .01 .5 .01 C .60 .01 .68 .075 .70 .20 L .765 .20 C .79 .20 .81 .19 .81 .18 C .81 .14 .85 .115 .905 .115 C .96 .115 1 .14 1 .18 V 1 H 0 Z';
-const PODIUM_CROWN_OUTLINE_PATH = 'M .6 18 C .6 14.2 4.2 11.7 9.6 11.7 C 15 11.7 18.8 14.2 18.8 18 C 18.8 19 21 20 23.5 20 L 30 20 C 32 7.5 40 1 50 1 C 60 1 68 7.5 70 20 L 76.5 20 C 79 20 81.2 19 81.2 18 C 81.2 14.2 85 11.7 90.4 11.7 C 95.8 11.7 99.4 14.2 99.4 18 V 99.4 H .6 Z';
+const PODIUM_CROWN_GEOMETRY = {
+  hero: {
+    clip: 'M 0 .28 C 0 .23 .02 .20 .055 .20 H .27 C .30 .08 .36 .04 .41 .20 C .43 .05 .465 .005 .5 .005 C .535 .005 .57 .05 .59 .20 C .64 .04 .70 .08 .73 .20 H .945 C .98 .20 1 .23 1 .28 V 1 H 0 Z',
+    outline: 'M .5 28 C .5 23 2 20 5.5 20 H 27 C 30 8 36 4 41 20 C 43 5 46.5 .5 50 .5 C 53.5 .5 57 5 59 20 C 64 4 70 8 73 20 H 94.5 C 98 20 99.5 23 99.5 28 V 99.5 H .5 Z',
+    cap: 'M 41 20 C 43 5 46.5 .5 50 .5 C 53.5 .5 57 5 59 20 C 55 27.5 45 27.5 41 20 Z',
+  },
+  side: {
+    clip: 'M 0 .28 C 0 .23 .02 .20 .055 .20 H .25 C .295 .065 .35 .045 .38 .20 C .405 .05 .455 .005 .5 .005 C .545 .005 .595 .05 .62 .20 C .65 .045 .705 .065 .75 .20 H .945 C .98 .20 1 .23 1 .28 V 1 H 0 Z',
+    outline: 'M .5 28 C .5 23 2 20 5.5 20 H 25 C 29.5 6.5 35 4.5 38 20 C 40.5 5 45.5 .5 50 .5 C 54.5 .5 59.5 5 62 20 C 65 4.5 70.5 6.5 75 20 H 94.5 C 98 20 99.5 23 99.5 28 V 99.5 H .5 Z',
+    cap: 'M 38 20 C 40.5 5 45.5 .5 50 .5 C 54.5 .5 59.5 5 62 20 C 56.5 27.5 43.5 27.5 38 20 Z',
+  },
+} as const;
 
 function analyticsDivergence(venue: RankedVenue): { divergenceDimension?: WildcardDimension } {
   const dimension = venue.divergenceDimensions[0];
@@ -221,6 +231,7 @@ function PodiumCard({ venue, saved, active, onSave, onFocus, onOpen, onShare, on
   const shownMinutes = shownTravel?.minutes ?? venue.travelEstimate.minutes;
   const shownOrigin = shownTravel?.originLabel ?? venue.travelEstimate.origin.shortLabel;
   const shownTravelDisclosure = shownTravel?.disclosure ?? venue.catalogApiRankingEvidence?.travelDisclosure;
+  const crownGeometry = venue.rank === 1 ? PODIUM_CROWN_GEOMETRY.hero : PODIUM_CROWN_GEOMETRY.side;
 
   return (
     <li
@@ -234,15 +245,16 @@ function PodiumCard({ venue, saved, active, onSave, onFocus, onOpen, onShare, on
       <svg className="podium-card__defs" aria-hidden="true" width="0" height="0">
         <defs>
           <clipPath id={clipId} clipPathUnits="objectBoundingBox">
-            <path d={PODIUM_CROWN_CLIP_PATH} />
+            <path d={crownGeometry.clip} />
           </clipPath>
         </defs>
       </svg>
       <article className="podium-card__frame" data-crown-lobes="3">
         <span className="sr-only">Posizione {venue.rank}.</span>
         <div className="podium-card__visual" style={{ clipPath: `url(#${clipId})` }}>
-          <svg className="podium-card__outline" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <path d={PODIUM_CROWN_OUTLINE_PATH} />
+          <svg className="podium-card__crown-art" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path className="podium-card__crown-cap" d={crownGeometry.cap} />
+            <path className="podium-card__outline" d={crownGeometry.outline} />
           </svg>
           <div className="podium-card__media">
             <img src={venue.image} alt={venue.imageAlt} width={venue.imageWidth} height={venue.imageHeight} loading={venue.rank === 1 ? 'eager' : 'lazy'} />
@@ -254,77 +266,82 @@ function PodiumCard({ venue, saved, active, onSave, onFocus, onOpen, onShare, on
             <h3><a href={venueDetailHref(venue)}>{venue.name}</a></h3>
             <p className="podium-card__meta">{venue.category} · {venue.neighborhood}</p>
           </div>
-          <div className="podium-card__facts">
-            <span className="podium-card__price">
-              <small>Spesa</small>
+          <dl className="podium-card__facts">
+            <div className="podium-card__price">
+              <dt>Spesa</dt>
+              <dd>
               {venue.pricingKnown === false
                 ? <strong className="podium-card__price-unknown"><span>Prezzo da verificare</span><em>Da verificare</em></strong>
                 : <strong>{'€'.repeat(venue.priceLevel)} <em>~{venue.averageSpend}</em></strong>}
-            </span>
-            <span
+              </dd>
+            </div>
+            <div
               className={`podium-card__travel${shownTravel ? ' podium-card__session-travel' : ''}`}
               aria-label={`${shownMinutes} minuti a piedi da ${shownTravel ? 'la tua posizione; stima, non routing' : venue.travelEstimate.origin.label}`}
             >
-              <small>A piedi</small>
-              <strong><Icon name="clock" /><span>{shownMinutes} min</span><span className="podium-card__travel-origin">· {shownOrigin}</span></strong>
+              <dt>A piedi</dt>
+              <dd><strong><Icon name="clock" /><span>{shownMinutes} min</span><span className="podium-card__travel-origin">· {shownOrigin}</span></strong></dd>
               {shownTravelDisclosure ? <small>{shownTravelDisclosure}</small> : null}
-            </span>
-          </div>
-          <div className="podium-card__evidence" aria-label={`Dati ${venue.fixtureOnly ? 'dimostrativi' : 'verificati'} aggiornati il ${venue.verifiedAt}; confidenza ${Math.round(venue.confidence * 100)} per cento`}>
-            <span><i aria-hidden="true" />{venue.fixtureOnly ? 'Demo' : 'Verificato'} · {shortVerifiedAt(venue.verifiedAt)}</span>
-            <strong>{Math.round(venue.confidence * 100)}%</strong>
-          </div>
-          <p className="podium-card__tradeoff-preview">
-            <span>Trade-off</span> · {venue.rank === 1
-              ? 'fit complessivo più alto'
-              : `varia ${venue.divergenceDimensions[0] ?? 'interpretazione'}`}
-          </p>
-          <a className="podium-card__open" href={venueDetailHref(venue)} onFocus={onFocus}>
-            <span>Apri scheda</span><Icon name="arrow" />
-          </a>
-          <div className="podium-card__footer">
-            <details
-              className="podium-card__why"
-              onToggle={(event) => {
-                if (event.currentTarget.open) onOpen();
-              }}
-              onKeyDown={(event) => {
-                if (event.key !== 'Escape') return;
-                event.currentTarget.open = false;
-                event.currentTarget.querySelector<HTMLElement>('summary')?.focus();
-              }}
-            >
-              <summary>{roleLabel}</summary>
-              <div>
-                <div className="podium-card__why-header">
-                  <strong>Perché questa scelta</strong>
-                  <button
-                    className="podium-card__why-close"
-                    type="button"
-                    onClick={(event) => {
-                      const details = event.currentTarget.closest('details');
-                      if (!details) return;
-                      details.open = false;
-                      details.querySelector<HTMLElement>('summary')?.focus();
-                    }}
-                  >
-                    <span className="sr-only">Chiudi i dettagli di {venue.name}</span>
-                    <Icon name="close" />
-                  </button>
-                </div>
-                <p>{venue.reason}</p>
-                <small className="podium-card__tradeoff">{venue.tradeoff}</small>
-                {venue.profileMatches.length ? <small>Profilo locale: {venue.profileMatches.join(' · ')}</small> : null}
-                <small>{venue.fixtureOnly ? 'Dati dimostrativi' : `Verificato ${venue.verifiedAt}`} · confidenza {Math.round(venue.confidence * 100)}%</small>
-                <div className="podium-card__why-actions">
-                  <button type="button" onClick={onShare}><Icon name="share" /> Condividi</button>
-                  <button type="button" onClick={onReplace}><Icon name="refresh" /> Ricalcola senza</button>
-                </div>
+            </div>
+            <div className="podium-card__evidence" aria-label={`Dati ${venue.fixtureOnly ? 'dimostrativi' : 'verificati'} aggiornati il ${venue.verifiedAt}; confidenza ${Math.round(venue.confidence * 100)} per cento`}>
+              <dt><i aria-hidden="true" />{venue.fixtureOnly ? 'Demo' : 'Verificato'}</dt>
+              <dd><span className="podium-card__evidence-date">{shortVerifiedAt(venue.verifiedAt)} · </span><strong>{Math.round(venue.confidence * 100)}%</strong></dd>
+            </div>
+            {venue.rank === 1 ? (
+              <div className="podium-card__tradeoff-preview">
+                <dt>Trade-off</dt>
+                <dd>fit complessivo più alto</dd>
               </div>
-            </details>
-            <button className="podium-card__save" type="button" aria-label={`${saved ? 'Rimuovi' : 'Salva'} ${venue.name} dai preferiti`} aria-pressed={saved} onClick={onSave}>
-              <Icon name="bookmark" />
-            </button>
+            ) : null}
+          </dl>
+          <div className="podium-card__actions">
+            <a className="podium-card__open" href={venueDetailHref(venue)} onFocus={onFocus}>
+              <span>Apri scheda</span>
+            </a>
+            <div className="podium-card__footer">
+              <button className="podium-card__save" type="button" aria-label={`${saved ? 'Rimuovi' : 'Salva'} ${venue.name} dai preferiti`} aria-pressed={saved} onClick={onSave}>
+                <Icon name="bookmark" />
+              </button>
+              <details
+                className="podium-card__why"
+                onToggle={(event) => {
+                  if (event.currentTarget.open) onOpen();
+                }}
+                onKeyDown={(event) => {
+                  if (event.key !== 'Escape') return;
+                  event.currentTarget.open = false;
+                  event.currentTarget.querySelector<HTMLElement>('summary')?.focus();
+                }}
+              >
+                <summary>{roleLabel}</summary>
+                <div>
+                  <div className="podium-card__why-header">
+                    <strong>Perché questa scelta</strong>
+                    <button
+                      className="podium-card__why-close"
+                      type="button"
+                      onClick={(event) => {
+                        const details = event.currentTarget.closest('details');
+                        if (!details) return;
+                        details.open = false;
+                        details.querySelector<HTMLElement>('summary')?.focus();
+                      }}
+                    >
+                      <span className="sr-only">Chiudi i dettagli di {venue.name}</span>
+                      <Icon name="close" />
+                    </button>
+                  </div>
+                  <p>{venue.reason}</p>
+                  <small className="podium-card__tradeoff">{venue.tradeoff}</small>
+                  {venue.profileMatches.length ? <small>Profilo locale: {venue.profileMatches.join(' · ')}</small> : null}
+                  <small>{venue.fixtureOnly ? 'Dati dimostrativi' : `Verificato ${venue.verifiedAt}`} · confidenza {Math.round(venue.confidence * 100)}%</small>
+                  <div className="podium-card__why-actions">
+                    <button type="button" onClick={onShare}><Icon name="share" /> Condividi</button>
+                    <button type="button" onClick={onReplace}><Icon name="refresh" /> Ricalcola senza</button>
+                  </div>
+                </div>
+              </details>
+            </div>
           </div>
         </div>
       </article>
