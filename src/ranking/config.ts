@@ -4,7 +4,7 @@
  * Any behavioural change to parsing, scoring or podium composition must bump
  * this value and update the reviewed golden dataset in the same change.
  */
-export const RANKING_VERSION = 'deterministic-local-v2' as const;
+export const RANKING_VERSION = 'deterministic-local-v3' as const;
 
 export const RANKING_WEIGHTS = Object.freeze({
   confidence: 24,

@@ -35,6 +35,7 @@ import {
 import {
   buildCatalogCandidateRequestUrl,
   catalogPayloadToVenues,
+  fetchCatalogCandidatePages,
   parseCatalogVenuePayload,
 } from './catalog-venue-adapter';
 import {
@@ -450,8 +451,15 @@ export default function DiscoveryExperience({ initialQuery, compact = false }: P
     if (!hydrated || catalogState.status !== 'live') return null;
     return buildCatalogCandidateRequestUrl(
       window.location.origin,
-      effectiveIntent.categories,
-      effectiveIntent.neighborhoods,
+      {
+        categories: effectiveIntent.categories,
+        neighborhoods: effectiveIntent.neighborhoods,
+        requiredServices: effectiveIntent.requiredConcepts,
+        requiredDietaryPreferences: effectiveIntent.requiredConcepts,
+        atmosphere: effectiveIntent.atmosphere,
+        occasions: effectiveIntent.occasions,
+        concepts: effectiveIntent.concepts,
+      },
     )?.toString() ?? null;
   }, [catalogState.status, effectiveIntent, hydrated]);
   const rankedResults = useMemo(
@@ -548,16 +556,15 @@ export default function DiscoveryExperience({ initialQuery, compact = false }: P
     candidateAbortRef.current = controller;
     completedCandidateRequestsRef.current.add(candidateRequestUrl);
 
-    void fetch(candidateRequestUrl, {
-      method: 'GET',
-      headers: { Accept: 'application/json' },
-      credentials: 'same-origin',
-      signal: controller.signal,
-    }).then(async (response) => {
-      if (!response.ok) throw new Error(`catalog_candidates_${response.status}`);
-      const payload = parseCatalogVenuePayload(await response.json());
-      if (!payload) throw new Error('catalog_candidates_invalid');
-      const candidates = catalogPayloadToVenues(payload, window.location.origin);
+    void fetchCatalogCandidatePages(
+      candidateRequestUrl,
+      window.location.origin,
+      fetch,
+      controller.signal,
+    ).then((payloads) => {
+      const candidates = payloads.flatMap((payload) => (
+        catalogPayloadToVenues(payload, window.location.origin)
+      ));
       if (!candidates.length) return;
       setCatalogState((current) => {
         if (current.status !== 'live') return current;
@@ -1116,6 +1123,21 @@ export default function DiscoveryExperience({ initialQuery, compact = false }: P
   const profileSignals = tasteProfileSignalCount(tasteProfile);
   const profileIsActive = !restoredLastPodium && isTasteProfileActive(tasteProfile);
   const profileMatchedResults = results.some((venue) => venue.reasonCodes.includes('PROFILE_MATCH'));
+  const profileSummaryTitle = profileIsActive
+    ? 'Profilo di gusto attivo'
+    : tasteProfile?.state === 'suspended'
+      ? 'Profilo di gusto sospeso'
+      : 'Profilo non applicato al podio offline';
+  const profileSummaryMeta = profileIsActive
+    ? `${profileSignals} ${profileSignals === 1 ? 'preferenza' : 'preferenze'}`
+    : 'Nessun impatto';
+  const profileDetailCopy = profileIsActive
+    ? profileMatchedResults
+      ? 'Le preferenze dichiarate hanno affinato il podio come segnale lieve. Budget, distanza, esclusioni e requisiti della ricerca restano sempre prioritari.'
+      : 'Nessuna affinità esplicita è presente nelle tre scelte. Il profilo non ha alterato l’ordine e i vincoli della ricerca restano prioritari.'
+    : tasteProfile?.state === 'suspended'
+      ? 'Il profilo è sospeso e non influenza il podio. Puoi riattivarlo dalla pagina Profilo.'
+      : 'Il podio ripristinato offline conserva i propri criteri e non viene ricalcolato con il profilo locale.';
   const interpretationCopy = {
     idle: {
       title: 'Ricerca ibrida',
@@ -1316,11 +1338,14 @@ export default function DiscoveryExperience({ initialQuery, compact = false }: P
           </p>
         )}
         {tasteProfileReady && tasteProfile && profileSignals > 0 ? (
-          <p className="active-filters" role="status" data-profile-state={tasteProfile.state}>
-            {profileIsActive
-              ? `Profilo locale applicato come segnale lieve (${profileSignals} ${profileSignals === 1 ? 'scelta dichiarata' : 'scelte dichiarate'})${profileMatchedResults ? '.' : '; nessuna affinità trovata in questo podio.'} I vincoli della ricerca hanno sempre priorità.`
-              : 'Profilo locale sospeso: queste preferenze non influenzano il podio.'}
-          </p>
+          <details className="profile-signal" data-profile-state={tasteProfile.state}>
+            <summary aria-live="polite" aria-atomic="true">
+              <Icon name="spark" />
+              <span>{profileSummaryTitle}</span>
+              <small>{profileSummaryMeta}</small>
+            </summary>
+            <p>{profileDetailCopy}</p>
+          </details>
         ) : null}
       </form>
 
@@ -1371,7 +1396,7 @@ export default function DiscoveryExperience({ initialQuery, compact = false }: P
               <strong>{restoredLastPodium ? 'Ultimo podio ripristinato offline' : 'Ultimo podio disponibile offline'}</strong>
               <small>Solo venue e criteri tassonomizzati · query, posizione e profilo non salvati</small>
             </span>
-            <button type="button" onClick={deleteLastPodium}>Cancella ultimo podio</button>
+            <button type="button" aria-label="Cancella ultimo podio" onClick={deleteLastPodium}>Rimuovi</button>
           </div>
         ) : null}
       </div>

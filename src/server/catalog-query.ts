@@ -1,8 +1,14 @@
 import type { CatalogSort } from '../domain/catalog-api';
 
-const ALLOWED_SORTS = new Set<CatalogSort>(['relevance', 'distance', 'price', 'rating', 'quality']);
+const ALLOWED_SORTS = new Set<CatalogSort>([
+  'relevance', 'distance', 'price', 'rating', 'quality', 'name', 'newest',
+]);
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const CURSOR_TEXT_MAX_BYTES = 240;
+const CURSOR_ENCODED_MAX_LENGTH = 512;
+const encoder = new TextEncoder();
+const decoder = new TextDecoder('utf-8', { fatal: true });
 
 export class CatalogQueryError extends Error {
   constructor(public readonly field: string, message: string) {
@@ -11,11 +17,12 @@ export class CatalogQueryError extends Error {
   }
 }
 
-export type CatalogCursor = { value: number; id: string };
+export type CatalogCursor = { value: number | string; id: string; sort?: CatalogSort };
 
 export type ParsedCatalogQuery = {
   query: string | null;
   categorySlugs: string[] | null;
+  subcategorySlugs: string[] | null;
   neighborhoodSlugs: string[] | null;
   serviceSlugs: string[] | null;
   minPriceLevel: number | null;
@@ -28,6 +35,7 @@ export type ParsedCatalogQuery = {
   cursor: CatalogCursor | null;
   limit: number;
   includeUnverified: boolean;
+  openNow: boolean;
 };
 
 const parseNumber = (value: string | null, field: string) => {
@@ -47,20 +55,45 @@ const parseSlugs = (values: string[], field: string) => {
 };
 
 export function encodeCatalogCursor(cursor: CatalogCursor) {
-  if (!Number.isFinite(cursor.value) || !UUID.test(cursor.id)) throw new CatalogQueryError('cursor', 'Cursor non valido.');
-  return btoa(JSON.stringify({ v: cursor.value, i: cursor.id })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const validValue = typeof cursor.value === 'number'
+    ? Number.isFinite(cursor.value)
+    : typeof cursor.value === 'string'
+      && cursor.value.length > 0
+      && encoder.encode(cursor.value).byteLength <= CURSOR_TEXT_MAX_BYTES;
+  if (!validValue || !UUID.test(cursor.id) || (cursor.sort !== undefined && !ALLOWED_SORTS.has(cursor.sort))) {
+    throw new CatalogQueryError('cursor', 'Cursor non valido.');
+  }
+  const bytes = encoder.encode(JSON.stringify({ v: cursor.value, i: cursor.id, ...(cursor.sort ? { s: cursor.sort } : {}) }));
+  const encoded = btoa(Array.from(bytes, (byte) => String.fromCharCode(byte)).join(''))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  if (encoded.length > CURSOR_ENCODED_MAX_LENGTH) throw new CatalogQueryError('cursor', 'Cursor non valido.');
+  return encoded;
 }
 
 export function decodeCatalogCursor(value: string | null): CatalogCursor | null {
   if (!value) return null;
-  if (value.length > 200 || !/^[A-Za-z0-9_-]+$/.test(value)) throw new CatalogQueryError('cursor', 'Cursor non valido.');
+  if (value.length > CURSOR_ENCODED_MAX_LENGTH || !/^[A-Za-z0-9_-]+$/.test(value)) {
+    throw new CatalogQueryError('cursor', 'Cursor non valido.');
+  }
   try {
     const base64 = value.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(value.length / 4) * 4, '=');
-    const parsed = JSON.parse(atob(base64)) as { v?: unknown; i?: unknown };
-    if (typeof parsed.v !== 'number' || !Number.isFinite(parsed.v) || typeof parsed.i !== 'string' || !UUID.test(parsed.i)) {
+    const binary = atob(base64);
+    const parsed = JSON.parse(decoder.decode(Uint8Array.from(binary, (character) => character.charCodeAt(0)))) as {
+      v?: unknown; i?: unknown; s?: unknown;
+    };
+    const validValue = (typeof parsed.v === 'number' && Number.isFinite(parsed.v))
+      || (typeof parsed.v === 'string'
+        && parsed.v.length > 0
+        && encoder.encode(parsed.v).byteLength <= CURSOR_TEXT_MAX_BYTES);
+    if (!validValue || typeof parsed.i !== 'string' || !UUID.test(parsed.i)
+      || (parsed.s !== undefined && (typeof parsed.s !== 'string' || !ALLOWED_SORTS.has(parsed.s as CatalogSort)))) {
       throw new Error('shape');
     }
-    return { value: parsed.v, id: parsed.i };
+    return {
+      value: parsed.v as number | string,
+      id: parsed.i,
+      ...(parsed.s ? { sort: parsed.s as CatalogSort } : {}),
+    };
   } catch {
     throw new CatalogQueryError('cursor', 'Cursor non valido.');
   }
@@ -116,10 +149,21 @@ export function parseCatalogQuery(url: URL): ParsedCatalogQuery {
   if (includeUnverifiedValue !== null && includeUnverifiedValue !== '1' && includeUnverifiedValue !== '0') {
     throw new CatalogQueryError('include_unverified', 'include_unverified accetta solo 0 o 1.');
   }
+  const openNowValue = url.searchParams.get('open_now');
+  if (openNowValue !== null && openNowValue !== '1' && openNowValue !== '0') {
+    throw new CatalogQueryError('open_now', 'open_now accetta solo 0 o 1.');
+  }
+
+  const cursor = decodeCatalogCursor(url.searchParams.get('cursor'));
+  if (cursor && (((sortCandidate === 'name') !== (typeof cursor.value === 'string'))
+    || (cursor.sort !== undefined && cursor.sort !== sortCandidate))) {
+    throw new CatalogQueryError('cursor', 'Il cursor non appartiene a questo ordinamento.');
+  }
 
   return {
     query,
     categorySlugs: parseSlugs(url.searchParams.getAll('category'), 'category'),
+    subcategorySlugs: parseSlugs(url.searchParams.getAll('subcategory'), 'subcategory'),
     neighborhoodSlugs: parseSlugs(url.searchParams.getAll('neighborhood'), 'neighborhood'),
     serviceSlugs: parseSlugs(url.searchParams.getAll('service'), 'service'),
     minPriceLevel,
@@ -129,8 +173,9 @@ export function parseCatalogQuery(url: URL): ParsedCatalogQuery {
     radiusMeters,
     bbox,
     sort: sortCandidate,
-    cursor: decodeCatalogCursor(url.searchParams.get('cursor')),
+    cursor,
     limit,
     includeUnverified: includeUnverifiedValue === '1',
+    openNow: openNowValue === '1',
   };
 }

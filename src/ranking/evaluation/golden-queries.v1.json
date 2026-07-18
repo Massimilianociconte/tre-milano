@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "datasetVersion": "fixture-baseline-v1",
-  "rankingVersion": "deterministic-local-v2",
+  "rankingVersion": "deterministic-local-v3",
   "catalogSnapshot": "fixture-2026-07-16",
   "catalogMode": "fixture",
   "referenceDate": "2026-07-16T12:00:00+02:00",

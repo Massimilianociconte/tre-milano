@@ -1,26 +1,37 @@
 import {
   CATALOG_API_VERSION,
   type CatalogVenueSummary,
+  type CatalogVenueWeeklyHour,
 } from '../../domain/catalog-api';
-import {
-  CONTROLLED_ATMOSPHERES,
-  CONTROLLED_CONCEPTS,
-  CONTROLLED_OCCASIONS,
-} from '../../search/interpretation-contract';
 import {
   DUOMO_DISCOVERY_ORIGIN,
   estimateSessionWalk,
   isWithinMilanDiscoveryArea,
 } from '../../domain/discovery-location';
 import {
+  isPublicHttpsUrl,
   isVenueCatalogApiRankingEligible,
   type PriceLevel,
   type Venue,
   type VenueCategory,
   type VenueMaturityTier,
+  type WeekdayKey,
 } from '../../domain/venue';
+import {
+  CONTROLLED_ATMOSPHERES,
+  CONTROLLED_CONCEPTS,
+  CONTROLLED_DIETARY_PREFERENCES,
+  CONTROLLED_NEIGHBORHOODS,
+  CONTROLLED_OCCASIONS,
+  CONTROLLED_SERVICES,
+  type ControlledConcept,
+  type ControlledDietaryPreference,
+  type ControlledService,
+} from '../../search/interpretation-contract';
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
+const WEEKDAY_KEYS: WeekdayKey[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 const LOCAL_IMAGE_ASSETS = {
   '/images/venue-cocktail.webp': { width: 900, height: 1124 },
   '/images/venue-navigli.webp': { width: 900, height: 1124 },
@@ -65,6 +76,43 @@ const CATEGORY_QUERY_SLUGS: Record<VenueCategory, string> = {
 export type CatalogVenuePayload = {
   generatedAt: string;
   summaries: CatalogVenueSummary[];
+  pagination: {
+    nextCursor: string | null;
+    limit: number;
+    hasMore: boolean;
+  };
+};
+
+export type CatalogCandidateIntent = {
+  categories: readonly string[];
+  neighborhoods: readonly string[];
+  requiredServices?: readonly string[];
+  requiredDietaryPreferences?: readonly string[];
+  atmosphere?: readonly string[];
+  occasions?: readonly string[];
+  concepts?: readonly string[];
+};
+
+export type CatalogCandidateFetcher = (
+  input: URL,
+  init: RequestInit,
+) => Promise<Response>;
+
+const CATALOG_CANDIDATE_MAX_REQUESTS = 3;
+const CATALOG_CANDIDATE_MAX_SUMMARIES = 150;
+const CATALOG_CANDIDATE_SEMANTIC_TERM_LIMIT = 8;
+const CATALOG_CANDIDATE_SEMANTIC_QUERY_MAX_LENGTH = 160;
+
+const CATALOG_SERVICE_SLUGS: Partial<Record<ControlledService | ControlledDietaryPreference, string>> = {
+  prenotazione: 'prenotazione',
+  asporto: 'asporto',
+  consegna: 'consegna',
+  wifi: 'wifi',
+  musica: 'musica-live',
+  'pet friendly': 'pet-friendly',
+  parcheggio: 'parcheggio',
+  'eventi privati': 'eventi-privati',
+  'opzioni vegane': 'opzioni-vegane',
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> => (
@@ -74,6 +122,29 @@ const isRecord = (value: unknown): value is Record<string, unknown> => (
 const isFiniteNumber = (value: unknown): value is number => (
   typeof value === 'number' && Number.isFinite(value)
 );
+
+function isCatalogWeeklyHour(value: unknown): value is CatalogVenueWeeklyHour {
+  if (!isRecord(value)
+    || !Number.isInteger(value.weekday)
+    || Number(value.weekday) < 0
+    || Number(value.weekday) > 6
+    || !Number.isInteger(value.sequence)
+    || Number(value.sequence) < 1
+    || Number(value.sequence) > 8
+    || typeof value.closed !== 'boolean'
+    || typeof value.closesNextDay !== 'boolean'
+    || typeof value.verifiedAt !== 'string'
+    || !Number.isFinite(Date.parse(value.verifiedAt))
+    || (value.validUntil !== null && (typeof value.validUntil !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value.validUntil)))) {
+    return false;
+  }
+  return value.closed
+    ? value.opensAt === null && value.closesAt === null
+    : typeof value.opensAt === 'string'
+      && TIME.test(value.opensAt)
+      && typeof value.closesAt === 'string'
+      && TIME.test(value.closesAt);
+}
 
 function normalise(value: string) {
   return value
@@ -98,6 +169,8 @@ function isCatalogVenueSummary(value: unknown): value is CatalogVenueSummary {
     || !isRecord(value.category)
     || typeof value.category.slug !== 'string'
     || typeof value.category.name !== 'string'
+    || (value.subcategorySlug !== null
+      && (typeof value.subcategorySlug !== 'string' || !SLUG.test(value.subcategorySlug)))
     || !isRecord(value.location)
     || !isFiniteNumber(value.location.latitude)
     || !isFiniteNumber(value.location.longitude)
@@ -109,7 +182,18 @@ function isCatalogVenueSummary(value: unknown): value is CatalogVenueSummary {
     || !Array.isArray(value.ratings)
     || !Array.isArray(value.services)
     || !value.services.every((service) => typeof service === 'string')
+    || (value.weeklyHours !== undefined && (
+      !Array.isArray(value.weeklyHours)
+      || !value.weeklyHours.every(isCatalogWeeklyHour)
+    ))
+    || (value.hoursSourceUrl !== undefined
+      && value.hoursSourceUrl !== null
+      && typeof value.hoursSourceUrl !== 'string')
+    || typeof value.recommendationEligible !== 'boolean'
+    || typeof value.openNow !== 'boolean'
     || !isRecord(value.verification)
+    || (value.verification.status !== null
+      && !['unverified', 'pending', 'verified', 'disputed', 'rejected'].includes(String(value.verification.status)))
     || !['bronze', 'silver', 'gold', 'platinum'].includes(String(value.verification.maturity))
     || !isFiniteNumber(value.verification.qualityScore)
     || !isFiniteNumber(value.verification.confidenceScore)
@@ -133,6 +217,17 @@ export function parseCatalogVenuePayload(value: unknown): CatalogVenuePayload | 
   if (!isRecord(value)
     || value.version !== CATALOG_API_VERSION
     || !Array.isArray(value.data)
+    || !isRecord(value.pagination)
+    || !Number.isInteger(value.pagination.limit)
+    || Number(value.pagination.limit) < 1
+    || Number(value.pagination.limit) > 50
+    || typeof value.pagination.hasMore !== 'boolean'
+    || (value.pagination.nextCursor !== null && (
+      typeof value.pagination.nextCursor !== 'string'
+      || value.pagination.nextCursor.length > 512
+      || !/^[A-Za-z0-9_-]+$/.test(value.pagination.nextCursor)
+    ))
+    || (value.pagination.hasMore !== (value.pagination.nextCursor !== null))
     || !isRecord(value.meta)
     || typeof value.meta.generatedAt !== 'string'
     || !Number.isFinite(Date.parse(value.meta.generatedAt))) return null;
@@ -140,6 +235,11 @@ export function parseCatalogVenuePayload(value: unknown): CatalogVenuePayload | 
   return {
     generatedAt: value.meta.generatedAt,
     summaries: value.data.filter(isCatalogVenueSummary),
+    pagination: {
+      nextCursor: value.pagination.nextCursor,
+      limit: Number(value.pagination.limit),
+      hasMore: value.pagination.hasMore,
+    },
   };
 }
 
@@ -183,13 +283,103 @@ function addDays(value: string, days: number) {
   return date.toISOString();
 }
 
+function addMinutes(value: string, minutes: number) {
+  const date = new Date(value);
+  date.setUTCMinutes(date.getUTCMinutes() + minutes);
+  return date.toISOString();
+}
+
+function earliestIso(values: string[]) {
+  const timestamps = values.map(Date.parse).filter(Number.isFinite);
+  return timestamps.length ? new Date(Math.min(...timestamps)).toISOString() : null;
+}
+
+function scheduleState(summary: CatalogVenueSummary, generatedAt: string): Pick<Venue, 'availability' | 'openStatus'> {
+  const hours = summary.weeklyHours ?? [];
+  const sourceUrl = summary.hoursSourceUrl?.trim();
+  const checkedAt = earliestIso(hours.map((hour) => hour.verifiedAt));
+  const validThrough = earliestIso(hours.flatMap((hour) => hour.validUntil
+    ? [`${hour.validUntil}T23:59:59.999Z`]
+    : []));
+  const provenanceValidUntil = checkedAt
+    ? [addDays(checkedAt, 90), validThrough].filter((value): value is string => Boolean(value)).sort()[0]
+    : addDays(generatedAt, 1);
+  const weekly = hours.reduce<Venue['availability']['weekly']>((result, hour) => {
+    if (hour.closed || !hour.opensAt || !hour.closesAt) return result;
+    const key = WEEKDAY_KEYS[hour.weekday];
+    result[key] = [...(result[key] ?? []), { opens: hour.opensAt, closes: hour.closesAt }];
+    return result;
+  }, {});
+  const generatedTime = Date.parse(generatedAt);
+  const provenanceUsable = Boolean(
+    checkedAt
+      && sourceUrl
+      && isPublicHttpsUrl(sourceUrl)
+      && Date.parse(checkedAt) <= generatedTime
+      && Date.parse(provenanceValidUntil) > generatedTime
+      && Object.values(weekly).some((windows) => windows?.length),
+  );
+  // The server evaluates the current instant against verified weekly hours
+  // and dated exceptions; the client never re-derives a potentially stale
+  // answer that could ignore an exceptional closure.
+  const isOpen = provenanceUsable && summary.openNow;
+
+  if (!hours.length || !checkedAt) {
+    return {
+      openStatus: {
+        value: false,
+        checkedAt: generatedAt,
+        validUntil: addDays(generatedAt, 1),
+        source: 'editorial',
+      },
+      availability: {
+        timezone: 'Europe/Rome',
+        weekly: {},
+        checkedAt: generatedAt,
+        validUntil: addDays(generatedAt, 1),
+        source: 'editorial',
+      },
+    };
+  }
+
+  return {
+    openStatus: {
+      value: isOpen,
+      checkedAt: generatedAt,
+      validUntil: addMinutes(generatedAt, 5),
+      source: 'official',
+      ...(provenanceUsable ? { sourceUrl } : {}),
+    },
+    availability: {
+      timezone: 'Europe/Rome',
+      weekly,
+      checkedAt,
+      validUntil: provenanceValidUntil,
+      source: 'official',
+      ...(sourceUrl ? { sourceUrl } : {}),
+    },
+  };
+}
+
 function humaniseService(value: string) {
   return value.replace(/[-_]+/g, ' ').trim();
 }
 
-function matchedControlledValues<T extends string>(text: string, values: readonly T[]) {
-  const haystack = ` ${normalise(text)} `;
-  return values.filter((value) => haystack.includes(` ${normalise(value)} `));
+const SERVICE_CONCEPT_BY_SLUG = new Map<string, ControlledConcept>(
+  Object.entries(CATALOG_SERVICE_SLUGS).flatMap(([concept, slug]) => (
+    slug ? [[slug, concept as ControlledConcept]] : []
+  )),
+);
+
+/**
+ * Only structured service rows may become factual ranking attributes. Free
+ * prose remains searchable below, but can never satisfy a mandatory concept.
+ */
+function structuredConceptsForServices(services: readonly string[]) {
+  return services.flatMap((service) => {
+    const concept = SERVICE_CONCEPT_BY_SLUG.get(service);
+    return concept ? [concept] : [];
+  });
 }
 
 export type CatalogLocalVisual = {
@@ -235,15 +425,29 @@ export function catalogLocalVisualFor(
   return { ...selected, ...LOCAL_IMAGE_ASSETS[selected.path] };
 }
 
+function controlledSelection<T extends string>(values: readonly string[], allowed: readonly T[]) {
+  const selected = new Set(values);
+  return allowed.filter((value) => selected.has(value));
+}
+
+function controlledSemanticQuery(values: readonly string[]) {
+  let query = '';
+  for (const value of [...new Set(values)].slice(0, CATALOG_CANDIDATE_SEMANTIC_TERM_LIMIT)) {
+    const candidate = query ? `${query} OR ${value}` : value;
+    if (candidate.length > CATALOG_CANDIDATE_SEMANTIC_QUERY_MAX_LENGTH) break;
+    query = candidate;
+  }
+  return query;
+}
+
 /**
  * Builds a constrained candidate expansion request. Only controlled catalog
- * dimensions are forwarded; the user's free-form query never leaves the
- * ranking/search interpretation boundary through this endpoint.
+ * dimensions and allowlisted semantic terms are forwarded to our same-origin
+ * catalog endpoint; the user's free-form query is deliberately not accepted.
  */
 export function buildCatalogCandidateRequestUrl(
   appOrigin: string,
-  categories: readonly string[],
-  neighborhoods: readonly string[],
+  intent: CatalogCandidateIntent,
 ): URL | null {
   let requestUrl: URL;
   try {
@@ -252,17 +456,36 @@ export function buildCatalogCandidateRequestUrl(
     return null;
   }
 
-  const categorySlugs = [...new Set(categories.flatMap((value) => {
+  const categorySlugs = [...new Set(intent.categories.flatMap((value) => {
     const category = categoryForValues(value, value);
     return category ? [CATEGORY_QUERY_SLUGS[category]] : [];
-  }))].slice(0, 5);
-  const neighborhoodSlugs = [...new Set(neighborhoods.flatMap((value) => {
-    if (!/^[\p{L}\p{N}][\p{L}\p{N}\s’'-]{0,79}$/u.test(value.trim())) return [];
+  }))].sort().slice(0, 5);
+  const controlledNeighborhoods = new Set(controlledSelection(intent.neighborhoods, CONTROLLED_NEIGHBORHOODS));
+  const neighborhoodSlugs = [...controlledNeighborhoods].flatMap((value) => {
     const slug = normalise(value).replace(/ /g, '-');
     return slug.length <= 80 && SLUG.test(slug) ? [slug] : [];
-  }))].slice(0, 8);
+  }).sort().slice(0, 8);
 
-  if (!categorySlugs.length && !neighborhoodSlugs.length) return null;
+  const requiredServices = controlledSelection(intent.requiredServices ?? [], CONTROLLED_SERVICES);
+  const requiredDietary = controlledSelection(
+    intent.requiredDietaryPreferences ?? [],
+    CONTROLLED_DIETARY_PREFERENCES,
+  );
+  const mappedRequiredConcepts = new Set<ControlledConcept>();
+  const serviceSlugs = [...requiredServices, ...requiredDietary].flatMap((value) => {
+    const slug = CATALOG_SERVICE_SLUGS[value];
+    if (!slug) return [];
+    mappedRequiredConcepts.add(value);
+    return [slug];
+  }).filter((slug, index, slugs) => slugs.indexOf(slug) === index).sort().slice(0, 12);
+
+  const atmosphere = controlledSelection(intent.atmosphere ?? [], CONTROLLED_ATMOSPHERES);
+  const occasions = controlledSelection(intent.occasions ?? [], CONTROLLED_OCCASIONS);
+  const concepts = controlledSelection(intent.concepts ?? [], CONTROLLED_CONCEPTS)
+    .filter((value) => !mappedRequiredConcepts.has(value));
+  const semanticQuery = controlledSemanticQuery([...atmosphere, ...occasions, ...concepts]);
+
+  if (!categorySlugs.length && !neighborhoodSlugs.length && !serviceSlugs.length && !semanticQuery) return null;
   requestUrl.searchParams.set('limit', '50');
   requestUrl.searchParams.set('sort', 'quality');
   categorySlugs.forEach((slug) => {
@@ -271,7 +494,65 @@ export function buildCatalogCandidateRequestUrl(
   neighborhoodSlugs.forEach((slug) => {
     requestUrl.searchParams.append('neighborhood', slug);
   });
+  serviceSlugs.forEach((slug) => {
+    requestUrl.searchParams.append('service', slug);
+  });
+  if (semanticQuery) requestUrl.searchParams.set('q', semanticQuery);
   return requestUrl;
+}
+
+/**
+ * Follows opaque catalog cursors with a strict request and row budget. A
+ * malformed page or a cross-origin initial URL fails closed; a later transient
+ * page failure retains already validated pages as a best-effort recall gain.
+ */
+export async function fetchCatalogCandidatePages(
+  initialRequestUrl: string | URL,
+  appOrigin: string,
+  fetcher: CatalogCandidateFetcher = fetch,
+  signal?: AbortSignal,
+): Promise<CatalogVenuePayload[]> {
+  const initialUrl = new URL(initialRequestUrl);
+  const expectedOrigin = new URL(appOrigin).origin;
+  if (initialUrl.origin !== expectedOrigin || initialUrl.pathname !== '/api/catalog') {
+    throw new Error('catalog_candidates_invalid_endpoint');
+  }
+
+  const pages: CatalogVenuePayload[] = [];
+  const seenCursors = new Set<string>();
+  let summaryCount = 0;
+  let requestUrl = new URL(initialUrl);
+
+  for (let requestCount = 0; requestCount < CATALOG_CANDIDATE_MAX_REQUESTS; requestCount += 1) {
+    try {
+      if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
+      const response = await fetcher(requestUrl, {
+        method: 'GET',
+        headers: { Accept: 'application/json' },
+        credentials: 'same-origin',
+        signal,
+      });
+      if (!response.ok) throw new Error(`catalog_candidates_${response.status}`);
+      const payload = parseCatalogVenuePayload(await response.json());
+      if (!payload) throw new Error('catalog_candidates_invalid');
+      pages.push(payload);
+      summaryCount += payload.summaries.length;
+
+      const cursor = payload.pagination.nextCursor;
+      if (!payload.pagination.hasMore
+        || !cursor
+        || summaryCount >= CATALOG_CANDIDATE_MAX_SUMMARIES
+        || seenCursors.has(cursor)) break;
+      seenCursors.add(cursor);
+      requestUrl = new URL(initialUrl);
+      requestUrl.searchParams.set('cursor', cursor);
+    } catch (error) {
+      if (signal?.aborted || pages.length === 0) throw error;
+      break;
+    }
+  }
+
+  return pages;
 }
 
 export function catalogSummaryToVenue(
@@ -284,6 +565,8 @@ export function catalogSummaryToVenue(
   const verifiedTimestamp = summary.verification.verifiedAt;
   const verifiedAt = verifiedTimestamp?.slice(0, 10) ?? '';
   if (!category
+    || !summary.recommendationEligible
+    || summary.verification.status !== 'verified'
     || !['Gold', 'Platinum'].includes(maturityTier)
     || summary.verification.confidenceScore < 0.7
     || summary.verification.confidenceScore > 1
@@ -302,18 +585,12 @@ export function catalogSummaryToVenue(
   );
   if (!image) return null;
   const sessionTravel = estimateSessionWalk(DUOMO_DISCOVERY_ORIGIN, summary.location);
-  const searchableText = [
-    summary.shortDescription ?? '',
-    summary.formattedAddress,
-    ...summary.services.map(humaniseService),
-  ].join(' ');
-  const atmosphere = matchedControlledValues(searchableText, CONTROLLED_ATMOSPHERES);
-  const occasions = matchedControlledValues(searchableText, CONTROLLED_OCCASIONS);
-  const concepts = matchedControlledValues(searchableText, CONTROLLED_CONCEPTS);
+  const concepts = structuredConceptsForServices(summary.services);
   const checkedAt = Number.isFinite(Date.parse(verifiedTimestamp!))
     ? new Date(verifiedTimestamp!).toISOString()
     : `${verifiedAt}T12:00:00.000Z`;
   const confidence = summary.verification.confidenceScore;
+  const schedule = scheduleState(summary, generatedAt);
 
   const venue: Venue = {
     id: summary.id,
@@ -354,26 +631,18 @@ export function catalogSummaryToVenue(
         rightsHolder: 'TRE Milano — asset locale di fallback',
       },
     },
-    // The reduced list projection has no verified live opening state. Unknown
-    // remains fail-closed for "aperto ora" and scheduled-time constraints.
-    openStatus: {
-      value: false,
-      checkedAt: generatedAt,
-      validUntil: addDays(generatedAt, 1),
-      source: 'editorial',
-    },
-    availability: {
-      timezone: 'Europe/Rome',
-      weekly: {},
-      checkedAt: generatedAt,
-      validUntil: addDays(generatedAt, 1),
-      source: 'editorial',
-    },
-    atmosphere,
-    occasions,
+    // Opening state is derived only from verified, current weekly hours with
+    // an official source URL. Missing/stale provenance stays fail-closed.
+    openStatus: schedule.openStatus,
+    availability: schedule.availability,
+    // The reduced public projection has no verified structured values for
+    // these dimensions. Empty is intentional and fail-closed.
+    atmosphere: [],
+    occasions: [],
     features: [...new Set([...summary.services.map(humaniseService), ...concepts])].slice(0, 6),
     semanticTags: [...new Set([
       summary.shortDescription ?? '',
+      summary.subcategorySlug ? humaniseService(summary.subcategorySlug) : '',
       summary.formattedAddress,
       ...summary.services.map(humaniseService),
       ...concepts,
@@ -382,7 +651,7 @@ export function catalogSummaryToVenue(
     verifiedAt,
     maturityTier,
     fixtureOnly: false,
-    recommendationEligible: true,
+    recommendationEligible: summary.recommendationEligible,
     catalogApiRankingEvidence: {
       source: 'catalog-api',
       qualityScore: summary.verification.qualityScore,

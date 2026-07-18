@@ -1,5 +1,5 @@
 begin;
-select plan(31);
+select plan(37);
 
 select has_schema('private', 'private schema exists');
 select ok(exists (select 1 from pg_extension where extname = 'postgis'), 'PostGIS is installed');
@@ -13,7 +13,9 @@ select has_table('public', 'venue_claims', 'owner claims exist');
 select has_index('public', 'venue_addresses', 'venue_addresses_location_gist_idx', 'spatial GIST index exists');
 select has_index('public', 'venues', 'venues_search_document_gin_idx', 'full-text GIN index exists');
 select has_function('public', 'search_venues', 'catalog search RPC exists');
+select has_function('public', 'get_venue_recommendation_eligibility', 'recommendation eligibility RPC exists');
 select has_function('public', 'get_venue_detail', 'detail RPC exists');
+select has_function('private', 'catalog_venue_source_attribution', 'observation attribution projection exists');
 select has_function('public', 'consume_api_rate_limit', 'persistent rate limit RPC exists');
 select has_function('public', 'ingest_venue_record', 'conservative venue ingest RPC exists');
 select has_function('public', 'ingest_source_observation', 'observation ingest RPC exists');
@@ -31,6 +33,8 @@ select ok(not has_table_privilege('authenticated', 'public.venue_claims', 'SELEC
 select ok(has_table_privilege('service_role', 'public.venues', 'SELECT'), 'service role can access catalog through backend');
 select ok(not has_function_privilege('anon', 'public.get_venue_detail(text)', 'EXECUTE'), 'anon cannot call detail RPC directly');
 select ok(has_function_privilege('service_role', 'public.get_venue_detail(text)', 'EXECUTE'), 'service role can call detail RPC');
+select ok(not has_function_privilege('anon', 'public.get_venue_recommendation_eligibility(uuid[])', 'EXECUTE'), 'anon cannot call recommendation eligibility RPC');
+select ok(has_function_privilege('service_role', 'public.get_venue_recommendation_eligibility(uuid[])', 'EXECUTE'), 'service role can resolve recommendation eligibility in a bounded batch');
 
 select is_empty('select id from public.venues', 'seed contains no simulated venue records');
 select ok((select bool_and(not enabled) from public.sources), 'all source adapters start disabled pending approval');
@@ -54,10 +58,29 @@ select ok((
 ), 'catalog search exposes only verified current prices');
 
 select ok((
+  select position('p_open_now boolean default false' in lower(pg_get_functiondef(p.oid))) > 0
+    and position('venue_hour_exceptions' in lower(pg_get_functiondef(p.oid))) > 0
+    and position('europe/rome' in lower(pg_get_functiondef(p.oid))) > 0
+    and position('not p_open_now or opening.is_open_now' in lower(pg_get_functiondef(p.oid))) > 0
+    and position('v.verification_status' in lower(pg_get_functiondef(p.oid))) > 0
+  from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+  where n.nspname = 'public' and p.proname = 'search_venues'
+), 'catalog search filters verified open-now windows server-side and projects verification status');
+
+select ok((
   select position('vp.verified_at is not null' in pg_get_functiondef(p.oid)) > 0
   from pg_proc p join pg_namespace n on n.oid = p.pronamespace
   where n.nspname = 'public' and p.proname = 'get_venue_detail'
 ), 'venue detail exposes only verified current prices');
+
+select ok((
+  select position('linked_venue_id' in pg_get_functiondef(p.oid)) > 0
+    and position('observed_through' in pg_get_functiondef(p.oid)) > 0
+    and position('normalized_payload' in pg_get_functiondef(p.oid)) = 0
+    and position('external_id' in pg_get_functiondef(p.oid)) = 0
+  from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+  where n.nspname = 'private' and p.proname = 'catalog_venue_source_attribution'
+), 'linked observations expose attribution without internal payload or identifiers');
 
 select ok((
   select position('src.enabled' in pg_get_functiondef(p.oid)) > 0

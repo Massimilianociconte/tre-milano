@@ -60,4 +60,58 @@ describe('catalog facets cache privacy', () => {
     expect(response.headers.get('cache-control')).toBe('no-store');
     expect(response.headers.get('vary')).toBe('Origin');
   });
+
+  it('allinea esplicitamente le facet alla vetrina Explore estesa', async () => {
+    const values: Record<string, string> = {
+      SUPABASE_URL: 'https://project.supabase.co',
+      SUPABASE_SECRET_KEY: `sb_secret_${'x'.repeat(40)}`,
+      RATE_LIMIT_HASH_SECRET: 'r'.repeat(40),
+    };
+    let rpcPayload: Record<string, unknown> | null = null;
+    vi.stubGlobal('Netlify', { env: { get: (name: string) => values[name] } });
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      if (String(input).endsWith('/consume_api_rate_limit')) return new Response('[{"allowed":true,"request_count":1,"retry_after_seconds":60}]');
+      if (String(input).endsWith('/catalog_facets')) {
+        rpcPayload = JSON.parse(String(init?.body));
+        return new Response('{"total":1670,"categories":[],"neighborhoods":[],"priceLevels":[],"services":[]}');
+      }
+      return new Response('{}', { status: 404 });
+    }));
+
+    const response = await catalogFacets(
+      new Request('https://tre.test/api/catalog/facets', { headers: { Origin: 'https://tre.test' } }), context,
+    );
+    expect(response.status).toBe(200);
+    expect(rpcPayload).toMatchObject({ p_include_unverified: true });
+  });
+
+  it('resta disponibile durante il rolling deploy soltanto per la vecchia firma RPC', async () => {
+    const values: Record<string, string> = {
+      SUPABASE_URL: 'https://project.supabase.co',
+      SUPABASE_SECRET_KEY: `sb_secret_${'x'.repeat(40)}`,
+      RATE_LIMIT_HASH_SECRET: 'r'.repeat(40),
+    };
+    const rpcPayloads: Record<string, unknown>[] = [];
+    vi.stubGlobal('Netlify', { env: { get: (name: string) => values[name] } });
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      if (String(input).endsWith('/consume_api_rate_limit')) return new Response('[{"allowed":true,"request_count":1,"retry_after_seconds":60}]');
+      if (String(input).endsWith('/catalog_facets')) {
+        const payload = JSON.parse(String(init?.body)) as Record<string, unknown>;
+        rpcPayloads.push(payload);
+        if ('p_include_unverified' in payload) {
+          return new Response('{"code":"PGRST202"}', { status: 404 });
+        }
+        return new Response('{"total":6,"categories":[],"neighborhoods":[],"priceLevels":[]}');
+      }
+      return new Response('{}', { status: 404 });
+    }));
+
+    const response = await catalogFacets(
+      new Request('https://tre.test/api/catalog/facets', { headers: { Origin: 'https://tre.test' } }), context,
+    );
+    expect(response.status).toBe(200);
+    expect(rpcPayloads).toHaveLength(2);
+    expect(rpcPayloads[0]).toMatchObject({ p_include_unverified: true });
+    expect(rpcPayloads[1]).not.toHaveProperty('p_include_unverified');
+  });
 });

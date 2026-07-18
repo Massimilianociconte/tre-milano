@@ -1,5 +1,5 @@
-import { readFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
+import { readFile } from 'node:fs/promises';
 
 export const NETLIFY_ENV_DEFINITIONS = [
   { key: 'PUBLIC_SITE_URL', required: true, scopes: ['builds', 'functions', 'runtime'] },
@@ -10,6 +10,8 @@ export const NETLIFY_ENV_DEFINITIONS = [
   { key: 'SUPABASE_SECRET_KEY', required: true, secret: true, scopes: ['functions', 'runtime'] },
   { key: 'RATE_LIMIT_HASH_SECRET', required: true, secret: true, scopes: ['functions', 'runtime'] },
   { key: 'DEEPSEEK_API_KEY', required: true, secret: true, scopes: ['functions', 'runtime'] },
+  { key: 'DEEPSEEK_INTERPRETER_CACHE_TTL_SECONDS', scopes: ['functions', 'runtime'] },
+  { key: 'DEEPSEEK_INTERPRETER_CACHE_MAX_ENTRIES', scopes: ['functions', 'runtime'] },
   { key: 'CATALOG_API_CACHE_SECONDS', scopes: ['functions', 'runtime'] },
   { key: 'CATALOG_API_RATE_LIMIT', scopes: ['functions', 'runtime'] },
   { key: 'TURNSTILE_SECRET_KEY', secret: true, scopes: ['functions', 'runtime'] },

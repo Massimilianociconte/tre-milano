@@ -11,6 +11,7 @@ test-results/
 netlify/functions/*.zip
 netlify/functions/manifest.json
 supabase/.temp/
+deno.lock
 *.log
 .env
 .env.*

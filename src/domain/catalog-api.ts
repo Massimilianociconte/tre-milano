@@ -1,6 +1,30 @@
 export const CATALOG_API_VERSION = 'tre-catalog-v1' as const;
 
-export type CatalogSort = 'relevance' | 'distance' | 'price' | 'rating' | 'quality';
+export type CatalogSort = 'relevance' | 'distance' | 'price' | 'rating' | 'quality' | 'name' | 'newest';
+export type CatalogVerificationStatus = 'unverified' | 'pending' | 'verified' | 'disputed' | 'rejected';
+
+export type CatalogVenueWeeklyHour = {
+  weekday: number;
+  sequence: number;
+  opensAt: string | null;
+  closesAt: string | null;
+  closesNextDay: boolean;
+  closed: boolean;
+  verifiedAt: string;
+  validUntil: string | null;
+};
+
+export type CatalogFacetOption = { slug: string; name: string; count: number };
+export type CatalogSubcategoryFacetOption = CatalogFacetOption & { categorySlug: string };
+
+export type CatalogFacets = {
+  total: number;
+  categories: CatalogFacetOption[];
+  subcategories: CatalogSubcategoryFacetOption[];
+  neighborhoods: CatalogFacetOption[];
+  services: CatalogFacetOption[];
+  priceLevels: Array<{ level: number; count: number }>;
+};
 
 export type CatalogVenueSummary = {
   id: string;
@@ -25,12 +49,22 @@ export type CatalogVenueSummary = {
   }>;
   primaryImage: { url: string; alt: string } | null;
   services: string[];
+  /** Optional during the rolling migration from the previous list projection. */
+  weeklyHours?: CatalogVenueWeeklyHour[];
+  /** Verified official website used as provenance for the weekly schedule. */
+  hoursSourceUrl?: string | null;
   verification: {
+    /** Null only during a rolling deploy against the previous RPC projection. */
+    status: CatalogVerificationStatus | null;
     maturity: 'bronze' | 'silver' | 'gold' | 'platinum';
     qualityScore: number;
     confidenceScore: number;
     verifiedAt: string | null;
   };
+  /** Authoritative database gate: only true records may enter recommendation ranking. */
+  recommendationEligible: boolean;
+  /** Evaluated server-side from verified weekly hours and dated exceptions. */
+  openNow: boolean;
   distanceMeters: number | null;
 };
 
@@ -39,6 +73,11 @@ export type CatalogListResponse = {
   data: CatalogVenueSummary[];
   pagination: { nextCursor: string | null; limit: number; hasMore: boolean };
   meta: { sort: CatalogSort; generatedAt: string };
+};
+
+export type CatalogFacetsResponse = {
+  version: typeof CATALOG_API_VERSION;
+  data: CatalogFacets;
 };
 
 export type CatalogDetailResponse = {

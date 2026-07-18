@@ -1,4 +1,6 @@
 import { venues as defaultVenues } from '../data/venues';
+import { NEIGHBORHOOD_LEXICON, type NeighborhoodName } from '../domain/neighborhoods';
+import { type TasteProfile, tasteProfileAffinity } from '../domain/taste-profile';
 import type {
   RankedVenue,
   RankingReasonCode,
@@ -13,8 +15,6 @@ import {
   isVenueAvailableAt,
   isVenueRankingEligible,
 } from '../domain/venue';
-import { tasteProfileAffinity, type TasteProfile } from '../domain/taste-profile';
-import { NEIGHBORHOOD_LEXICON, type NeighborhoodName } from '../domain/neighborhoods';
 import { CONCEPT_WEIGHTS, RANKING_THRESHOLDS, RANKING_WEIGHTS } from './config';
 
 export type RankingContext = {
@@ -82,12 +82,41 @@ const ATMOSPHERE_LEXICON: Array<LexiconEntry<string>> = [
   { value: 'elegante', aliases: ['elegante', 'raffinato', 'raffinata', 'chic', 'sofisticato'] },
   { value: 'tranquillo', aliases: ['tranquillo', 'tranquilla', 'calmo', 'quieto', 'poco rumoroso'] },
   { value: 'romantico', aliases: ['romantico', 'romantica', 'romance'] },
-  { value: 'vivace', aliases: ['vivace', 'animato', 'movimentato', 'energia', 'energetico'] },
+  {
+    value: 'vivace',
+    aliases: [
+      'vivace',
+      'animato',
+      'movimentato',
+      'energia',
+      'energetico',
+      'rumoroso',
+      'rumorosa',
+      'chiassoso',
+      'chiassosa',
+      'musica vivace',
+      'musica rumorosa',
+    ],
+  },
   { value: 'panoramico', aliases: ['panoramico', 'panoramica', 'skyline', 'vista'] },
   { value: 'rilassato', aliases: ['rilassato', 'rilassata', 'informale', 'easy', 'senza fretta'] },
   { value: 'autentico', aliases: ['autentico', 'autentica', 'milanese vero'] },
   { value: 'contemporaneo', aliases: ['contemporaneo', 'moderno', 'moderna', 'trendy'] },
-  { value: 'creativo', aliases: ['creativo', 'creativa', 'originale', 'ricercato'] },
+  {
+    value: 'creativo',
+    aliases: [
+      'creativo',
+      'creativa',
+      'originale',
+      'ricercato',
+      'scenografico',
+      'scenografica',
+      'cinematografico',
+      'cinematografica',
+      'teatrale',
+      'instagrammabile',
+    ],
+  },
   { value: 'luminoso', aliases: ['luminoso', 'luminosa', 'luce naturale'] },
   { value: 'sociale', aliases: ['sociale', 'conviviale', 'socievole', 'per socializzare'] },
 ];
@@ -162,6 +191,10 @@ const CONCEPT_LEXICON: ConceptEntry[] = [
     aliases: ['vegetariano', 'vegetariana', 'vegetariane', 'veg', 'cucina vegetale'],
   },
   {
+    value: 'opzioni vegane',
+    aliases: ['opzioni vegane', 'opzione vegana', 'vegano', 'vegana', 'plant based'],
+  },
+  {
     value: 'musica',
     aliases: ['musica', 'dj', 'dj set', 'live music', 'concerto'],
   },
@@ -177,6 +210,12 @@ const CONCEPT_LEXICON: ConceptEntry[] = [
     value: 'prenotazione',
     aliases: ['prenotazione', 'prenotabile', 'prenotare', 'riservare'],
   },
+  { value: 'asporto', aliases: ['asporto', 'take away', 'takeaway'] },
+  { value: 'consegna', aliases: ['consegna', 'delivery', 'consegna a domicilio'] },
+  { value: 'wifi', aliases: ['wifi', 'wi fi', 'internet'] },
+  { value: 'pet friendly', aliases: ['pet friendly', 'animali ammessi', 'cani ammessi'] },
+  { value: 'parcheggio', aliases: ['parcheggio', 'parking'] },
+  { value: 'eventi privati', aliases: ['eventi privati', 'evento privato', 'festa privata', 'sala privata'] },
   {
     value: 'tramonto',
     aliases: ['tramonto', 'golden hour', 'ora dorata'],
@@ -225,6 +264,31 @@ const STOP_WORDS = new Set([
   'cerco',
 ]);
 
+const PARTY_SIZE_WORDS = Object.freeze({
+  uno: 1,
+  una: 1,
+  due: 2,
+  tre: 3,
+  quattro: 4,
+  cinque: 5,
+  sei: 6,
+  sette: 7,
+  otto: 8,
+  nove: 9,
+  dieci: 10,
+  undici: 11,
+  dodici: 12,
+  tredici: 13,
+  quattordici: 14,
+  quindici: 15,
+  sedici: 16,
+  diciassette: 17,
+  diciotto: 18,
+  diciannove: 19,
+  venti: 20,
+});
+const PARTY_SIZE_WORD_PATTERN = Object.keys(PARTY_SIZE_WORDS).join('|');
+
 const unique = <T>(items: T[]) => [...new Set(items)];
 const CLAUSE_BREAK = 'clausebreak';
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -246,7 +310,7 @@ function isOptional(text: string, alias: string) {
 }
 
 function isNegated(text: string, alias: string) {
-  const bridgeWord = '(?:un|una|uno|il|lo|la|i|gli|le|dei|delle|degli|a|al|allo|alla|ai|agli|alle|in|di|da|con|che|sia|abbia|avere|andare|finire|stare|posto|posti|locale|locali|troppo|molto|zona|quartiere|per\\s+forza)';
+  const bridgeWord = '(?:un|una|uno|il|lo|la|i|gli|le|dei|delle|degli|a|al|allo|alla|ai|agli|alle|in|di|da|con|che|sia|abbia|essere|avere|andare|finire|stare|posto|posti|locale|locali|troppo|molto|zona|quartiere|per\\s+forza)';
   const boundedBridge = `(?:${bridgeWord}\\s+){0,6}`;
   const coordinatedList = `(?:^|\\s)${NEGATION_PREFIX}\\s+(?:(?!${CLAUSE_BREAK}\\b)[a-z0-9€]+\\s+){0,6}(?:e|ne|o|oppure)\\s+(?:(?:un|una|uno|il|lo|la|i|gli|le|a|al|alla|ai)\\s+)?${phrasePattern(alias)}(?=\\s|$)`;
   return new RegExp(`(?:^|\\s)${NEGATION_PREFIX}\\s+${boundedBridge}${phrasePattern(alias)}(?=\\s|$)`).test(text) ||
@@ -255,6 +319,9 @@ function isNegated(text: string, alias: string) {
 }
 
 function isRequired(text: string, alias: string) {
+  if (new RegExp(`(?:^|\\s)${phrasePattern(alias)}\\s+(?:obbligatori[oaie]|necessari[oaie])(?=\\s|$)`).test(text)) {
+    return true;
+  }
   const aliasIndex = text.search(new RegExp(`(?:^|\\s)${phrasePattern(alias)}(?=\\s|$)`));
   if (aliasIndex < 0) return false;
 
@@ -268,7 +335,7 @@ function isRequired(text: string, alias: string) {
 
   const scope = text.slice(latestPrefixEnd, aliasIndex).trim();
   if (scope.includes(CLAUSE_BREAK) || scope.split(/\s+/).length > 10) return false;
-  if (!scope || /^(?:(?:un|una|uno|il|lo|la|i|gli|le|con|in|a|al|allo|alla|ai|agli|alle|zona|quartiere)\s*)+$/.test(scope)) return true;
+  if (!scope || /^(?:(?:un|una|uno|il|lo|la|i|gli|le|con|in|di|a|al|allo|alla|ai|agli|alle|qualcosa|posto|locale|che|sia|essere|zona|quartiere)\s*)+$/.test(scope)) return true;
   return /(?:^|\s)(?:e|o|ne|oppure|ma\s+anche)(?=\s|$)/.test(scope);
 }
 
@@ -298,9 +365,12 @@ function findLexiconMatches<T extends string>(text: string, lexicon: Array<Lexic
   const ordered = (matches: Array<{ value: T; index: number }>) =>
     unique(matches.sort((a, b) => a.index - b.index).map(({ value }) => value));
 
+  const excludedValues = ordered(excluded);
   return {
-    positive: ordered(positive),
-    excluded: ordered(excluded),
+    // An explicit negative phrase wins when a longer negated alias overlaps a
+    // shorter positive alias (for example "senza musica vivace").
+    positive: ordered(positive).filter((value) => !excludedValues.includes(value)),
+    excluded: excludedValues,
     required: ordered(required),
     optional: ordered(optional),
   };
@@ -503,6 +573,26 @@ export function parseIntent(query: string, selectedOccasion?: string, referenceD
   const walkingMinutesMatch = text.match(/(?:^|\s)(\d{1,2})\s*(?:min|minuti)\s+(?:a\s+piedi|camminando)\b/);
   const originMinutesMatch = text.match(/(?:^|\s)(\d{1,2})\s*(?:min|minuti)\s+(?:da|dal|dalla|dai|dagli|dalle)\s+/);
   const quarterHourMatch = /\b(?:un\s+)?quarto\s+d\s+ora\b/.test(text);
+  const partySizeMatch = text.match(
+    /\b(?:per\s+)?(\d+)\s+(?:persone|commensali)\b|\b(?:siamo|saremo|veniamo)\s+(?:in\s+)?(\d+)\b|\b(?:tavolo|prenotazione)\s+(?:per|da)\s+(\d+)\b/,
+  );
+  const partySizeWordMatch = text.match(new RegExp(
+    `\\b(?:per\\s+)?(${PARTY_SIZE_WORD_PATTERN})\\s+(?:persone|commensali)\\b|\\b(?:siamo|saremo|veniamo)\\s+(?:in\\s+)?(${PARTY_SIZE_WORD_PATTERN})\\b|\\b(?:tavolo|prenotazione)\\s+(?:per|da)\\s+(${PARTY_SIZE_WORD_PATTERN})\\b`,
+  ));
+  const partySizeWord = partySizeWordMatch
+    ? PARTY_SIZE_WORDS[
+        (partySizeWordMatch[1] ?? partySizeWordMatch[2] ?? partySizeWordMatch[3]) as keyof typeof PARTY_SIZE_WORDS
+      ]
+    : undefined;
+  const parsedPartySize = partySizeMatch
+    ? Number(partySizeMatch[1] ?? partySizeMatch[2] ?? partySizeMatch[3])
+    : partySizeWord;
+  const partySize = parsedPartySize !== undefined && parsedPartySize >= 1 && parsedPartySize <= 50
+    ? parsedPartySize
+    : undefined;
+  const requestsUnverifiedCapacity = partySizeMatch !== null
+    || partySizeWordMatch !== null
+    || /\b(?:tavol[oi]\s+grand[ei]|grand[ei]\s+grupp[oi]|grupp[oi]\s+numeros[oi]|comitiv[ae])\b/.test(text);
   const openNowNegated = /(?:non|senza)\s+(?:(?:necessariamente|per\s+forza|serve|deve\s+essere|bisogno(?:\s+che\s+sia|\s+di)?|che\s+sia)\s+)*(?:apert[oa]\s+)?(?:ora|adesso)\b/.test(text);
   const serviceTime = requestedServiceTime(text, referenceDate);
   const unsupportedConstraints: SearchIntent['unsupportedConstraints'] = [];
@@ -514,11 +604,26 @@ export function parseIntent(query: string, selectedOccasion?: string, referenceD
   if (hasAmbiguousTimeRange || hasInvalidClock || hasDayWithoutServiceTime) {
     unsupportedConstraints.push({ code: 'EXACT_OPENING_TIME', label: 'apertura per giorno o orario specifico' });
   }
-  if (/\b(?:senza\s+glutine|gluten\s+free|celiach|senza\s+lattosio|lactose\s+free|vegan|vegan[oaie]|allerg|arachid|frutta\s+secca)\w*/.test(text)) {
+  if (/\b(?:senza\s+glutine|gluten\s+free|celiach|senza\s+lattosio|lactose\s+free|allerg|arachid|frutta\s+secca)\w*/.test(text)) {
     unsupportedConstraints.push({ code: 'DIETARY_SAFETY', label: 'requisiti alimentari o allergeni' });
   }
-  if (/\b(?:sedia\s+a\s+rotelle|carrozzina|senza\s+barriere|disabil)\w*/.test(text)) {
+  if (/\b(?:sedia\s+a\s+rotelle|carrozzina|senza\s+barriere|bagno\s+accessibile|disabil)\w*/.test(text)) {
     unsupportedConstraints.push({ code: 'ACCESSIBILITY', label: 'accessibilità verificata' });
+  }
+  if (requestsUnverifiedCapacity) {
+    unsupportedConstraints.push({
+      code: 'PARTY_SIZE',
+      label: partySize ? `capienza verificata per ${partySize} persone` : 'capienza verificata per gruppi numerosi',
+    });
+  }
+  if (/\b(?:area\s+bambini|seggiolone|fasciatoio|guardaroba|ricarica\s+elettrica|colonnina\s+elettrica)\b/.test(text)) {
+    unsupportedConstraints.push({ code: 'UNVERIFIED_SERVICE', label: 'servizio richiesto non verificabile nel catalogo' });
+  }
+  if (/\b(?:halal|kosher|pescetarian\w*)\b/.test(text)) {
+    unsupportedConstraints.push({
+      code: 'UNVERIFIED_DIETARY_OPTION',
+      label: 'opzione alimentare richiesta non verificabile nel catalogo',
+    });
   }
   if (originNeighborhood && originNeighborhood !== 'Duomo') {
     unsupportedConstraints.push({ code: 'TRAVEL_ORIGIN', label: `tempi di viaggio verificati da ${originNeighborhood}` });
@@ -545,6 +650,7 @@ export function parseIntent(query: string, selectedOccasion?: string, referenceD
           : quarterHourMatch
             ? 15
             : undefined,
+    partySize,
     travelOriginId: originNeighborhood === 'Duomo' ? 'milano-duomo-centroid' : undefined,
     requiresOpenNow:
       !openNowNegated && /(?:aperto|aperta|disponibile)\s+(?:ora|adesso)|\badesso\b/.test(text),
@@ -555,6 +661,7 @@ export function parseIntent(query: string, selectedOccasion?: string, referenceD
     excludedAtmosphere: atmospheres.excluded,
     occasion: occasions[0],
     occasions,
+    requiredOccasions: queryOccasions.required,
     excludedOccasions: queryOccasions.excluded,
     concepts: concepts.positive,
     requiredConcepts: concepts.required,
@@ -578,17 +685,29 @@ function venueSearchText(venue: Venue) {
   );
 }
 
+function structuredFieldContains(field: string, phrase: string) {
+  const normalizedField = normaliseItalian(field);
+  const normalizedPhrase = normaliseItalian(phrase);
+  return Boolean(
+    normalizedField
+      && normalizedPhrase
+      && ` ${normalizedField} `.includes(` ${normalizedPhrase} `),
+  );
+}
+
 function venueMatchesConcept(venue: Venue, concept: string) {
   const entry = CONCEPT_LEXICON.find((candidate) => candidate.value === concept);
-  if (!entry) return containsPhrase(venueSearchText(venue), concept);
-  const text = venueSearchText(venue);
-  return entry.aliases.some((alias) => containsPhrase(text, alias));
+  const aliases = entry?.aliases ?? [concept];
+  return venue.features.some((field) => (
+    [concept, ...aliases].some((alias) => structuredFieldContains(field, alias))
+  ));
 }
 
 function venueMatchesOccasion(venue: Venue, occasion: string) {
   const entry = OCCASION_LEXICON.find((candidate) => candidate.value === occasion);
-  const text = normaliseItalian([...venue.occasions, ...(venue.semanticTags ?? [])].join(' '));
-  return [occasion, ...(entry?.aliases ?? [])].some((alias) => containsPhrase(text, alias));
+  return venue.occasions.some((field) => (
+    [occasion, ...(entry?.aliases ?? [])].some((alias) => structuredFieldContains(field, alias))
+  ));
 }
 
 type PreferenceDimension = 'categoria' | 'zona' | 'occasione' | 'atmosfera' | 'caratteristica';
@@ -624,6 +743,7 @@ export function respectsHardConstraints(
   context?: RankingContext,
 ) {
   if (!isVenueRankingEligible(venue, at)) return false;
+  const reducedCatalogEvidence = venue.catalogApiRankingEvidence?.source === 'catalog-api';
   if (intent.excludedCategories.includes(venue.category)) return false;
   if (intent.requiredCategories.length && !intent.requiredCategories.includes(venue.category)) return false;
   if (intent.excludedNeighborhoods.includes(venue.neighborhood)) return false;
@@ -642,8 +762,17 @@ export function respectsHardConstraints(
   )) return false;
   if (intent.requiredAtmosphere.some((mood) => !venue.atmosphere.includes(mood))) return false;
   if (intent.requiredAtmosphereAny.length && !intent.requiredAtmosphereAny.some((mood) => venue.atmosphere.includes(mood))) return false;
+  // The public catalog projection currently exposes verified positive service
+  // rows, but not authoritative negative claims for mood, occasion or service.
+  // An exclusion therefore cannot be proven for an API venue and fails closed.
+  if (reducedCatalogEvidence && (
+    intent.excludedAtmosphere.length
+      || intent.excludedOccasions.length
+      || intent.excludedConcepts.length
+  )) return false;
   if (intent.excludedAtmosphere.some((mood) => venue.atmosphere.includes(mood))) return false;
   if (intent.excludedOccasions.some((occasion) => venueMatchesOccasion(venue, occasion))) return false;
+  if (intent.requiredOccasions.some((occasion) => !venueMatchesOccasion(venue, occasion))) return false;
   if (intent.requiredConcepts.some((concept) => !venueMatchesConcept(venue, concept))) return false;
   if (intent.excludedConcepts.some((concept) => venueMatchesConcept(venue, concept))) return false;
   return true;
@@ -724,6 +853,7 @@ function scoreVenue(
       || intent.requiredAtmosphere.length
       || intent.requiredAtmosphereAny.length
       || intent.excludedAtmosphere.length
+      || intent.requiredOccasions.length
       || intent.requiredConcepts.length
       || intent.excludedConcepts.length
     )
@@ -930,6 +1060,7 @@ export function rankVenues(
       || intent.requiredAtmosphere.length
       || intent.requiredAtmosphereAny.length
       || intent.excludedAtmosphere.length
+      || intent.requiredOccasions.length
       || intent.requiredConcepts.length
       || intent.excludedConcepts.length,
   );
@@ -941,7 +1072,10 @@ export function rankVenues(
         || (intent.neighborhoods.length && evidence.codes.includes('NEIGHBORHOOD_MATCH'))
         || (intent.occasions.length && evidence.codes.includes('OCCASION_MATCH'))
         || (intent.atmosphere.length && evidence.codes.includes('ATMOSPHERE_MATCH'))
-        || (intent.concepts.length && evidence.codes.includes('FEATURE_MATCH')),
+        || (intent.concepts.length && evidence.codes.includes('FEATURE_MATCH'))
+        // Free editorial prose may improve recall for optional preferences,
+        // but remains generic evidence and never satisfies a hard constraint.
+        || evidence.codes.includes('SEMANTIC_MATCH'),
       );
     }
     if (intentHasHardSignals) return true;

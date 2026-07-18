@@ -1,5 +1,12 @@
 import type { Config, Context } from '@netlify/functions';
-import { CATALOG_API_VERSION, type CatalogListResponse, type CatalogVenueSummary } from '../../src/domain/catalog-api';
+import {
+  CATALOG_API_VERSION,
+  type CatalogListResponse,
+  type CatalogVerificationStatus,
+  type CatalogVenueSummary,
+  type CatalogVenueWeeklyHour,
+} from '../../src/domain/catalog-api';
+import { isPublicHttpsUrl } from '../../src/domain/venue';
 import { CatalogQueryError, encodeCatalogCursor, parseCatalogQuery } from '../../src/server/catalog-query';
 import { loadSupabaseRuntimeConfig, numberEnv, requiredSecretEnv, RuntimeConfigurationError } from './_shared/env';
 import { cacheWindowTimestamp, clientIp, isSameOriginOrServerRequest, json, problem, responseEtag } from './_shared/http';
@@ -15,9 +22,65 @@ type SearchRow = {
   rating: number | null; review_count: number | null; review_source_count: number | null;
   rating_sources: CatalogVenueSummary['ratings'] | null;
   image_url: string | null; image_alt: string | null; service_slugs: string[] | null;
+  weekly_hours?: unknown; hours_source_url?: string | null;
+  verification_status?: unknown; open_now?: unknown;
   maturity: CatalogVenueSummary['verification']['maturity']; quality_score: number; confidence_score: number;
-  verified_at: string | null; distance_meters: number | null; relevance_score: number; sort_value: number;
+  verified_at: string | null; published_at?: string | null;
+  distance_meters: number | null; relevance_score: number; sort_value: number;
+  sort_text?: string | null;
 };
+
+type RecommendationEligibilityRow = {
+  id: string;
+  recommendation_eligible: boolean;
+};
+
+type GatedSearchRow = SearchRow & {
+  recommendationEligible: boolean;
+};
+
+const TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
+const VERIFICATION_STATUSES = new Set<CatalogVerificationStatus>([
+  'unverified', 'pending', 'verified', 'disputed', 'rejected',
+]);
+
+function parseVerificationStatus(value: unknown): CatalogVerificationStatus | null {
+  return typeof value === 'string' && VERIFICATION_STATUSES.has(value as CatalogVerificationStatus)
+    ? value as CatalogVerificationStatus
+    : null;
+}
+
+function parseWeeklyHours(value: unknown): CatalogVenueWeeklyHour[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((entry) => {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return [];
+    const row = entry as Record<string, unknown>;
+    const weekday = Number(row.weekday);
+    const sequence = Number(row.sequence);
+    const opensAt = row.opensAt === null ? null : String(row.opensAt ?? '');
+    const closesAt = row.closesAt === null ? null : String(row.closesAt ?? '');
+    const verifiedAt = String(row.verifiedAt ?? '');
+    const validUntil = row.validUntil === null ? null : String(row.validUntil ?? '');
+    const closed = row.closed === true;
+    if (!Number.isInteger(weekday) || weekday < 0 || weekday > 6
+      || !Number.isInteger(sequence) || sequence < 1 || sequence > 8
+      || !Number.isFinite(Date.parse(verifiedAt))
+      || (validUntil !== null && !/^\d{4}-\d{2}-\d{2}$/.test(validUntil))
+      || (closed
+        ? opensAt !== null || closesAt !== null
+        : !opensAt || !closesAt || !TIME.test(opensAt) || !TIME.test(closesAt))) return [];
+    return [{
+      weekday,
+      sequence,
+      opensAt,
+      closesAt,
+      closesNextDay: row.closesNextDay === true,
+      closed,
+      verifiedAt: new Date(verifiedAt).toISOString(),
+      validUntil,
+    }];
+  });
+}
 
 export function createCatalogHandler() {
   return async (request: Request, context: Context) => {
@@ -39,6 +102,7 @@ export function createCatalogHandler() {
       const rows = await client.rpc<SearchRow[]>('search_venues', {
         p_query: query.query,
         p_category_slugs: query.categorySlugs,
+        ...(query.subcategorySlugs ? { p_subcategory_slugs: query.subcategorySlugs } : {}),
         p_neighborhood_slugs: query.neighborhoodSlugs,
         p_service_slugs: query.serviceSlugs,
         p_min_price_level: query.minPriceLevel,
@@ -51,53 +115,98 @@ export function createCatalogHandler() {
         p_max_latitude: query.bbox?.[2] ?? null,
         p_max_longitude: query.bbox?.[3] ?? null,
         p_sort: query.sort,
-        p_after_value: query.cursor?.value ?? null,
+        p_after_value: typeof query.cursor?.value === 'number' ? query.cursor.value : null,
+        ...(query.sort === 'name' ? {
+          p_after_text: typeof query.cursor?.value === 'string' ? query.cursor.value : null,
+        } : {}),
         p_after_id: query.cursor?.id ?? null,
         p_limit: query.limit + 1,
         p_include_unverified: query.includeUnverified,
+        ...(query.openNow ? { p_open_now: true } : {}),
       });
-      const hasMore = rows.length > query.limit;
-      const visible = rows.slice(0, query.limit);
-      const data: CatalogVenueSummary[] = visible.map((row) => ({
-        id: row.id,
-        slug: row.slug,
-        name: row.name,
-        shortDescription: row.short_description,
-        category: { slug: row.category_slug, name: row.category_name },
-        subcategorySlug: row.subcategory_slug,
-        neighborhood: row.neighborhood_slug && row.neighborhood_name
-          ? { slug: row.neighborhood_slug, name: row.neighborhood_name } : null,
-        municipality: row.municipality_id,
-        location: { latitude: row.latitude, longitude: row.longitude },
-        formattedAddress: row.formatted_address,
-        price: { level: row.price_level, averageSpendCents: row.average_spend_cents, currency: 'EUR' },
-        ratings: Array.isArray(row.rating_sources) ? row.rating_sources.map((rating) => ({
-          ...rating,
-          value: Number(rating.value), scale: Number(rating.scale), count: Number(rating.count),
-        })) : [],
-        primaryImage: row.image_url && row.image_alt ? {
-          url: row.image_url.startsWith('/storage/v1/')
-            ? `${config.url}${row.image_url}`
-            : row.image_url.startsWith('/') ? new URL(row.image_url, request.url).toString() : row.image_url,
-          alt: row.image_alt,
-        } : null,
-        services: row.service_slugs || [],
-        verification: {
-          maturity: row.maturity,
-          qualityScore: Number(row.quality_score),
-          confidenceScore: Number(row.confidence_score),
-          verifiedAt: row.verified_at,
-        },
-        distanceMeters: row.distance_meters === null ? null : Math.round(row.distance_meters),
+      const eligibilityRows = rows.length
+        ? await client.rpc<RecommendationEligibilityRow[]>('get_venue_recommendation_eligibility', {
+            p_venue_ids: rows.map(({ id }) => id),
+          })
+        : [];
+      const eligibilityById = new Map(eligibilityRows.flatMap((row) => (
+        typeof row.id === 'string' && typeof row.recommendation_eligible === 'boolean'
+          ? [[row.id, row.recommendation_eligible] as const]
+          : []
+      )));
+      const gatedRows: GatedSearchRow[] = rows.map((row) => ({
+        ...row,
+        // Missing or malformed eligibility is never promoted to a recommendation.
+        recommendationEligible: eligibilityById.get(row.id) === true,
       }));
-      const last = visible.at(-1);
-      const privacySensitive = query.query !== null || query.latitude !== null || query.bbox !== null;
+      const visible: GatedSearchRow[] = [];
+      let consumedCount = 0;
+      let cursorRow: GatedSearchRow | null = null;
+      for (const row of gatedRows) {
+        consumedCount += 1;
+        cursorRow = row;
+        if (query.includeUnverified || row.recommendationEligible) visible.push(row);
+        if (visible.length === query.limit) break;
+      }
+      // search_venues returns at most limit + 1. If the gate consumes that
+      // whole window while discarding rows, keep a cursor on the last scanned
+      // record so the next request advances instead of looping or truncating.
+      const hasMore = gatedRows.length > 0 && (
+        consumedCount < gatedRows.length || gatedRows.length > query.limit
+      );
+      const data: CatalogVenueSummary[] = visible.map((row) => {
+        const hoursSourceUrl = typeof row.hours_source_url === 'string' && isPublicHttpsUrl(row.hours_source_url)
+          ? row.hours_source_url
+          : null;
+        return {
+          id: row.id,
+          slug: row.slug,
+          name: row.name,
+          shortDescription: row.short_description,
+          category: { slug: row.category_slug, name: row.category_name },
+          subcategorySlug: row.subcategory_slug,
+          neighborhood: row.neighborhood_slug && row.neighborhood_name
+            ? { slug: row.neighborhood_slug, name: row.neighborhood_name } : null,
+          municipality: row.municipality_id,
+          location: { latitude: row.latitude, longitude: row.longitude },
+          formattedAddress: row.formatted_address,
+          price: { level: row.price_level, averageSpendCents: row.average_spend_cents, currency: 'EUR' },
+          ratings: Array.isArray(row.rating_sources) ? row.rating_sources.map((rating) => ({
+            ...rating,
+            value: Number(rating.value), scale: Number(rating.scale), count: Number(rating.count),
+          })) : [],
+          primaryImage: row.image_url && row.image_alt ? {
+            url: row.image_url.startsWith('/storage/v1/')
+              ? `${config.url}${row.image_url}`
+              : row.image_url.startsWith('/') ? new URL(row.image_url, request.url).toString() : row.image_url,
+            alt: row.image_alt,
+          } : null,
+          services: row.service_slugs || [],
+          weeklyHours: hoursSourceUrl ? parseWeeklyHours(row.weekly_hours) : [],
+          hoursSourceUrl,
+          verification: {
+            status: parseVerificationStatus(row.verification_status),
+            maturity: row.maturity,
+            qualityScore: Number(row.quality_score),
+            confidenceScore: Number(row.confidence_score),
+            verifiedAt: row.verified_at,
+          },
+          recommendationEligible: row.recommendationEligible,
+          openNow: row.open_now === true,
+          distanceMeters: row.distance_meters === null ? null : Math.round(row.distance_meters),
+        };
+      });
+      const privacySensitive = query.query !== null || query.latitude !== null || query.bbox !== null || query.openNow;
       const cacheSeconds = numberEnv('CATALOG_API_CACHE_SECONDS', 60, { min: 0, max: 3600 });
       const response: CatalogListResponse = {
         version: CATALOG_API_VERSION,
         data,
         pagination: {
-          nextCursor: hasMore && last ? encodeCatalogCursor({ value: Number(last.sort_value), id: last.id }) : null,
+          nextCursor: hasMore && cursorRow ? encodeCatalogCursor({
+            value: query.sort === 'name' ? String(cursorRow.sort_text) : Number(cursorRow.sort_value),
+            id: cursorRow.id,
+            sort: query.sort,
+          }) : null,
           limit: query.limit,
           hasMore,
         },

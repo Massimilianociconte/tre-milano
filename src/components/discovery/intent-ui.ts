@@ -121,7 +121,9 @@ export function buildIntentChips(intent: SearchIntent, removedIds: ReadonlySet<s
       intent.requiredAtmosphere.includes(value) || intent.requiredAtmosphereAny.includes(value),
     );
   }
-  for (const value of intent.occasions) add(`occasion:${value}`, `Occasione · ${titleCaseItalian(value)}`, false);
+  for (const value of intent.occasions) {
+    add(`occasion:${value}`, `Occasione · ${titleCaseItalian(value)}`, intent.requiredOccasions.includes(value));
+  }
   for (const value of intent.concepts) add(`concept:${value}`, `Dettaglio · ${titleCaseItalian(value)}`, intent.requiredConcepts.includes(value));
   for (const value of intent.excludedCategories) add(`exclude:category:${value}`, `Esclude · ${titleCaseItalian(value)}`, true);
   for (const value of intent.excludedNeighborhoods) add(`exclude:neighborhood:${value}`, `Esclude · ${value}`, true);
@@ -163,6 +165,7 @@ export function buildIntentRemovalOverrides(intent: SearchIntent, removedIds: Re
   if ([...removedIds].some((id) => id.startsWith('occasion:') || id.startsWith('exclude:occasion:'))) {
     overrides.occasions = intent.occasions.filter((value) => !removed(`occasion:${value}`));
     overrides.occasion = overrides.occasions[0];
+    overrides.requiredOccasions = intent.requiredOccasions.filter((value) => !removed(`occasion:${value}`));
     overrides.excludedOccasions = intent.excludedOccasions.filter((value) => !removed(`exclude:occasion:${value}`));
   }
   if ([...removedIds].some((id) => id.startsWith('concept:') || id.startsWith('exclude:concept:'))) {

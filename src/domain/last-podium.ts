@@ -20,7 +20,8 @@ const OCCASIONS = [
 const CONCEPTS = [
   'vista Duomo', 'vista canale', 'vista iconica', 'spazio all’aperto',
   'conversazione', 'vino naturale', 'cocktail d’autore', 'alta cucina',
-  'vegetariano', 'musica', 'design', 'lavorare', 'prenotazione', 'tramonto',
+  'vegetariano', 'opzioni vegane', 'musica', 'design', 'lavorare', 'prenotazione',
+  'asporto', 'consegna', 'wifi', 'pet friendly', 'parcheggio', 'eventi privati', 'tramonto',
 ] as const;
 const TRAVEL_ORIGINS = ['milano-duomo-centroid'] as const;
 const VENUE_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -33,7 +34,9 @@ const INTENT_KEYS = [
   'concepts', 'requiredConcepts', 'excludedConcepts',
   'requiresOpenNow',
 ] as const;
-const INTENT_OPTIONAL_KEYS = ['minSpend', 'maxSpend', 'maxMinutes', 'travelOriginId', 'requestedServiceTime'] as const;
+const INTENT_OPTIONAL_KEYS = [
+  'minSpend', 'maxSpend', 'maxMinutes', 'travelOriginId', 'requestedServiceTime', 'requiredOccasions',
+] as const;
 
 export type LastPodiumIntentV1 = {
   categories: VenueCategory[];
@@ -53,6 +56,7 @@ export type LastPodiumIntentV1 = {
   requiredAtmosphereAny: string[];
   excludedAtmosphere: string[];
   occasions: string[];
+  requiredOccasions?: string[];
   excludedOccasions: string[];
   concepts: string[];
   requiredConcepts: string[];
@@ -102,7 +106,13 @@ function validIntent(value: unknown): value is LastPodiumIntentV1 {
   if (!isTaxonomyArray(value.requiredAtmosphereAny, ATMOSPHERES)) return false;
   if (!isTaxonomyArray(value.excludedAtmosphere, ATMOSPHERES)) return false;
   if (!isTaxonomyArray(value.occasions, OCCASIONS)) return false;
+  if (value.requiredOccasions !== undefined && !isTaxonomyArray(value.requiredOccasions, OCCASIONS)) return false;
   if (!isTaxonomyArray(value.excludedOccasions, OCCASIONS)) return false;
+  const occasions = value.occasions as string[];
+  const requiredOccasions = value.requiredOccasions as string[] | undefined;
+  const excludedOccasions = value.excludedOccasions as string[];
+  if (requiredOccasions?.some((occasion) => !occasions.includes(occasion))) return false;
+  if (occasions.some((occasion) => excludedOccasions.includes(occasion))) return false;
   if (!isTaxonomyArray(value.concepts, CONCEPTS)) return false;
   if (!isTaxonomyArray(value.requiredConcepts, CONCEPTS)) return false;
   if (!isTaxonomyArray(value.excludedConcepts, CONCEPTS)) return false;
@@ -173,6 +183,7 @@ export function createLastPodiumSnapshot(
       requiredAtmosphereAny: taxonomyCopy(intent.requiredAtmosphereAny, ATMOSPHERES, 'requiredAtmosphereAny'),
       excludedAtmosphere: taxonomyCopy(intent.excludedAtmosphere, ATMOSPHERES, 'excludedAtmosphere'),
       occasions: taxonomyCopy(intent.occasions, OCCASIONS, 'occasions'),
+      requiredOccasions: taxonomyCopy(intent.requiredOccasions, OCCASIONS, 'requiredOccasions'),
       excludedOccasions: taxonomyCopy(intent.excludedOccasions, OCCASIONS, 'excludedOccasions'),
       concepts: taxonomyCopy(intent.concepts, CONCEPTS, 'concepts'),
       requiredConcepts: taxonomyCopy(intent.requiredConcepts, CONCEPTS, 'requiredConcepts'),
@@ -244,6 +255,7 @@ export function lastPodiumIntentToOverrides(intent: LastPodiumIntentV1): Partial
     excludedAtmosphere: [...intent.excludedAtmosphere],
     occasion: intent.occasions[0],
     occasions: [...intent.occasions],
+    requiredOccasions: [...(intent.requiredOccasions ?? [])],
     excludedOccasions: [...intent.excludedOccasions],
     concepts: [...intent.concepts],
     requiredConcepts: [...intent.requiredConcepts],

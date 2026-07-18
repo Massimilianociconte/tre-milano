@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { isPlaceholder, netlifySetArgs, NETLIFY_ENV_DEFINITIONS, parseEnv } from './sync-netlify-env.mjs';
+import { isPlaceholder, NETLIFY_ENV_DEFINITIONS, netlifySetArgs, parseEnv } from './sync-netlify-env.mjs';
 
 test('il parser Netlify non interpreta sintassi shell', () => {
   const env = parseEnv("SAFE='value with spaces'\nLITERAL=$(do-not-run)\n# commento\n");
@@ -21,6 +21,16 @@ test('la allowlist non può importare la service-role legacy o credenziali pipel
   assert.equal(keys.has('SUPABASE_DB_URL'), false);
   assert.equal(keys.has('SUPABASE_SECRET_KEY'), true);
   assert.equal(keys.has('DEEPSEEK_API_KEY'), true);
+  assert.equal(keys.has('DEEPSEEK_INTERPRETER_CACHE_TTL_SECONDS'), true);
+  assert.equal(keys.has('DEEPSEEK_INTERPRETER_CACHE_MAX_ENTRIES'), true);
+});
+
+test('il tuning cache DeepSeek resta server-only e non secret', () => {
+  for (const key of ['DEEPSEEK_INTERPRETER_CACHE_TTL_SECONDS', 'DEEPSEEK_INTERPRETER_CACHE_MAX_ENTRIES']) {
+    const definition = NETLIFY_ENV_DEFINITIONS.find((candidate) => candidate.key === key);
+    assert.deepEqual(definition?.scopes, ['functions', 'runtime']);
+    assert.notEqual(definition?.secret, true);
+  }
 });
 
 test('un secret viene scritto una sola volta insieme al valore reale', () => {

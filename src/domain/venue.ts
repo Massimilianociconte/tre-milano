@@ -617,6 +617,8 @@ export type SearchIntent = {
   minSpend?: number;
   maxSpend?: number;
   maxMinutes?: number;
+  /** Parsed locally and fail-closed until verified venue capacity exists. */
+  partySize?: number;
   travelOriginId?: string;
   requiresOpenNow: boolean;
   requestedServiceTime?: {
@@ -632,13 +634,21 @@ export type SearchIntent = {
   excludedAtmosphere: string[];
   occasion?: string;
   occasions: string[];
+  requiredOccasions: string[];
   excludedOccasions: string[];
   concepts: string[];
   requiredConcepts: string[];
   excludedConcepts: string[];
   semanticTokens: string[];
   unsupportedConstraints: Array<{
-    code: 'EXACT_OPENING_TIME' | 'DIETARY_SAFETY' | 'ACCESSIBILITY' | 'TRAVEL_ORIGIN';
+    code:
+      | 'EXACT_OPENING_TIME'
+      | 'DIETARY_SAFETY'
+      | 'ACCESSIBILITY'
+      | 'TRAVEL_ORIGIN'
+      | 'PARTY_SIZE'
+      | 'UNVERIFIED_SERVICE'
+      | 'UNVERIFIED_DIETARY_OPTION';
     label: string;
   }>;
 };

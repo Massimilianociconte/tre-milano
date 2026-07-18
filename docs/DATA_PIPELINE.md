@@ -94,7 +94,7 @@ osservazioni comunali in venue pubbliche **bronze/unverified explore-only**:
 - insegne generiche ("PASTICCERIA", "BAR"…) escluse dalla promozione (`20260717153000`); i 124 record già promossi con nome generico sono stati riportati a draft;
 - ogni scheda promossa dichiara fonte e data del dato ("anagrafica Comune di Milano, dati al 31/12/2023") nella descrizione e resta `recommendation_eligible=false`.
 
-Esito finale del 17 luglio 2026: 7.531 venue promosse; 124 de-pubblicate per insegna generica e 5.743 per etichetta merceologica senza insegna reale (migrazione 20260717190000) → **1.664 schede bronze pubbliche con insegna reale** + 6 verificate Gold/Platinum.
+Esito del 17 luglio 2026: 7.531 venue promosse; 124 de-pubblicate per insegna generica e 5.743 per etichetta merceologica senza insegna reale (migrazione `20260717190000`). La successiva guardia `20260718140840` ha rimosso dalla pubblicazione altre 196 etichette amministrative chiaramente non riconducibili a un'insegna. Checkpoint remoto del 18 luglio 2026: **1.468 schede bronze pubbliche da verificare + 6 verificate Gold/Platinum = 1.474 locali esplorabili**; le restanti 6.063 venue sono draft o non pubblicate.
 
 Le API le espongono solo su richiesta esplicita: `GET /api/catalog?include_unverified=1`
 (default invariato: solo verificate). Le schede runtime `/locale/?slug=…` servono anche
@@ -117,6 +117,9 @@ l'adapter client scarta ogni record senza `verifiedAt`.
 - Pagina pubblica `/esplora/`: browser del catalogo completo con filtri per
   testo, categoria e quartiere, badge "Verificato" / "Da verificare · fonte
   2023" e paginazione keyset via `/api/catalog?include_unverified=1`.
-- Cost guard DeepSeek: cache in-memory per sessione di pagina delle
-  interpretazioni (stessa query ⇒ una sola chiamata al provider), senza
-  persistere il testo della query, in coerenza con la privacy policy.
+- Cost guard DeepSeek: cache in-memory nel client e cache best-effort per
+  istanza serverless delle interpretazioni; il server conserva soltanto
+  l'hash SHA-256 della query canonica, deduplica anche richieste equivalenti
+  già in-flight e non persiste il testo della query. TTL e cap sono regolabili
+  con `DEEPSEEK_INTERPRETER_CACHE_TTL_SECONDS` e
+  `DEEPSEEK_INTERPRETER_CACHE_MAX_ENTRIES`.

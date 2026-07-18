@@ -9,16 +9,32 @@ import ExploreCatalog from '@/components/explore/ExploreCatalog';
   description="Sfoglia il catalogo completo dei locali di Milano: schede verificate dalla redazione e schede importate dalle fonti comunali, sempre distinte e dichiarate."
   noindex={true}
 >
-  <section class="editorial-hero editorial-hero--compact">
-    <div class="shell">
-      <span class="editorial-eyebrow">Catalogo completo</span>
-      <h1 style="max-width: 760px">Esplora tutta Milano.</h1>
-      <p style="max-width: 640px">
-        Ogni scheda dichiara la propria origine: le selezioni <strong>verificate</strong> dalla
-        redazione convivono con le schede <strong>da verificare</strong> importate
-        dall’anagrafica del Comune di Milano (dati al 31/12/2023). Solo le prime
-        possono entrare nel podio.
-      </p>
+  <section class="editorial-hero editorial-hero--compact explore-hero">
+    <div class="shell explore-hero__inner">
+      <div class="explore-hero__copy">
+        <span class="editorial-eyebrow">Catalogo completo · Milano</span>
+        <h1>Esplora la città come una collezione.</h1>
+        <p>
+          Una galleria urbana di indirizzi, quartieri e atmosfere. Le selezioni
+          <strong>verificate</strong> dalla redazione restano distinte dalle schede
+          <strong>open data da verificare</strong>; solo le prime possono entrare nel podio.
+        </p>
+        <div class="explore-hero__legend" aria-label="Legenda del catalogo">
+          <span><i aria-hidden="true"></i>Venue passport verificato</span>
+          <span><i aria-hidden="true"></i>Anagrafica comunale · 31/12/2023</span>
+        </div>
+      </div>
+      <figure class="explore-hero__visual">
+        <img
+          src="/images/galleria-milano.webp"
+          alt="Architettura della Galleria Vittorio Emanuele II a Milano"
+          width="1400"
+          height="933"
+          loading="eager"
+          fetchpriority="high"
+        />
+        <figcaption><span>01</span>Milano, archivio vivo</figcaption>
+      </figure>
     </div>
   </section>
   <div class="shell" style="padding-bottom: 5rem">

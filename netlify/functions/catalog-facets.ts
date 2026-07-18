@@ -21,10 +21,24 @@ export default async (request: Request, context: Context) => {
       route: 'catalog:facets', limit, windowSeconds: 60,
     });
     if (!rate.allowed) return problem(429, 'Troppe richieste', { requestId: context.requestId, headers: { 'Retry-After': String(rate.retryAfterSeconds) } });
-    const facets = await client.rpc<Record<string, unknown>>('catalog_facets', {
+    const facetParameters = {
       p_min_latitude: bbox[1] ?? null, p_min_longitude: bbox[0] ?? null,
       p_max_latitude: bbox[3] ?? null, p_max_longitude: bbox[2] ?? null,
-    });
+      // This endpoint powers Explore, whose list explicitly requests the
+      // browse-only Bronze catalog with include_unverified=1.
+      p_include_unverified: true,
+    };
+    let facets: Record<string, unknown>;
+    try {
+      facets = await client.rpc<Record<string, unknown>>('catalog_facets', facetParameters);
+    } catch (error) {
+      // Rolling-deploy safety: code may reach the CDN just before the versioned
+      // migration. Only the exact PostgREST signature-miss falls back; database
+      // and authorization failures still fail closed.
+      if (!(error instanceof SupabaseRequestError) || error.code !== 'PGRST202') throw error;
+      const { p_include_unverified: _includeUnverified, ...legacyParameters } = facetParameters;
+      facets = await client.rpc<Record<string, unknown>>('catalog_facets', legacyParameters);
+    }
     const cacheSeconds = numberEnv('CATALOG_API_CACHE_SECONDS', 60, { min: 0, max: 3600 });
     const response = { version: CATALOG_API_VERSION, data: facets };
     const etag = bbox.length ? null : await responseEtag(response);

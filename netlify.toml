@@ -16,6 +16,11 @@
   directory = "netlify/functions"
   node_bundler = "esbuild"
 
+[images]
+  # Solo il bucket pubblico del catalogo, già filtrato server-side per
+  # approvazione e diritti compatibili, può passare dall'Image CDN.
+  remote_images = ["^https://glalvaiuhrohrvauuwcp\\.supabase\\.co/storage/v1/object/public/venue-media/[A-Za-z0-9][A-Za-z0-9/_.,%+@~-]*$"]
+
 [dev]
   command = "pnpm run dev"
   targetPort = 4321

@@ -62,4 +62,16 @@ describe('production deployment security contract', () => {
     expect(source).not.toMatch(/^PUBLIC_TURNSTILE_SECRET_KEY=/m);
     expect(source).not.toMatch(/^SUPABASE_SERVICE_ROLE_KEY=/m);
   });
+
+  it('anchors the Netlify Image CDN allowlist to the approved Supabase bucket', () => {
+    const source = read('netlify.toml');
+    const serializedPattern = source.match(/remote_images\s*=\s*\["([^"]+)"\]/)?.[1];
+    expect(serializedPattern).toBeTruthy();
+    const pattern = new RegExp(JSON.parse(`"${serializedPattern}"`));
+
+    expect(pattern.test('https://glalvaiuhrohrvauuwcp.supabase.co/storage/v1/object/public/venue-media/notturno.webp')).toBe(true);
+    expect(pattern.test('https://attacker.example/image.webp?next=https://glalvaiuhrohrvauuwcp.supabase.co/storage/v1/object/public/venue-media/notturno.webp')).toBe(false);
+    expect(pattern.test('https://glalvaiuhrohrvauuwcp.supabase.co/storage/v1/object/public/other-bucket/notturno.webp')).toBe(false);
+    expect(pattern.test('https://glalvaiuhrohrvauuwcp.supabase.co/storage/v1/object/public/venue-media/notturno.webp?redirect=https://attacker.example')).toBe(false);
+  });
 });

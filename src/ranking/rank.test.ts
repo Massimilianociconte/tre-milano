@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { venues } from '../data/venues';
-import type { Venue } from '../domain/venue';
 import { buildSessionTravelEstimates } from '../domain/discovery-location';
 import { createEmptyTasteProfile, type TasteProfile } from '../domain/taste-profile';
+import type { Venue } from '../domain/venue';
 import { RANKING_THRESHOLDS, RANKING_VERSION, RANKING_WEIGHTS } from './config';
 import { normaliseItalian, parseIntent, rankVenues, respectsHardConstraints } from './rank';
 
@@ -67,7 +67,7 @@ function runtimeGoldVenue(overrides: Partial<Venue> = {}): Venue {
 
 describe('normalizzazione italiana', () => {
   it('espone una configurazione ranking versionata e priva di magic number nel contratto pubblico', () => {
-    expect(RANKING_VERSION).toBe('deterministic-local-v2');
+    expect(RANKING_VERSION).toBe('deterministic-local-v3');
     expect(RANKING_THRESHOLDS.explanationReasonLimit).toBe(3);
     expect(RANKING_WEIGHTS.confidence).toBeGreaterThan(0);
     expect(Object.isFrozen(RANKING_THRESHOLDS)).toBe(true);
@@ -279,6 +279,11 @@ describe('vincoli duri prima del ranking', () => {
     expect(parseIntent('non deve avere musica').requiredConcepts).not.toContain('musica');
     expect(parseIntent('non vorrei musica').excludedConcepts).toContain('musica');
     expect(parseIntent('non mi interessa la musica').excludedConcepts).toContain('musica');
+
+    const quietMusic = parseIntent('cocktail bar con opzioni vegane e senza musica vivace');
+    expect(quietMusic.excludedConcepts).toContain('musica');
+    expect(quietMusic.excludedAtmosphere).toContain('vivace');
+    expect(quietMusic.atmosphere).not.toContain('vivace');
   });
 
   it('propaga le esclusioni coordinate senza trasformarle in preferenze', () => {
@@ -295,6 +300,12 @@ describe('vincoli duri prima del ranking', () => {
     expect(parseIntent('deve essere intimo e tranquillo').requiredAtmosphere).toEqual(['intimo', 'tranquillo']);
     expect(parseIntent('deve essere intimo ma anche tranquillo').requiredAtmosphere).toEqual(['intimo', 'tranquillo']);
     expect(parseIntent('deve essere intimo oppure tranquillo').requiredAtmosphereAny).toEqual(['intimo', 'tranquillo']);
+    expect(parseIntent('solo aperitivo').requiredOccasions).toEqual(['aperitivo']);
+
+    const colloquialMood = parseIntent('solo qualcosa di scenografico, senza essere rumoroso');
+    expect(colloquialMood.requiredAtmosphere).toEqual(['creativo']);
+    expect(colloquialMood.excludedAtmosphere).toEqual(['vivace']);
+    expect(colloquialMood.atmosphere).not.toContain('vivace');
 
     const categoryResults = rankVenues('solo ristoranti o cocktail bar');
     expect(categoryResults.length).toBeGreaterThan(0);
@@ -307,6 +318,10 @@ describe('vincoli duri prima del ranking', () => {
     const alternativeMoodResults = rankVenues('deve essere intimo oppure tranquillo');
     expect(alternativeMoodResults.length).toBeGreaterThan(0);
     expect(alternativeMoodResults.every((venue) => venue.atmosphere.includes('intimo') || venue.atmosphere.includes('tranquillo'))).toBe(true);
+
+    const requiredOccasionResults = rankVenues('solo aperitivo');
+    expect(requiredOccasionResults.length).toBeGreaterThan(0);
+    expect(requiredOccasionResults.every((venue) => venue.occasions.includes('aperitivo'))).toBe(true);
 
     const multiClause = parseIntent('solo cocktail bar oppure rooftop; deve essere elegante e tranquillo');
     expect(multiClause.requiredCategories).toEqual(['Cocktail bar', 'Rooftop']);
@@ -404,10 +419,85 @@ describe('vincoli duri prima del ranking', () => {
   it('non indovina requisiti alimentari o di accessibilità safety-critical', () => {
     expect(parseIntent('aperitivo senza glutine').unsupportedConstraints.map(({ code }) => code)).toContain('DIETARY_SAFETY');
     expect(parseIntent('cena senza lattosio').unsupportedConstraints.map(({ code }) => code)).toContain('DIETARY_SAFETY');
-    expect(parseIntent('opzioni vegane obbligatorie').unsupportedConstraints.map(({ code }) => code)).toContain('DIETARY_SAFETY');
+    expect(parseIntent('opzioni vegane obbligatorie').requiredConcepts).toContain('opzioni vegane');
+    expect(parseIntent('opzioni vegane obbligatorie').unsupportedConstraints).toHaveLength(0);
     expect(parseIntent('ristorante accessibile in sedia a rotelle').unsupportedConstraints.map(({ code }) => code)).toContain('ACCESSIBILITY');
     expect(rankVenues('aperitivo senza glutine')).toHaveLength(0);
     expect(parseIntent('facilmente accessibile con la metro').unsupportedConstraints).toHaveLength(0);
+  });
+
+  it('non soddisfa vincoli duri con affermazioni negate nel catalogo', () => {
+    const poisoned = runtimeGoldVenue({
+      id: 'poisoned-live',
+      features: [],
+      occasions: [],
+      semanticTags: [
+        'non offre opzioni vegane',
+        'opzioni vegane non sono disponibili',
+        'opzioni vegane al momento non sono garantite',
+        'opzioni vegane solo su richiesta, non sempre disponibili',
+        'aperitivo non disponibile',
+      ],
+    });
+    expect(rankVenues(
+      'opzioni vegane obbligatorie',
+      undefined,
+      [poisoned],
+      {},
+      undefined,
+      runtimeReferenceDate,
+    )).toEqual([]);
+    expect(rankVenues('solo aperitivo', undefined, [poisoned], {}, undefined, runtimeReferenceDate)).toEqual([]);
+  });
+
+  it('non interpreta l’assenza di un attributo API come prova di un’esclusione', () => {
+    const reducedCatalogVenue = runtimeGoldVenue({
+      id: 'reduced-catalog-live',
+      catalogApiRankingEvidence: {
+        source: 'catalog-api',
+        qualityScore: 90,
+        generatedAt: runtimeReferenceDate.toISOString(),
+        travelDisclosure: 'stimata, non routing',
+      },
+      features: [],
+      atmosphere: [],
+      occasions: [],
+      semanticTags: ['ambiente senza musica', 'non pensato per aperitivo'],
+    });
+    expect(rankVenues('senza musica', undefined, [reducedCatalogVenue], {}, undefined, runtimeReferenceDate)).toEqual([]);
+    expect(rankVenues('evita aperitivo', undefined, [reducedCatalogVenue], {}, undefined, runtimeReferenceDate)).toEqual([]);
+  });
+
+  it('estrae il numero di persone ma resta fail-closed senza capienza verificata', () => {
+    const explicit = parseIntent('aperitivo elegante per 8 persone');
+    const conversational = parseIntent('siamo in 12 e cerchiamo un rooftop');
+    const conversationalWords = parseIntent('siamo in quattro e cerchiamo un rooftop');
+    expect(explicit.partySize).toBe(8);
+    expect(conversational.partySize).toBe(12);
+    expect(conversationalWords.partySize).toBe(4);
+    expect(explicit.unsupportedConstraints).toContainEqual({
+      code: 'PARTY_SIZE',
+      label: 'capienza verificata per 8 persone',
+    });
+    expect(rankVenues(explicit.query)).toEqual([]);
+    expect(parseIntent('tavoli grandi').unsupportedConstraints.map(({ code }) => code)).toContain('PARTY_SIZE');
+    expect(parseIntent('aperitivo elegante per 100 persone').unsupportedConstraints.map(({ code }) => code)).toContain('PARTY_SIZE');
+    expect(parseIntent('siamo in 120 e cerchiamo un rooftop').unsupportedConstraints.map(({ code }) => code)).toContain('PARTY_SIZE');
+    expect(conversationalWords.unsupportedConstraints.map(({ code }) => code)).toContain('PARTY_SIZE');
+    expect(rankVenues('aperitivo elegante per 100 persone')).toEqual([]);
+  });
+
+  it('distingue servizi e dieta verificabili dalle richieste non rappresentabili', () => {
+    expect(parseIntent('deve avere wifi').requiredConcepts).toContain('wifi');
+    expect(parseIntent('preferibilmente pet friendly con parcheggio').concepts)
+      .toEqual(expect.arrayContaining(['pet friendly', 'parcheggio']));
+    expect(parseIntent('ristorante halal').unsupportedConstraints.map(({ code }) => code))
+      .toContain('UNVERIFIED_DIETARY_OPTION');
+    expect(parseIntent('locale con area bambini').unsupportedConstraints.map(({ code }) => code))
+      .toContain('UNVERIFIED_SERVICE');
+    expect(rankVenues('deve avere wifi').every((venue) => (
+      [...venue.features, ...(venue.semanticTags ?? [])].some((value) => /wifi/i.test(value))
+    ))).toBe(true);
   });
 
   it('tratta mood obbligatori come vincoli e non come semplice scoring', () => {
@@ -463,11 +553,13 @@ describe('vincoli duri prima del ranking', () => {
 });
 
 describe('retrieval, override e spiegabilità', () => {
-  it('premia i concetti pesati e i token semantici curati', () => {
+  it('distingue gli attributi strutturati dalla somiglianza semantica editoriale', () => {
     const [result] = rankVenues('vista Duomo al tramonto per un ospite da fuori');
     expect(result.id).toBe('quota-ventuno');
-    expect(result.matchedConcepts).toEqual(expect.arrayContaining(['vista Duomo', 'tramonto']));
+    expect(result.matchedConcepts).toContain('vista Duomo');
+    expect(result.matchedConcepts).not.toContain('tramonto');
     expect(result.reasonCodes).toContain('FEATURE_MATCH');
+    expect(result.reasonCodes).toContain('SEMANTIC_MATCH');
   });
 
   it('un override UI del quartiere sostituisce la località nella query', () => {

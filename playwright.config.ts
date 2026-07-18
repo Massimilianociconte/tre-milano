@@ -33,6 +33,7 @@ export default defineConfig({
   },
   projects: [
     { name: 'chromium-360', use: { viewport: { width: 360, height: 800 } } },
+    { name: 'chromium-432', use: { viewport: { width: 432, height: 900 } } },
     { name: 'chromium-768', use: { viewport: { width: 768, height: 1024 } } },
     { name: 'chromium-1440', use: { viewport: { width: 1440, height: 1000 } } },
   ],
