@@ -13,8 +13,9 @@
   --error: #7d2d2d;
   --font-display: 'Playfair Display', 'Iowan Old Style', 'Baskerville', Georgia, serif;
   --font-sans: 'Inter', 'Helvetica Neue', Arial, sans-serif;
-  --shadow-card: 0 12px 32px rgb(11 19 32 / 9%);
-  --shadow-float: 0 18px 50px rgb(11 19 32 / 13%);
+  --shadow-card: 0 1px 2px rgb(11 19 32 / 5%), 0 12px 32px rgb(11 19 32 / 8%);
+  --shadow-float: 0 2px 6px rgb(11 19 32 / 6%), 0 22px 56px rgb(11 19 32 / 13%);
+  --ease-premium: cubic-bezier(0.22, 0.61, 0.36, 1);
   --radius-sm: 0.5rem;
   --radius-md: 0.85rem;
   --radius-lg: 1.15rem;
@@ -38,7 +39,9 @@ body {
   color: var(--navy);
   background: var(--ivory);
   font-family: var(--font-sans);
-  font-size: 0.9375rem;
+  font-size: 1rem;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   line-height: 1.55;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -66,6 +69,13 @@ a {
 button,
 input {
   font: inherit;
+}
+
+input,
+select,
+textarea {
+  /* Sotto i 16px iOS forza lo zoom al focus: mai scendere. */
+  font-size: max(1rem, 1em);
 }
 
 button,
@@ -1896,7 +1906,7 @@ a {
 
 .category-rail a {
   min-width: max-content;
-  min-height: 42px;
+  min-height: 48px;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -3824,7 +3834,7 @@ a {
     box-shadow: 0 -8px 24px rgb(11 19 32 / 7%);
     backdrop-filter: blur(14px);
   }
-  .bottom-nav a { min-height: 72px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem; color: #5e5a54; font-size: 0.48rem; font-weight: 600; letter-spacing: 0.08em; text-decoration: none; text-transform: uppercase; }
+  .bottom-nav a { min-height: 72px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.25rem; color: #5e5a54; font-size: 0.58rem; font-weight: 600; letter-spacing: 0.08em; text-decoration: none; text-transform: uppercase; }
   .bottom-nav a[aria-current='page'] { color: var(--gold-ink); }
   .bottom-nav svg { width: 1.25rem; height: 1.25rem; }
 }
@@ -4128,4 +4138,70 @@ a {
 @media (prefers-reduced-motion: reduce) {
   .category-section article:hover,
   .collection article:hover { transform: none; }
+}
+
+/* ---------------------------------------------------------------------------
+ * Rifinitura premium: navigazione persistente, motion d'ingresso e stati
+ * interattivi. Solo transform/opacity (CLS 0) e sempre riducibile.
+ * ------------------------------------------------------------------------- */
+
+@media (min-width: 761px) {
+  .site-header {
+    position: sticky;
+    top: 0;
+  }
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.home-hero__copy > div,
+.editorial-hero .shell > * {
+  animation: rise-in 640ms var(--ease-premium) both;
+}
+
+.editorial-hero .shell > *:nth-child(2) { animation-delay: 70ms; }
+.editorial-hero .shell > *:nth-child(3) { animation-delay: 140ms; }
+.editorial-hero .shell > *:nth-child(n + 4) { animation-delay: 200ms; }
+
+.search-composer__submit {
+  transition: background 200ms var(--ease-premium), transform 200ms var(--ease-premium), box-shadow 200ms var(--ease-premium);
+}
+
+.search-composer__submit:hover {
+  background: var(--navy-soft);
+  box-shadow: 0 10px 26px rgb(11 19 32 / 22%);
+  transform: translateY(-1px);
+}
+
+.search-composer__submit:active { transform: translateY(0); }
+
+.text-link {
+  text-underline-offset: 0.22em;
+  transition: color 160ms ease, text-underline-offset 160ms var(--ease-premium);
+}
+
+.text-link:hover { color: var(--gold-ink); text-underline-offset: 0.34em; }
+
+.podium-card[data-rank='1'] .podium-card__rank {
+  box-shadow:
+    0 0 0 2px rgb(200 169 110 / 35%),
+    0 0 22px rgb(200 169 110 / 30%),
+    0 6px 16px rgb(11 19 32 / 30%);
+}
+
+.category-rail a,
+.related-card {
+  transition: color 180ms ease, background 180ms ease, border-color 180ms ease, transform 180ms var(--ease-premium), box-shadow 180ms ease;
+}
+
+.category-rail a:hover { transform: translateY(-1px); box-shadow: var(--shadow-card); }
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero__copy > div,
+  .editorial-hero .shell > * { animation: none; }
+  .search-composer__submit:hover,
+  .category-rail a:hover { transform: none; }
 }
