@@ -83,6 +83,14 @@ describe('POST /api/search/interpret', () => {
         unsupportedConstraints: [{ code: 'PARTY_SIZE', label: 'capienza verificata per 8 persone' }],
       },
     });
+    const complexParty = await (await handler(request(queryRequest(
+      'solo rooftop elegante a Brera, entro 60 euro, per quattro persone domani alle 20, con opzioni vegane e senza musica vivace',
+    )))).json();
+    expect(complexParty).toMatchObject({
+      source: 'deterministic-fallback',
+      fallbackReason: 'local_sufficient',
+      intent: { partySize: 4 },
+    });
     expect(fetchImpl).not.toHaveBeenCalled();
   });
 

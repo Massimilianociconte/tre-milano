@@ -259,6 +259,12 @@ const AMBIGUOUS_NUANCE_PATTERN = /\b(?:cinematograf|film|teatral|scenograf|memor
 const CAPITALIZED_NAME_PATTERN = /\b\p{Lu}[\p{Ll}'’-]{1,30}(?:\s+\p{Lu}[\p{Ll}'’-]{1,30}){1,2}\b/gu;
 const ADDRESS_OR_TOPONYM_PATTERN = /\b(?:via|viale|v\.?\s*le|piazza|piazzale|p\.?\s*le|corso|c\.?\s*so|largo|vicolo|strada|str\.?|alzaia|ripa|foro|bastioni|galleria|lungomare|lungarno|contrada|localit[aà]|frazione)\s+[\p{L}'’.-]+(?:\s+[\p{L}'’.-]+){0,4}(?:\s+\d{1,4}[a-z]?)?\b/giu;
 const CONTEXTUAL_PERSON_NAME_PATTERN = /\b(?:per|con|insieme\s+a|a\s+nome\s+di|fare\s+colpo\s+su|stupire|impressionare|(?:compleanno|festa|anniversario|regalo|sorpresa|prenotazione)\s+(?:di|per|a)|dedicat[oa]\s+a)\s+((?!(?:un|una|uno|il|lo|la|i|gli|le|mio|mia|nostro|nostra|fare|parlare|bere|mangiare|stare|vedere|vista|musica|cena|aperitivo|cocktail|ristorante|locale|posto)\s)\p{L}[\p{L}'’-]{1,30}\s+\p{L}[\p{L}'’-]{1,30})\b/giu;
+const CONTEXTUAL_NON_PERSON_PREFIXES = new Set([
+  'uno', 'una', 'due', 'tre', 'quattro', 'cinque', 'sei', 'sette', 'otto', 'nove', 'dieci',
+  'undici', 'dodici', 'tredici', 'quattordici', 'quindici', 'sedici', 'diciassette', 'diciotto',
+  'diciannove', 'venti', 'questa', 'questo', 'queste', 'questi', 'oggi', 'domani', 'sera', 'serata',
+  'persone', 'commensali', 'opzioni', 'tavoli', 'cucina', 'servizio', 'atmosfera', 'budget', 'rooftop',
+].map(normaliseItalian));
 
 // Proper-case intent labels and public Milan place names are not personal
 // names. Redacting them before the conservative capitalized-name check keeps
@@ -398,6 +404,8 @@ function hasDirectSearchPrivacyRisk(query: string) {
   ))) return true;
   if ([...query.matchAll(CONTEXTUAL_PERSON_NAME_PATTERN)].some((match) => {
     const candidate = match[1] ?? '';
+    const firstToken = normaliseItalian(candidate).split(' ')[0] ?? '';
+    if (CONTEXTUAL_NON_PERSON_PREFIXES.has(firstToken)) return false;
     return !isControlledPublicPhrase(candidate) && !startsWithControlledPublicPhrase(candidate);
   })) return true;
   return false;

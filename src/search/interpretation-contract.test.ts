@@ -49,6 +49,8 @@ describe('contratto query e privacy', () => {
     'prenotazione per giulia bianchi',
     'prenotazione a nome di john smith',
     'un posto cinematografico per massimiliano ciconte che faccia colpo',
+    'un rooftop per quattro persone con xavier dupont',
+    'un aperitivo per questa sera insieme a xavier dupont',
     'una cena speciale per il compleanno di xavier dupont in un posto cinematografico',
     'un posto intimo come casa di Mario Rossi in via Torino 10',
     'un aperitivo vicino a piazzale loreto 5',
@@ -71,6 +73,9 @@ describe('contratto query e privacy', () => {
     expect(hasSearchPrivacyRisk('Cena Romantica nel Quadrilatero Della Moda')).toBe(false);
     expect(hasSearchPrivacyRisk('Aperitivo in Piazza Duomo')).toBe(false);
     expect(hasSearchPrivacyRisk('Cocktail vicino a Piazza Gae Aulenti')).toBe(false);
+    expect(hasSearchPrivacyRisk('solo rooftop elegante a Brera, entro 60 euro, per quattro persone domani alle 20, con opzioni vegane e senza musica vivace')).toBe(false);
+    expect(hasSearchPrivacyRisk('vorrei un aperitivo elegante a Brera per questa sera')).toBe(false);
+    expect(hasSearchPrivacyRisk('rooftop con opzioni vegane e tavoli esterni')).toBe(false);
     expect(hasSearchPrivacyRisk('Aperitivo in Via Torino')).toBe(true);
     expect(hasSearchPrivacyRisk('Aperitivo in Piazza Duomo 4')).toBe(true);
   });
