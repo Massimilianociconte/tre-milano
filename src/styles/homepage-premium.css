@@ -53,7 +53,13 @@
 
 @media (min-width: 761px) and (max-width: 1050px) {
   .home-shell .site-header {
-    background: linear-gradient(180deg, rgb(5 12 21 / 94%) 0%, rgb(5 12 21 / 76%) 100%);
+    background: #050c15;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 900px) {
+  .home-shell .profile-link > span:nth-child(2) {
+    display: none;
   }
 }
 
