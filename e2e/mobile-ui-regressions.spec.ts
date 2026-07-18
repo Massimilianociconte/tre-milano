@@ -134,3 +134,27 @@ test.describe('regressioni UI mobile dagli screenshot', () => {
     expect(geometry).toEqual({ contained: true, pageContained: true, wraps: true });
   });
 });
+
+test.describe('regressioni UI tablet dagli screenshot', () => {
+  test.beforeEach(({ page }) => {
+    const width = page.viewportSize()?.width ?? 0;
+    test.skip(width < 721 || width > 900, 'Contratto specifico tablet');
+  });
+
+  test('la testata della homepage contiene azioni e profilo senza overflow', async ({ page }) => {
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    const geometry = await page.locator('.site-header__inner').evaluate((element) => {
+      const headerRect = element.getBoundingClientRect();
+      const actionsRect = element.querySelector('.site-header__actions')?.getBoundingClientRect();
+      return {
+        actionsInside: Boolean(actionsRect
+          && actionsRect.left >= headerRect.left - 1
+          && actionsRect.right <= headerRect.right + 1),
+        pageContained: document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1,
+      };
+    });
+
+    expect(geometry).toEqual({ actionsInside: true, pageContained: true });
+  });
+});

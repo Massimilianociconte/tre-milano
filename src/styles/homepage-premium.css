@@ -58,6 +58,10 @@
 }
 
 @media (min-width: 761px) and (max-width: 900px) {
+  .home-shell .site-header__inner {
+    grid-template-columns: 120px minmax(0, 1fr) 84px;
+  }
+
   .home-shell .profile-link > span:nth-child(2) {
     display: none;
   }
