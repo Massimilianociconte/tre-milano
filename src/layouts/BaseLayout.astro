@@ -5,6 +5,7 @@ import '@fontsource/inter/latin-400.css';
 import '@fontsource/inter/latin-500.css';
 import '@fontsource/inter/latin-600.css';
 import '@/styles/global.css';
+import '@/styles/discovery-premium.css';
 import Header from '@/components/layout/Header.astro';
 import Footer from '@/components/layout/Footer.astro';
 import { SITE } from '@/config/site';
@@ -24,6 +25,7 @@ type Props = {
   modifiedTime?: string;
   structuredData?: Record<string, unknown> | Array<Record<string, unknown>>;
   hideFooter?: boolean;
+  bodyClass?: string;
 };
 
 const {
@@ -39,6 +41,7 @@ const {
   modifiedTime,
   structuredData,
   hideFooter = false,
+  bodyClass,
 } = Astro.props;
 const canonical = new URL(Astro.url.pathname, SITE.url).toString();
 const socialImage = new URL(image, SITE.url).toString();
@@ -133,7 +136,7 @@ const serializedSchema = serializeJsonLd(schema);
     <title>{title}</title>
     <script is:inline type="application/ld+json" set:html={serializedSchema} />
   </head>
-  <body>
+  <body class={bodyClass}>
     <Header />
     {SITE.preview && (
       <div class="preview-bar" role="status">

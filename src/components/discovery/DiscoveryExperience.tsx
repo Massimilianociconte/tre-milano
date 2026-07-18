@@ -163,8 +163,9 @@ function buildMapPositions(results: RankedVenue[]): Map<string, MapPosition> {
 
 /*
  * One continuous, three-lobed crown: two restrained side lobes frame the
- * taller central lobe that carries the rank medallion. Keep the clip and the
- * visible outline in sync when the silhouette changes.
+ * taller central lobe that carries the rank medallion. The silhouette is
+ * applied only to the fixed-height visual — never to the full card — so its
+ * proportions stay architectural instead of stretching with the copy.
  */
 const PODIUM_CROWN_CLIP_PATH = 'M 0 .18 C 0 .14 .04 .115 .095 .115 C .15 .115 .19 .14 .19 .18 C .19 .19 .21 .20 .235 .20 L .30 .20 C .32 .075 .40 .01 .5 .01 C .60 .01 .68 .075 .70 .20 L .765 .20 C .79 .20 .81 .19 .81 .18 C .81 .14 .85 .115 .905 .115 C .96 .115 1 .14 1 .18 V 1 H 0 Z';
 const PODIUM_CROWN_OUTLINE_PATH = 'M .6 18 C .6 14.2 4.2 11.7 9.6 11.7 C 15 11.7 18.8 14.2 18.8 18 C 18.8 19 21 20 23.5 20 L 30 20 C 32 7.5 40 1 50 1 C 60 1 68 7.5 70 20 L 76.5 20 C 79 20 81.2 19 81.2 18 C 81.2 14.2 85 11.7 90.4 11.7 C 95.8 11.7 99.4 14.2 99.4 18 V 99.4 H .6 Z';
@@ -237,13 +238,15 @@ function PodiumCard({ venue, saved, active, onSave, onFocus, onOpen, onShare, on
           </clipPath>
         </defs>
       </svg>
-      <article className="podium-card__frame" data-crown-lobes="3" style={{ clipPath: `url(#${clipId})` }}>
+      <article className="podium-card__frame" data-crown-lobes="3">
         <span className="sr-only">Posizione {venue.rank}.</span>
-        <svg className="podium-card__outline" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
-          <path d={PODIUM_CROWN_OUTLINE_PATH} />
-        </svg>
-        <div className="podium-card__media">
-          <img src={venue.image} alt={venue.imageAlt} width={venue.imageWidth} height={venue.imageHeight} loading={venue.rank === 1 ? 'eager' : 'lazy'} />
+        <div className="podium-card__visual" style={{ clipPath: `url(#${clipId})` }}>
+          <svg className="podium-card__outline" aria-hidden="true" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d={PODIUM_CROWN_OUTLINE_PATH} />
+          </svg>
+          <div className="podium-card__media">
+            <img src={venue.image} alt={venue.imageAlt} width={venue.imageWidth} height={venue.imageHeight} loading={venue.rank === 1 ? 'eager' : 'lazy'} />
+          </div>
           <span className="podium-card__rank" aria-hidden="true">{venue.rank}</span>
         </div>
         <div className="podium-card__body">
@@ -255,7 +258,7 @@ function PodiumCard({ venue, saved, active, onSave, onFocus, onOpen, onShare, on
             <span className="podium-card__price">
               <small>Spesa</small>
               {venue.pricingKnown === false
-                ? <strong className="podium-card__price-unknown">Prezzo da verificare</strong>
+                ? <strong className="podium-card__price-unknown"><span>Prezzo da verificare</span><em>Da verificare</em></strong>
                 : <strong>{'€'.repeat(venue.priceLevel)} <em>~{venue.averageSpend}</em></strong>}
             </span>
             <span
@@ -1304,14 +1307,56 @@ export default function DiscoveryExperience({ initialQuery, compact = false }: P
         ) : null}
       </form>
 
-      <div
-        className={`catalog-status catalog-status--${catalogState.status}`}
-        data-catalog-status={catalogState.status}
-        role="status"
-        aria-live="polite"
-      >
-        <span aria-hidden="true"><Icon name={catalogState.status === 'live' ? 'spark' : 'refresh'} /></span>
-        <p><strong>{catalogStatusCopy.title}</strong><small>{catalogStatusCopy.detail}</small></p>
+      <div className="discovery-utilities">
+        <div
+          className={`catalog-status catalog-status--${catalogState.status}`}
+          data-catalog-status={catalogState.status}
+          role="status"
+          aria-live="polite"
+        >
+          <span aria-hidden="true"><Icon name={catalogState.status === 'live' ? 'spark' : 'refresh'} /></span>
+          <p><strong>{catalogStatusCopy.title}</strong><small>{catalogStatusCopy.detail}</small></p>
+        </div>
+
+        <div className={`travel-origin-control travel-origin-control--${geolocationStatus}`}>
+          <span className="travel-origin-control__icon"><Icon name="pin" /></span>
+          <span className="travel-origin-control__copy">
+            <strong>{sessionOrigin ? 'La tua posizione · solo questa sessione' : 'Origine Duomo'}</strong>
+            <small id="tre-travel-origin-status" aria-live="polite">
+              {geolocationStatus === 'requesting' && 'Richiesta della posizione in corso…'}
+              {geolocationStatus === 'active' && 'Tempi a piedi stimati, non routing. Le coordinate non vengono salvate.'}
+              {geolocationStatus === 'denied' && 'Permesso negato. Puoi riprovare dal browser; resti sull’origine Duomo.'}
+              {geolocationStatus === 'outside-milan' && 'Posizione fuori dall’area di Milano; resti sull’origine Duomo.'}
+              {geolocationStatus === 'error' && 'Posizione non disponibile; resti sull’origine Duomo.'}
+              {geolocationStatus === 'unsupported' && 'Geolocalizzazione non supportata; resti sull’origine Duomo.'}
+              {geolocationStatus === 'idle' && 'Attivazione solo su richiesta; nessuna coordinata viene salvata.'}
+            </small>
+          </span>
+          <button
+            type="button"
+            aria-describedby="tre-travel-origin-status"
+            disabled={geolocationStatus === 'requesting'}
+            onClick={sessionOrigin ? resetTravelOrigin : requestForegroundLocation}
+          >
+            {geolocationStatus === 'requesting'
+              ? 'Attendo…'
+              : sessionOrigin
+                ? 'Ripristina Duomo'
+                : geolocationStatus === 'idle'
+                  ? 'Usa la mia posizione'
+                  : 'Riprova'}
+          </button>
+        </div>
+
+        {lastPodiumSaved ? (
+          <div className={`last-podium-status ${restoredLastPodium ? 'is-restored' : ''}`} role="status">
+            <span>
+              <strong>{restoredLastPodium ? 'Ultimo podio ripristinato offline' : 'Ultimo podio disponibile offline'}</strong>
+              <small>Solo venue e criteri tassonomizzati · query, posizione e profilo non salvati</small>
+            </span>
+            <button type="button" onClick={deleteLastPodium}>Cancella ultimo podio</button>
+          </div>
+        ) : null}
       </div>
 
       {unsupportedConstraints.length ? (
@@ -1325,46 +1370,6 @@ export default function DiscoveryExperience({ initialQuery, compact = false }: P
             </p>
           </div>
           <button type="button" onClick={() => { searchInputRef.current?.focus(); searchInputRef.current?.select(); }}>Modifica la ricerca</button>
-        </div>
-      ) : null}
-
-      <div className={`travel-origin-control travel-origin-control--${geolocationStatus}`}>
-        <span className="travel-origin-control__icon"><Icon name="pin" /></span>
-        <span className="travel-origin-control__copy">
-          <strong>{sessionOrigin ? 'La tua posizione · solo questa sessione' : 'Origine Duomo'}</strong>
-          <small id="tre-travel-origin-status" aria-live="polite">
-            {geolocationStatus === 'requesting' && 'Richiesta della posizione in corso…'}
-            {geolocationStatus === 'active' && 'Tempi a piedi stimati, non routing. Le coordinate non vengono salvate.'}
-            {geolocationStatus === 'denied' && 'Permesso negato. Puoi riprovare dal browser; resti sull’origine Duomo.'}
-            {geolocationStatus === 'outside-milan' && 'Posizione fuori dall’area di Milano; resti sull’origine Duomo.'}
-            {geolocationStatus === 'error' && 'Posizione non disponibile; resti sull’origine Duomo.'}
-            {geolocationStatus === 'unsupported' && 'Geolocalizzazione non supportata; resti sull’origine Duomo.'}
-            {geolocationStatus === 'idle' && 'Attivazione solo su richiesta; nessuna coordinata viene salvata.'}
-          </small>
-        </span>
-        <button
-          type="button"
-          aria-describedby="tre-travel-origin-status"
-          disabled={geolocationStatus === 'requesting'}
-          onClick={sessionOrigin ? resetTravelOrigin : requestForegroundLocation}
-        >
-          {geolocationStatus === 'requesting'
-            ? 'Attendo…'
-            : sessionOrigin
-              ? 'Ripristina Duomo'
-              : geolocationStatus === 'idle'
-                ? 'Usa la mia posizione'
-                : 'Riprova'}
-        </button>
-      </div>
-
-      {lastPodiumSaved ? (
-        <div className={`last-podium-status ${restoredLastPodium ? 'is-restored' : ''}`} role="status">
-          <span>
-            <strong>{restoredLastPodium ? 'Ultimo podio ripristinato offline' : 'Ultimo podio disponibile offline'}</strong>
-            <small>Solo venue e criteri tassonomizzati · query, posizione e profilo non salvati</small>
-          </span>
-          <button type="button" onClick={deleteLastPodium}>Cancella ultimo podio</button>
         </div>
       ) : null}
 
@@ -1402,21 +1407,24 @@ export default function DiscoveryExperience({ initialQuery, compact = false }: P
               <p>Il podio apparirà appena i candidati reali avranno superato validazione e gate di ranking.</p>
             </div>
           ) : results.length ? (
-            <ol className="podium-list" aria-label="Risultati in ordine di pertinenza">
-              {results.map((venue) => (
-                <PodiumCard
-                  key={venue.id}
-                  venue={venue}
-                  saved={saved.includes(venue.id)}
-                  active={activeMapVenue?.id === venue.id}
-                  onSave={() => toggleSaved(venue.id, venue.name)}
-                  onFocus={() => setActiveVenue(venue.id)}
-                  onOpen={() => openCard(venue)}
-                  onShare={() => shareVenue(venue)}
-                  onReplace={() => replaceVenue(venue)}
-                />
-              ))}
-            </ol>
+            <>
+              <ol className="podium-list" aria-label="Risultati in ordine di pertinenza">
+                {results.map((venue) => (
+                  <PodiumCard
+                    key={venue.id}
+                    venue={venue}
+                    saved={saved.includes(venue.id)}
+                    active={activeMapVenue?.id === venue.id}
+                    onSave={() => toggleSaved(venue.id, venue.name)}
+                    onFocus={() => setActiveVenue(venue.id)}
+                    onOpen={() => openCard(venue)}
+                    onShare={() => shareVenue(venue)}
+                    onReplace={() => replaceVenue(venue)}
+                  />
+                ))}
+              </ol>
+              <p className="podium-disclosure"><Icon name="clock" /> Tempi a piedi stimati dall’origine indicata, non routing. Dettagli e stato delle fonti sono nella scheda.</p>
+            </>
           ) : (
             <div className="podium-empty">
               <Icon name="spark" />

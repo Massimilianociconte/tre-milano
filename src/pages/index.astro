@@ -4,21 +4,24 @@ import BottomNav from '@/components/layout/BottomNav.astro';
 import DiscoveryExperience from '@/components/discovery/DiscoveryExperience';
 import CuratedCollection from '@/components/editorial/CuratedCollection.astro';
 import ResponsiveImage from '@/components/media/ResponsiveImage.astro';
+import '@/styles/homepage-premium.css';
 ---
 
 <BaseLayout
   title="TRE Milano — Tre posti. Quello giusto, adesso."
   description="Scopri dove andare a Milano con una top 3 spiegata: tre scelte motivate per momento, distanza, budget, atmosfera e qualità dei dati."
+  bodyClass="home-shell"
 >
   <div class="home-page">
     <section class="home-hero" aria-labelledby="home-title">
       <div class="home-hero__inner">
         <div class="home-hero__copy">
           <div>
-            <span class="home-hero__eyebrow">Concierge urbano per Milano</span>
-            <h1 id="home-title">Tre posti.<br />Quello giusto, adesso.</h1>
-            <p class="home-hero__lede">La tua top 3 di Milano, spiegata.</p>
-            <p class="home-hero__proof">Scelte filtrate per momento, distanza, budget e atmosfera. Senza liste infinite.</p>
+            <span class="home-hero__edition">Concierge editoriale · Milano</span>
+            <h1 id="home-title">Il meglio di Milano.<br /><em>Selezionato per te.</em></h1>
+            <p class="home-hero__lede">La tua top 3 perfetta.</p>
+            <p class="home-hero__proof">Tre scelte motivate per momento, distanza, budget e atmosfera. Nessuna lista infinita.</p>
+            <a class="home-hero__method" href="/metodologia/">Scopri come scegliamo <span aria-hidden="true">↗</span></a>
           </div>
         </div>
         <ResponsiveImage
@@ -32,6 +35,11 @@ import ResponsiveImage from '@/components/media/ResponsiveImage.astro';
           fetchpriority="high"
           decorative
         />
+        <div class="home-hero__values" aria-label="Valori di TRE Milano">
+          <span><i aria-hidden="true"></i>Curato</span>
+          <span><i aria-hidden="true"></i>Locale</span>
+          <span><i aria-hidden="true"></i>Spiegato</span>
+        </div>
       </div>
     </section>
 
@@ -40,17 +48,32 @@ import ResponsiveImage from '@/components/media/ResponsiveImage.astro';
     <section class="category-section shell" aria-labelledby="categories-title">
       <div class="section-heading section-heading--inline">
         <div>
-          <span class="section-kicker">Esplora Milano</span>
-          <h2 id="categories-title">Parti dall’occasione</h2>
+          <span class="section-kicker">Milano, secondo te</span>
+          <h2 id="categories-title">Non una categoria.<br />Il momento giusto.</h2>
         </div>
-        <p>Le categorie sono scorciatoie. Il consiglio resta contestuale.</p>
+        <p>Quattro modi di iniziare. La ricerca li trasforma in una selezione personale.</p>
       </div>
-      <nav class="category-rail" aria-label="Categorie principali">
-        <a href="/categorie/cocktail-bar/"><svg viewBox="0 0 24 24"><path d="M5 4h14l-7 8v7M8 20h8" /></svg>Cocktail bar</a>
-        <a href="/occasioni/cena-romantica/"><svg viewBox="0 0 24 24"><path d="M8 3v8M5 3v5a3 3 0 0 0 6 0V3M8 11v10M16 3c3 4 3 8 0 10v8" /></svg>Cena romantica</a>
-        <a href="/milano/"><svg viewBox="0 0 24 24"><path d="M4 20V9l8-6 8 6v11M8 20v-5h8v5M8 10h.01M12 10h.01M16 10h.01" /></svg>Rooftop</a>
-        <a href="/quartieri/brera/"><svg viewBox="0 0 24 24"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10" r="2.5" /></svg>Brera</a>
-        <a href="/guide/milano-di-sera/"><svg viewBox="0 0 24 24"><path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.5 8.5 0 1 0 20 15.5Z" /></svg>Milano di sera</a>
+      <nav class="occasion-grid" aria-label="Esplora per occasione">
+        <a class="occasion-card occasion-card--wide" href="/categorie/cocktail-bar/">
+          <img src="/images/venue-cocktail.webp" alt="Cocktail ambrato in un ambiente milanese raccolto" width="900" height="1124" loading="lazy" />
+          <span class="occasion-card__index">01</span>
+          <span class="occasion-card__copy"><small>Dopo il lavoro</small><strong>Aperitivo, fatto bene.</strong><em>Esplora i cocktail bar</em></span>
+        </a>
+        <a class="occasion-card" href="/occasioni/cena-romantica/">
+          <img src="/images/venue-ristorante.webp" alt="Tavolo elegante preparato per una cena a due" width="900" height="1124" loading="lazy" />
+          <span class="occasion-card__index">02</span>
+          <span class="occasion-card__copy"><small>Per due</small><strong>Una cena che resta.</strong><em>Scopri la selezione</em></span>
+        </a>
+        <a class="occasion-card" href="/milano/">
+          <img src="/images/hero-milano.webp" alt="Panorama serale di Milano da una terrazza" width="1672" height="941" loading="lazy" />
+          <span class="occasion-card__index">03</span>
+          <span class="occasion-card__copy"><small>Sopra la città</small><strong>Milano dall’alto.</strong><em>Trova il rooftop</em></span>
+        </a>
+        <a class="occasion-card occasion-card--wide" href="/guide/milano-di-sera/">
+          <img src="/images/galleria-milano.webp" alt="Galleria Vittorio Emanuele II nella luce della sera" width="1400" height="933" loading="lazy" />
+          <span class="occasion-card__index">04</span>
+          <span class="occasion-card__copy"><small>Dopo il tramonto</small><strong>Milano cambia ritmo.</strong><em>Leggi la guida</em></span>
+        </a>
       </nav>
     </section>
 
@@ -59,8 +82,8 @@ import ResponsiveImage from '@/components/media/ResponsiveImage.astro';
     <section class="editorial-split" aria-labelledby="night-title">
       <div class="editorial-split__copy">
         <div>
-          <span class="section-kicker">Guida curata</span>
-          <h2 id="night-title">Milano di sera, oltre la prima impressione.</h2>
+          <span class="section-kicker">Taccuino 01 · La sera</span>
+          <h2 id="night-title">La città non si sceglie dalla classifica.</h2>
           <p>Atmosfera, facilità di conversazione e distanza reale contano più della popolarità. La guida mostra criteri, trade-off e stato delle fonti.</p>
           <a class="text-link" href="/guide/milano-di-sera/">Leggi la guida <svg viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5" /></svg></a>
         </div>
@@ -75,7 +98,7 @@ import ResponsiveImage from '@/components/media/ResponsiveImage.astro';
         <div class="section-heading section-heading--inline">
           <div>
             <span class="section-kicker">Metodo, non magia</span>
-            <h2 id="method-title">Perché proprio questi tre?</h2>
+            <h2 id="method-title">Tre scelte.<br />Ogni scelta, una ragione.</h2>
           </div>
           <p>Il podio nasce da vincoli, qualità del dato e diversità utile.</p>
         </div>

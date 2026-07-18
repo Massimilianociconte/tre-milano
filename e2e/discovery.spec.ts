@@ -57,22 +57,27 @@ test('il podio mantiene DOM semantico 1–2–3 e composizione visuale 2–1–3
 
   const crownStyles = await cards.evaluateAll((items) => items.map((item) => {
     const frame = item.querySelector<HTMLElement>('.podium-card__frame');
+    const visual = item.querySelector<HTMLElement>('.podium-card__visual');
     const outline = item.querySelector<SVGElement>('.podium-card__outline');
     const rank = item.querySelector<HTMLElement>('.podium-card__rank');
-    if (!frame || !outline || !rank) return null;
-    const frameRect = frame.getBoundingClientRect();
+    if (!frame || !visual || !outline || !rank) return null;
+    const visualRect = visual.getBoundingClientRect();
     const rankRect = rank.getBoundingClientRect();
     return {
-      clipPath: getComputedStyle(frame).clipPath,
+      frameClipPath: getComputedStyle(frame).clipPath,
+      visualClipPath: getComputedStyle(visual).clipPath,
       outlineStroke: getComputedStyle(outline).stroke,
-      rankInsideCrown: rankRect.top >= frameRect.top && rankRect.bottom < frameRect.top + (frameRect.height * 0.2),
+      rankInsideCrown: rankRect.top >= visualRect.top && rankRect.bottom < visualRect.top + (visualRect.height * 0.3),
+      crownIsShallow: visualRect.height < frame.getBoundingClientRect().height * 0.55,
     };
   }));
   expect(crownStyles.every((style) => (
     style
-    && style.clipPath.startsWith('url(')
+    && style.frameClipPath === 'none'
+    && style.visualClipPath.startsWith('url(')
     && style.outlineStroke !== 'none'
     && style.rankInsideCrown
+    && style.crownIsShallow
   ))).toBe(true);
 
   const domRanks = await cards.evaluateAll((items) => items.map((item) => item.getAttribute('data-rank')));
@@ -85,7 +90,28 @@ test('il podio mantiene DOM semantico 1–2–3 e composizione visuale 2–1–3
     }))
     .sort((left, right) => left.left - right.left)
     .map(({ rank }) => rank));
-  expect(visualRanks).toEqual(['2', '1', '3']);
+  expect(visualRanks).toEqual((page.viewportSize()?.width ?? 999) <= 760 ? ['1', '2', '3'] : ['2', '1', '3']);
+
+  const geometry = await cards.evaluateAll((items) => items.map((item) => {
+    const card = item.getBoundingClientRect();
+    const name = item.querySelector('h3')?.getBoundingClientRect();
+    const cta = item.querySelector<HTMLElement>('.podium-card__open')?.getBoundingClientRect();
+    return {
+      rank: item.getAttribute('data-rank'),
+      card: { left: card.left, right: card.right, top: card.top, bottom: card.bottom },
+      nameInside: Boolean(name && name.left >= card.left && name.right <= card.right),
+      ctaInside: Boolean(cta && cta.left >= card.left && cta.right <= card.right),
+    };
+  }));
+  expect(geometry.every(({ nameInside, ctaInside }) => nameInside && ctaInside)).toBe(true);
+  if ((page.viewportSize()?.width ?? 999) <= 760) {
+    const rankOne = geometry.find(({ rank }) => rank === '1')!;
+    const rankTwo = geometry.find(({ rank }) => rank === '2')!;
+    const rankThree = geometry.find(({ rank }) => rank === '3')!;
+    expect(rankOne.card.right - rankOne.card.left).toBeGreaterThan(rankTwo.card.right - rankTwo.card.left);
+    expect(rankTwo.card.right).toBeLessThanOrEqual(rankThree.card.left);
+    expect(rankTwo.card.top).toBeGreaterThanOrEqual(rankOne.card.bottom);
+  }
 
   const rankOneMediaHeight = await page.locator('.podium-card[data-rank="1"] .podium-card__media')
     .evaluate((element) => element.getBoundingClientRect().height);
@@ -128,7 +154,7 @@ test('mappa e podio restano sincronizzati anche da tastiera', async ({ page }) =
 test('la ricerca dalla homepage conserva la query e rende risultati reali', async ({ page }) => {
   const runtimeErrors = collectRuntimeErrors(page);
   await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await expect(page.getByRole('heading', { level: 1, name: /Tre posti/ })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: /Il meglio di Milano/ })).toBeVisible();
 
   const search = page.getByLabel('Descrivi la serata che vuoi');
   await search.fill(SEARCH_QUERY);
