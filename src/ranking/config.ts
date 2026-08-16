@@ -4,7 +4,7 @@
  * Any behavioural change to parsing, scoring or podium composition must bump
  * this value and update the reviewed golden dataset in the same change.
  */
-export const RANKING_VERSION = 'deterministic-local-v3' as const;
+export const RANKING_VERSION = 'deterministic-local-v4' as const;
 
 export const RANKING_WEIGHTS = Object.freeze({
   confidence: 24,
@@ -20,6 +20,11 @@ export const RANKING_WEIGHTS = Object.freeze({
   atmosphereSecondary: 7,
   semanticSimilarity: 38,
   conceptDefault: 7,
+  /**
+   * Il contributo del profilo di gusto è calcolato in tasteProfileAffinity
+   * (cap ~16, intensità slider + soft-cap). Non è un peso moltiplicativo qui:
+   * entra come addendo PROFILE_MATCH dopo i hard gate.
+   */
 } as const);
 
 export const RANKING_THRESHOLDS = Object.freeze({

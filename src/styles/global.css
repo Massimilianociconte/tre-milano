@@ -220,6 +220,13 @@ a {
   border-radius: 50%;
   font-family: var(--font-display);
   letter-spacing: 0.04em;
+  flex: none;
+}
+
+.profile-link__avatar svg {
+  display: block;
+  width: 1.05rem;
+  height: 1.05rem;
 }
 
 .mobile-menu {
@@ -3334,6 +3341,17 @@ a {
 }
 
 .site-footer__legal span:last-child { text-align: right; }
+
+.site-footer__legal a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.18s ease;
+}
+
+.site-footer__legal a:hover,
+.site-footer__legal a:focus-visible {
+  color: var(--gold);
+}
 
 .bottom-nav {
   display: none;

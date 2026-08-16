@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-07-18T17:30:26.490Z",
+  "generatedAt": "2026-08-16T18:54:35.620Z",
   "dataset": {
     "version": "fixture-baseline-v1",
-    "rankingVersion": "deterministic-local-v3",
+    "rankingVersion": "deterministic-local-v4",
     "catalogSnapshot": "fixture-2026-07-16",
     "catalogMode": "fixture",
     "referenceDate": "2026-07-16T12:00:00+02:00",
@@ -28,8 +28,8 @@
     "emptyRate": 0.2,
     "unexpectedEmptyRate": 0,
     "expectedEmptyAccuracy": 1,
-    "warmP95LatencyMs": 1.56,
-    "coldP95LatencyMs": 86.056,
+    "warmP95LatencyMs": 0.951,
+    "coldP95LatencyMs": 3.876,
     "warmSampleCount": 600
   },
   "gates": [
@@ -63,14 +63,14 @@
     },
     {
       "metric": "warmP95LatencyMs",
-      "actual": 1.5604580000001533,
+      "actual": 0.9511249999999336,
       "target": 700,
       "operator": "<",
       "passed": true
     },
     {
       "metric": "coldP95LatencyMs",
-      "actual": 86.056,
+      "actual": 3.876,
       "target": 1500,
       "operator": "<",
       "passed": true
@@ -111,7 +111,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 86.056
+      "coldLatencyMs": 8.86
     },
     {
       "id": "core-navigli-wine",
@@ -138,7 +138,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 5.009
+      "coldLatencyMs": 1.479
     },
     {
       "id": "core-porta-romana-dinner",
@@ -165,7 +165,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 37.308
+      "coldLatencyMs": 1.717
     },
     {
       "id": "core-duomo-rooftop",
@@ -192,7 +192,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 7.61
+      "coldLatencyMs": 1.857
     },
     {
       "id": "core-isola-brunch",
@@ -219,7 +219,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 17.879
+      "coldLatencyMs": 1.945
     },
     {
       "id": "core-moscova-after-dinner",
@@ -246,7 +246,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 9.13
+      "coldLatencyMs": 1.827
     },
     {
       "id": "budget-under-30",
@@ -273,7 +273,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 4.118
+      "coldLatencyMs": 0.755
     },
     {
       "id": "hard-only-rooftop",
@@ -300,7 +300,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 12.227
+      "coldLatencyMs": 0.567
     },
     {
       "id": "hard-only-restaurant",
@@ -327,7 +327,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 10.154
+      "coldLatencyMs": 0.45
     },
     {
       "id": "hard-only-wine-bar",
@@ -354,7 +354,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 3.824
+      "coldLatencyMs": 0.41
     },
     {
       "id": "hard-only-cafe",
@@ -381,7 +381,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 3.287
+      "coldLatencyMs": 0.589
     },
     {
       "id": "hard-only-cocktail",
@@ -414,7 +414,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 2.675
+      "coldLatencyMs": 0.47
     },
     {
       "id": "occasion-out-of-town",
@@ -441,7 +441,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 9.838
+      "coldLatencyMs": 1.551
     },
     {
       "id": "occasion-first-date",
@@ -480,7 +480,7 @@
       "thirdSelection": "wildcard",
       "wildcardUseful": true,
       "annotationIssues": [],
-      "coldLatencyMs": 7.838
+      "coldLatencyMs": 3.876
     },
     {
       "id": "occasion-anniversary",
@@ -507,7 +507,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 5.571
+      "coldLatencyMs": 1.329
     },
     {
       "id": "concept-natural-wine",
@@ -534,7 +534,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 3.698
+      "coldLatencyMs": 1.517
     },
     {
       "id": "concept-author-cocktail",
@@ -561,7 +561,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 91.47
+      "coldLatencyMs": 1.451
     },
     {
       "id": "occasion-late-music",
@@ -588,7 +588,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 4.689
+      "coldLatencyMs": 1.242
     },
     {
       "id": "occasion-breakfast-work",
@@ -615,7 +615,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 5.602
+      "coldLatencyMs": 1.278
     },
     {
       "id": "concept-iconic-view",
@@ -642,7 +642,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 4.243
+      "coldLatencyMs": 1.232
     },
     {
       "id": "hard-exclusions",
@@ -675,7 +675,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 3.883
+      "coldLatencyMs": 0.947
     },
     {
       "id": "hard-budget-distance",
@@ -708,7 +708,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 1.596
+      "coldLatencyMs": 0.573
     },
     {
       "id": "temporal-cocktail-2230",
@@ -741,7 +741,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 2.932
+      "coldLatencyMs": 0.973
     },
     {
       "id": "temporal-dinner-tomorrow",
@@ -768,7 +768,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 4.408
+      "coldLatencyMs": 0.811
     },
     {
       "id": "adversarial-karaoke",
@@ -787,7 +787,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 3.004
+      "coldLatencyMs": 0.799
     },
     {
       "id": "adversarial-sushi",
@@ -806,7 +806,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 12.817
+      "coldLatencyMs": 0.764
     },
     {
       "id": "adversarial-pizzeria",
@@ -825,7 +825,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 3.532
+      "coldLatencyMs": 0.782
     },
     {
       "id": "safety-gluten-free",
@@ -844,7 +844,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 7.972
+      "coldLatencyMs": 0.327
     },
     {
       "id": "safety-wheelchair",
@@ -863,7 +863,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 8.688
+      "coldLatencyMs": 0.331
     },
     {
       "id": "hard-impossible-budget",
@@ -882,7 +882,7 @@
       "thirdSelection": "none",
       "wildcardUseful": null,
       "annotationIssues": [],
-      "coldLatencyMs": 3.126
+      "coldLatencyMs": 0.324
     }
   ]
 }

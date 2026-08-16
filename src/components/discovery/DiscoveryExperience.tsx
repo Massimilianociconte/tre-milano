@@ -3,7 +3,13 @@ import { createAnalyticsDispatcher, type WildcardDimension } from '@/analytics/e
 import { SITE } from '@/config/site';
 import { venues as catalogVenues } from '@/data/venues';
 import { buildSessionTravelEstimates, isWithinMilanDiscoveryArea } from '@/domain/discovery-location';
-import { FAVORITES_STORAGE_KEY } from '@/domain/favorites';
+import {
+  isVenueSaved,
+  readSavedVenuesFromStorage,
+  toggleSavedVenue,
+  writeSavedVenuesToStorage,
+  type SavedVenueEntry,
+} from '@/domain/favorites';
 import {
   clearLastPodium,
   type LastPodiumSnapshotV1,
@@ -362,7 +368,7 @@ export default function DiscoveryExperience({ initialQuery, compact = false }: P
   const [locationExplicit, setLocationExplicit] = useState(false);
   const [maxSpend, setMaxSpend] = useState<number | null>(null);
   const [onlyOpen, setOnlyOpen] = useState(false);
-  const [saved, setSaved] = useState<string[]>([]);
+  const [saved, setSaved] = useState<SavedVenueEntry[]>([]);
   const [savedReady, setSavedReady] = useState(false);
   const [savedNotice, setSavedNotice] = useState('');
   const [dismissedVenueIds, setDismissedVenueIds] = useState<string[]>([]);
@@ -772,8 +778,7 @@ export default function DiscoveryExperience({ initialQuery, compact = false }: P
     }
 
     try {
-      const stored = JSON.parse(window.localStorage.getItem(FAVORITES_STORAGE_KEY) || '[]');
-      if (Array.isArray(stored)) setSaved(stored.filter((item): item is string => typeof item === 'string'));
+      setSaved(readSavedVenuesFromStorage(window.localStorage));
     } catch {
       // Preferiti corrotti o storage disabilitato: la ricerca resta sempre utilizzabile.
     }
@@ -811,7 +816,7 @@ export default function DiscoveryExperience({ initialQuery, compact = false }: P
   useEffect(() => {
     if (!savedReady) return;
     try {
-      window.localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(saved));
+      writeSavedVenuesToStorage(window.localStorage, saved);
     } catch {
       // La persistenza è un miglioramento progressivo, non un requisito per il ranking.
     }
@@ -1010,11 +1015,11 @@ export default function DiscoveryExperience({ initialQuery, compact = false }: P
     setSavedNotice('Ultimo podio offline cancellato.');
   };
 
-  const toggleSaved = (id: string, name: string) => {
-    const removing = saved.includes(id);
-    setSaved((current) => removing ? current.filter((item) => item !== id) : [...current, id]);
-    setSavedNotice(removing ? `${name} rimosso dai preferiti.` : `${name} salvato nei preferiti.`);
-    analytics.emit('venue_saved', { venueId: id, saved: !removing, source: 'podium' });
+  const toggleSaved = (venue: Venue) => {
+    const result = toggleSavedVenue(saved, venue);
+    setSaved(result.items);
+    setSavedNotice(result.saved ? `${venue.name} salvato nei preferiti.` : `${venue.name} rimosso dai preferiti.`);
+    analytics.emit('venue_saved', { venueId: venue.id, saved: result.saved, source: 'podium' });
   };
 
   const shareVenue = async (venue: RankedVenue) => {
@@ -1133,8 +1138,8 @@ export default function DiscoveryExperience({ initialQuery, compact = false }: P
     : 'Nessun impatto';
   const profileDetailCopy = profileIsActive
     ? profileMatchedResults
-      ? 'Le preferenze dichiarate hanno affinato il podio come segnale lieve. Budget, distanza, esclusioni e requisiti della ricerca restano sempre prioritari.'
-      : 'Nessuna affinità esplicita è presente nelle tre scelte. Il profilo non ha alterato l’ordine e i vincoli della ricerca restano prioritari.'
+      ? 'Le preferenze dichiarate (intensità degli slider e interessi) hanno riordinato i candidati ammissibili in modo deterministico. Budget, distanza, esclusioni e requisiti espliciti della ricerca restano sempre prioritari.'
+      : 'Nessuna affinità misurabile con le tre scelte: il profilo non ha spostato l’ordine. Vincoli e requisiti della ricerca restano prioritari.'
     : tasteProfile?.state === 'suspended'
       ? 'Il profilo è sospeso e non influenza il podio. Puoi riattivarlo dalla pagina Profilo.'
       : 'Il podio ripristinato offline conserva i propri criteri e non viene ricalcolato con il profilo locale.';
@@ -1455,9 +1460,9 @@ export default function DiscoveryExperience({ initialQuery, compact = false }: P
                   <PodiumCard
                     key={venue.id}
                     venue={venue}
-                    saved={saved.includes(venue.id)}
+                    saved={isVenueSaved(saved, venue.id)}
                     active={activeMapVenue?.id === venue.id}
-                    onSave={() => toggleSaved(venue.id, venue.name)}
+                    onSave={() => toggleSaved(venue)}
                     onFocus={() => setActiveVenue(venue.id)}
                     onOpen={() => openCard(venue)}
                     onShare={() => shareVenue(venue)}

@@ -193,7 +193,7 @@ export default function TasteProfile() {
           <header className={styles.header}>
             <p>Preferenze personali</p>
             <h1 id="taste-profile-title">Il tuo profilo di gusto</h1>
-            <span>Più intenzione, più controllo. Solo le preferenze che dichiari vengono usate; i cursori non toccati restano neutri.</span>
+            <span>Solo ciò che dichiari conta: più spingi uno slider, più pesa nel podio. I cursori non toccati restano neutri e non inviano nulla online.</span>
             <div className={styles.profileState} data-state={profile.state}>
               <span><i aria-hidden="true" />{profile.state === 'active' ? 'Profilo attivo' : 'Profilo sospeso'}</span>
               <button type="button" onClick={toggleProfileState}>

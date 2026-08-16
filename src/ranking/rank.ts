@@ -933,16 +933,28 @@ function scoreVenue(
     );
   }
 
-  // Profile affinity is intentionally evaluated after hard eligibility and
-  // contributes at most four points. It can refine a valid set, never relax it.
+  // Profilo locale: dopo hard eligibility. Intensità slider + soft-cap
+  // (vedi tasteProfileAffinity). Può raffinare l’ordine, mai rilassare vincoli.
+  // Punteggio anche negativo (mismatch lieve) ma con floor controllato.
   const profileAffinity = tasteProfileAffinity(venue, tasteProfile);
-  if (profileAffinity.score > 0) {
-    addEvidence(
-      evidence,
-      profileAffinity.score,
-      'PROFILE_MATCH',
-      `profilo locale: ${profileAffinity.matches.slice(0, RANKING_THRESHOLDS.evidenceMatchesPerSignal).join(', ')}`,
-    );
+  if (profileAffinity.score !== 0 || profileAffinity.matches.length) {
+    if (profileAffinity.score !== 0) {
+      addEvidence(
+        evidence,
+        profileAffinity.score,
+        'PROFILE_MATCH',
+        profileAffinity.matches.length
+          ? `profilo locale: ${profileAffinity.matches.slice(0, RANKING_THRESHOLDS.evidenceMatchesPerSignal).join(', ')}`
+          : undefined,
+      );
+    } else if (profileAffinity.matches.length) {
+      addEvidence(
+        evidence,
+        0,
+        'PROFILE_MATCH',
+        `profilo locale: ${profileAffinity.matches.slice(0, RANKING_THRESHOLDS.evidenceMatchesPerSignal).join(', ')}`,
+      );
+    }
     evidence.profileMatches = profileAffinity.matches;
   }
 

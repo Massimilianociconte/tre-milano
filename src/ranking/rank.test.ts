@@ -67,7 +67,7 @@ function runtimeGoldVenue(overrides: Partial<Venue> = {}): Venue {
 
 describe('normalizzazione italiana', () => {
   it('espone una configurazione ranking versionata e priva di magic number nel contratto pubblico', () => {
-    expect(RANKING_VERSION).toBe('deterministic-local-v3');
+    expect(RANKING_VERSION).toBe('deterministic-local-v4');
     expect(RANKING_THRESHOLDS.explanationReasonLimit).toBe(3);
     expect(RANKING_WEIGHTS.confidence).toBeGreaterThan(0);
     expect(Object.isFrozen(RANKING_THRESHOLDS)).toBe(true);
@@ -688,12 +688,29 @@ describe('profilo di gusto locale', () => {
     interests: ['Rooftop', 'Vista Duomo'],
   };
 
-  it('applica il profilo soltanto come segnale debole e spiegabile', () => {
+  it('applica il profilo come segnale ponderato e spiegabile', () => {
     const results = rankVenues('', undefined, venues, {}, rooftopProfile);
     const rooftop = results.find((venue) => venue.id === 'quota-ventuno');
 
     expect(rooftop?.reasonCodes).toContain('PROFILE_MATCH');
     expect(rooftop?.profileMatches).toEqual(expect.arrayContaining(['Rooftop', 'Vista Duomo']));
+  });
+
+  it('riordina in modo deterministico i candidati ammissibili in base al profilo', () => {
+    const baseline = rankVenues('', undefined, venues);
+    const withProfile = rankVenues('', undefined, venues, {}, rooftopProfile);
+
+    expect(withProfile.map(({ id }) => id)).not.toEqual(baseline.map(({ id }) => id));
+    // Un profilo rooftop deve spingere in alto i rooftop ammissibili rispetto al baseline.
+    const baselineRooftopRank = baseline.findIndex((venue) => venue.id === 'quota-ventuno');
+    const profileRooftopRank = withProfile.findIndex((venue) => venue.id === 'quota-ventuno');
+    expect(profileRooftopRank).toBeGreaterThanOrEqual(0);
+    if (baselineRooftopRank >= 0) {
+      expect(profileRooftopRank).toBeLessThanOrEqual(baselineRooftopRank);
+    }
+    // Stesso input → stesso ordine (determinismo).
+    expect(rankVenues('', undefined, venues, {}, rooftopProfile).map(({ id, score }) => ({ id, score })))
+      .toEqual(withProfile.map(({ id, score }) => ({ id, score })));
   });
 
   it('non permette al profilo di superare un hard constraint', () => {
